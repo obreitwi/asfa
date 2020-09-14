@@ -1,0 +1,15 @@
+default_host: my-remote-site
+verify_via_hash: true
+auth:
+  interactive: true
+  use_agent: true
+hosts:
+  my-remote-site:
+    # note: port is optional and defaults to 22
+    hostname: my-hostname.eu:222
+    folder: /var/www/default/my-uploads
+    url: https://my-domain.eu/my-uploads
+    group: www-data
+    auth:
+      interactive: false
+      use_agent: true

@@ -1,0 +1,37 @@
+[package]
+name = "asfa"
+version = "0.1.0"
+authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
+edition = "2018"
+description = "Avoid sending file attachments by uploading to a remote site with non-guessable (hash-based) prefix and print URLs."
+keywords = ["cli", "file", "ssh", "upload"]
+license = "MIT OR Apache-2.0"
+categories = ["command-line-utilities"]
+readme = "README.md"
+homepage = "https://github.com/obreitwi/asfa"
+repository = "https://github.com/obreitwi/asfa.git"
+documentation = "https://docs.rs/asfa"
+
+[features]
+doc = []
+
+[dependencies]
+anyhow = "1.0.32"
+clap = "3.0.0-beta.1" # TODO: On update: short options need to be char instead of string literals
+expanduser = "1.2.1"
+hex = "0.4.2"
+log = "0.4.8"
+percent-encoding = "2.1.0"
+rand = "0.7.3"
+rpassword = "5.0.0"
+sha2="0.9.1"
+simple-error = "0.2.1"
+simple_logger = "1.6.0"
+ssh2 = "0.8.0"
+thiserror = "1.0.20"
+whoami = "0.9.0"
+yaml-rust = "0.4.4"
+
+[package.metadata.docs.rs]
+features = ["doc"]
+targets = ["x86_64-unknown-linux-gnu"]

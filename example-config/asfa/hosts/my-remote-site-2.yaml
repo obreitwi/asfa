@@ -1,0 +1,5 @@
+# note: port is optional and defaults to 22
+hostname: my-hostname-2.eu
+folder: /var/www/default/my-uploads
+url: https://my-domain-2.eu/my-uploads
+group: www-data
