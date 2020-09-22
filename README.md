@@ -3,7 +3,7 @@
 Upload files via ssh to a remote server and generate a seemingly random link.
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt
 ```
 
 In case you have a webserver with ssh access, you can avoid sending files via
