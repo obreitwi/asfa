@@ -1,6 +1,6 @@
 [package]
 name = "asfa"
-version = "0.1.1"
+version = "0.1.2pre"
 authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
 edition = "2018"
 description = "Avoid sending file attachments by uploading to a remote site with non-guessable (hash-based) prefix and print URLs."
@@ -10,7 +10,7 @@ categories = ["command-line-utilities"]
 readme = "README.md"
 homepage = "https://github.com/obreitwi/asfa"
 repository = "https://github.com/obreitwi/asfa.git"
-documentation = "https://docs.rs/asfa"
+documentation = "https://github.com/obreitwi/asfa"
 
 [features]
 doc = []
