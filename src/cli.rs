@@ -12,7 +12,7 @@ use crate::cmd::{Clean, List, Push};
 pub struct Opts {
     /// Path to configuration folder. Alternatively, ASFA_CONFIG can be set.
     /// [default: ~/.config/asfa]
-    #[clap(short = "c", long = "config")]
+    #[clap(short = 'c', long = "config")]
     pub config: Option<String>,
 
     /// Set loglevel.
@@ -26,7 +26,7 @@ pub struct Opts {
 
     /// Name of remote site to push to. Only relevant if several remote sites are configured.
     /// The default host can be set in config via `default_host`-option.
-    #[clap(short = "H", long)]
+    #[clap(short = 'H', long)]
     pub host: Option<String>,
 
     #[clap(subcommand)]

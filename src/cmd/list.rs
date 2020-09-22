@@ -14,7 +14,7 @@ pub struct List {
     url_only: bool,
 
     /// Only list last `n` entries
-    #[clap(short = "n", long)]
+    #[clap(short = 'n', long)]
     last: Option<usize>,
 
     /// Specify indices of files to list (if none given, list all).
