@@ -1,13 +1,15 @@
+
 # `asfa` - avoid sending file attachments
 
-Upload files via ssh to a remote server and generate a seemingly random link.
+<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="128" align="left">Upload files via ssh to a remote server and generate a seemingly random link.
+
 ```text
 $ asfa push my-file.txt
 https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt
 ```
 
 In case you have a webserver with ssh access, you can avoid sending files via
-email or directly and instead send a link instead.
+email or peer-to-peer and send a link instead.
 
 As a small exercise for writing rust, I ported a small [python
 script](https://github.com/obreitwi/py-rpush) I had been using for a couple of
