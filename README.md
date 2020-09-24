@@ -93,7 +93,7 @@ or build from source
 
 ```text
 $ git clone https://github.com/obreitwi/asfa.git
-$ cargo build --path asfa
+$ cargo install --path asfa
 ```
 
 ## Configuration
