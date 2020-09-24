@@ -1,5 +1,6 @@
 default_host: my-remote-site
 verify_via_hash: true
+length_prefix: 32
 auth:
   interactive: true
   use_agent: true

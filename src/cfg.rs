@@ -11,10 +11,7 @@ use yaml_rust::{yaml::Hash, Yaml, YamlLoader};
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
-use crate::util::{
-    get_bool_from, get_dict_from, get_optional, get_required, get_string_from, yaml_string,
-    InvalidYamlTypeError,
-};
+use crate::util::*;
 
 /// The main configuration
 #[derive(Debug)]
@@ -27,6 +24,9 @@ pub struct Config {
 
     /// List of all configured hosts.
     hosts: HashMap<String, Host>,
+
+    /// Length of prefix to use unless overwritten in host
+    pub prefix_length: u8,
 
     /// Compute hash on remote side after upload to verify.
     pub verify_via_hash: bool,
@@ -64,6 +64,9 @@ pub struct Host {
     /// If the user REALLY REALLY wants to, a plaintext password can be provided (but it is not
     /// recommended!).
     pub password: Option<String>,
+
+    /// Length of prefix to use
+    pub prefix_length: Option<u8>,
 
     /// url-prefix to apply to random link
     pub url: String,
@@ -193,6 +196,13 @@ impl Config {
         };
 
         let mut hosts = HashMap::new();
+        let prefix_length = {
+            let length = get_int_from(config_yaml, "prefix_length")?
+                .cloned()
+                .unwrap_or(32);
+            check_prefix_length(length)?;
+            length as u8
+        };
 
         match config_yaml.get(&yaml_string("hosts")) {
             Some(Yaml::Hash(dict)) => {
@@ -239,6 +249,7 @@ impl Config {
 
         Ok(Config {
             auth,
+            prefix_length,
             hosts,
             default_host,
             verify_via_hash,
@@ -286,17 +297,26 @@ impl Host {
                 None => None,
             };
 
+            let prefix_length = match get_optional(dict, "prefix_length", get_int_from)? {
+                Some(prefix) => {
+                    check_prefix_length(*prefix)?;
+                    Some(*prefix as u8)
+                }
+                None => None,
+            };
+
             let password = get_optional(dict, "password", get_string_from)?.cloned();
 
             Ok(Host {
                 alias,
-                hostname,
-                url,
-                user,
+                auth,
                 folder,
                 group,
-                auth,
+                hostname,
                 password,
+                prefix_length,
+                url,
+                user,
             })
         } else {
             bail!("Invalid yaml data for Host-alias '{}'", alias);
@@ -330,6 +350,13 @@ impl Auth {
             interactive,
         })
     }
+}
+
+fn check_prefix_length(length: i64) -> Result<()> {
+    if length < 8 || 64 < length {
+        bail! {"Prefix needs to be between 8 and 64 characters."};
+    }
+    Ok(())
 }
 
 #[cfg(test)]

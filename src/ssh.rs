@@ -142,9 +142,19 @@ impl<'a> SshSession<'a> {
     }
 
     /// Get hash of the remote file
-    pub fn get_remote_hash(&self, path: &Path) -> Result<String> {
+    pub fn get_remote_hash(&self, path: &Path, length: u8) -> Result<String> {
+        let hasher = if length == 0 {
+            bail!("Length cannot be zero!");
+        } else if length <= 32 {
+            "sha256sum"
+        } else if length <= 64 {
+            "sha512sum"
+        } else {
+            bail!("Length should be smaller than 64.");
+        };
+
         let mut channel = self.raw.channel_session()?;
-        let cmd = format!("sha256sum \"{}\"", path.display());
+        let cmd = format!("{} \"{}\"", hasher, path.display());
         channel.exec(&cmd)?;
         let mut stdout = String::new();
         let mut stderr = String::new();
@@ -153,7 +163,7 @@ impl<'a> SshSession<'a> {
         channel.wait_close()?;
         match channel.exit_status()? {
             0 => { /* just continue */ }
-            127 => bail!("sha256sum not found on remote site."),
+            127 => bail!("{} not found on remote site.", hasher),
             s => bail!(
                 "Computing remote hash exited with {}. Stdout: {} Stderr: {}",
                 s,
@@ -161,11 +171,11 @@ impl<'a> SshSession<'a> {
                 stderr
             ),
         }
-        Ok(stdout
+        let full_hash = stdout
             .split_whitespace()
             .next()
-            .context("No hash found in output.")?
-            .to_string())
+            .context("No hash found in output.")?;
+        Ok(full_hash[..length as usize].to_string())
     }
 
     /// Remove the given folder and its contents

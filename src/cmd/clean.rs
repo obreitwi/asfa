@@ -25,7 +25,7 @@ pub struct Clean {
 }
 
 impl Command for Clean {
-    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         debug!("Cleaning remote files..");
 
         let files = session.list_files(&session.host.folder)?;
@@ -47,10 +47,8 @@ impl Command for Clean {
             Ok(())
         };
 
-        if self.indices.len() == 0 && self.files.len() == 0
-        {
-            for idx in 0..num_files
-            {
+        if self.indices.len() == 0 && self.files.len() == 0 {
+            for idx in 0..num_files {
                 remove_idx(idx as usize)?;
             }
         }
@@ -64,7 +62,10 @@ impl Command for Clean {
             let mut folder = PathBuf::new();
             folder.push(&session.host.folder);
 
-            let hash = get_hash(Path::new(file))?;
+            let hash = get_hash(
+                Path::new(file),
+                session.host.prefix_length.unwrap_or(config.prefix_length),
+            )?;
             folder.push(&hash);
             session.remove_folder(&folder)?;
         }

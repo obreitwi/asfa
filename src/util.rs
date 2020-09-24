@@ -1,6 +1,5 @@
 use anyhow::{bail, Result};
 use log::{debug, error};
-use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -19,9 +18,22 @@ pub fn yaml_string(s: &str) -> Yaml {
     Yaml::String(String::from(s))
 }
 
-/// Get SHA256 digest of given file
-pub fn get_hash(path: &Path) -> Result<String> {
-    let mut hash = Sha256::new();
+/// Get hash digest of given file with chosen length
+pub fn get_hash(path: &Path, length: u8) -> Result<String> {
+    let hash = if length == 0 {
+        bail!("Length cannot be zero!");
+    } else if length <= 32 {
+        get_explicit_hash::<sha2::Sha256>(path)?
+    } else if length <= 64 {
+        get_explicit_hash::<sha2::Sha512>(path)?
+    } else {
+        bail!("Length should be smaller than 64.");
+    };
+    Ok(hash[..length as usize].to_string())
+}
+
+fn get_explicit_hash<Hasher: sha2::Digest>(path: &Path) -> Result<String> {
+    let mut hash = Hasher::new();
     let mut reader = BufReader::new(File::open(path)?);
     loop {
         let buf = &reader.fill_buf()?;
