@@ -1,6 +1,7 @@
 use crate::cfg::{Auth, Host};
 
 use anyhow::{bail, Context, Result};
+use indicatif::ProgressBar;
 use log::{debug, error, info};
 use rpassword::prompt_password_stderr;
 use ssh2::Session as RawSession;
@@ -213,7 +214,9 @@ impl<'a> SshSession<'a> {
             .scp_send(path_remote, 0o644, size, None)
             .with_context(|| format!("Could not create remote file: {}", path_remote.display()))?;
 
+        let bar = ProgressBar::new(local_file.metadata()?.len());
         let mut reader = BufReader::new(local_file);
+
         loop {
             let buf = &reader.fill_buf()?;
             let to_write = buf.len();
@@ -223,6 +226,7 @@ impl<'a> SshSession<'a> {
                     .context("Failed to write chunk to remote file.")?;
                 debug!("Wrote {} bytes..", to_write);
                 &reader.consume(to_write);
+                bar.inc(to_write as u64);
             } else {
                 break;
             }
