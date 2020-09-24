@@ -22,11 +22,11 @@ pub struct Config {
     /// Authentication settings to use if no host-specific authentication settings specified.
     pub auth: Auth,
 
-    /// List of all configured hosts.
-    hosts: HashMap<String, Host>,
-
     /// Default host to upload to.
     default_host: Option<String>,
+
+    /// List of all configured hosts.
+    hosts: HashMap<String, Host>,
 
     /// Compute hash on remote side after upload to verify.
     pub verify_via_hash: bool,
@@ -48,14 +48,8 @@ pub struct Host {
     /// Alias under which the host is known
     pub alias: String,
 
-    /// Self-explanatory (if not set alias will be used)
-    pub hostname: Option<String>,
-
-    /// url-prefix to apply to random link
-    pub url: String,
-
-    /// The user to sign in, otherwise ssh config will be used.
-    pub user: Option<String>,
+    /// Overwrite global authentication settings for this host.
+    pub auth: Option<Auth>,
 
     /// In which folder do we store files on the host.
     pub folder: PathBuf,
@@ -64,12 +58,18 @@ pub struct Host {
     /// readable by the webserver.
     pub group: Option<String>,
 
+    /// Self-explanatory (if not set alias will be used)
+    pub hostname: Option<String>,
+
     /// If the user REALLY REALLY wants to, a plaintext password can be provided (but it is not
     /// recommended!).
     pub password: Option<String>,
 
-    /// Overwrite global authentication settings for this host.
-    pub auth: Option<Auth>,
+    /// url-prefix to apply to random link
+    pub url: String,
+
+    /// The user to sign in, otherwise ssh config will be used.
+    pub user: Option<String>,
 }
 
 fn default_config_directories() -> Vec<&'static str> {
