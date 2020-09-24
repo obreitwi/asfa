@@ -1,7 +1,11 @@
 
 # `asfa` - avoid sending file attachments
 
-<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="128" align="left">Upload files via ssh to a remote server and generate a seemingly random link.
+<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96" align="center">
+
+Avoid sending file attachments by uploading them via SSH to a remote site and
+sending a publicly-accessible URL with non-guessable (hash-based) prefix
+instead.
 
 ```text
 $ asfa push my-file.txt
