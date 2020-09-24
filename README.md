@@ -1,7 +1,9 @@
 
 # `asfa` - avoid sending file attachments
 
-<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96" align="center">
+<p align="center">
+<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96">
+</p>
 
 Avoid sending file attachments by uploading them via SSH to a remote site and
 sending a publicly-accessible URL with non-guessable (hash-based) prefix
