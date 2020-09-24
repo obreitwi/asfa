@@ -5,7 +5,7 @@
 
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-file.txt
 ```
 
 In case you have a webserver with ssh access, you can avoid sending files via
@@ -27,7 +27,7 @@ Note: All commands can actually be abbreviated:
 Push (upload) a local file to the remote site and print the URL under which it is reachable:
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-file.txt
 ```
 
 ### Push with alias
@@ -37,21 +37,21 @@ a logfile or plot with a generic name.
 
 ```text
 $ asfa push my-file.txt -a my-very-specific-file.txt
-https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-very-specific-file.txt
 ```
 
 Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.
 ```text
 $ asfa push my-file.txt --alias=my-very-specific-file.txt my-file-2.txt --alias=my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af826fab003103c64c07c9dba3feb9c18f/my-very-specific-file-2.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af/my-very-specific-file-2.txt
 ```
 
 Or specify the aliases afterwards.
 ```text
 $ asfa push my-file.txt my-file-2.txt --alias my-very-specific-file.txt my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af826fab003103c64c07c9dba3feb9c18f/my-very-specific-file-2.txt
+https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af/my-very-specific-file-2.txt
 ```
 
 ### List
@@ -60,8 +60,8 @@ List all files currently available online:
 ```text
 $ asfa list
 2020-09-11 20:13:25,214 INFO  [asfa::cmd::list] Listing remote files:
-[0|-2] https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-very-specific-file.txt
-[1|-1] https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af826fab003103c64c07c9dba3feb9c18f/my-very-specific-file-2.txt
+[0|-2] https://my-domain.eu/my-uploads/999b762599f7a46555b07297a1ba7fad/my-very-specific-file.txt
+[1|-1] https://my-domain.eu/my-uploads/f9d0c87a02ab96fb035615b0384cc1af/my-very-specific-file-2.txt
 ```
 
 ### Clean
@@ -70,15 +70,15 @@ Remove the file from remote site via index (negative indices need to be sepearat
 ```text
 $ asfa clean 0
 [ alternative: $ asfa clean -- -2 ]
-2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146/my-file.txt'
-2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/999b762599f7a46555b07297a1ba7fadf6c5c808377a912818d58ba326128146'
+2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/999b762599f7a46555b07297a1ba7fad/my-file.txt'
+2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/999b762599f7a46555b07297a1ba7fad'
 ```
 
 You can also ensure that a specific file is deleted by specifying `--file`:
 ```text
 $ asfa clean --file my-file-2.txt
-2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/f9d0c87a02ab96fb035615b0384cc1af826fab003103c64c07c9dba3feb9c18f/my-very-specific-file-2.txt'
-2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/f9d0c87a02ab96fb035615b0384cc1af826fab003103c64c07c9dba3feb9c18f'
+2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/f9d0c87a02ab96fb035615b0384cc1af/my-very-specific-file-2.txt'
+2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/f9d0c87a02ab96fb035615b0384cc1af'
 ```
 Note that the file is deleted even though it was uploaded with an alias.
 
@@ -125,6 +125,7 @@ group: www-data
 
 ```yaml
 default_host: my-remote-site
+prefix_length: 32
 verify_via_hash: true
 auth:
   interactive: true
