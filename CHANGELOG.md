@@ -4,6 +4,7 @@
 ## v0.2.1
 
 * Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
+* Add notifications for upload progress and remote verification
 
 ## v0.2.0
 

@@ -1,9 +1,11 @@
 use anyhow::{bail, Context, Result};
 use clap::Clap;
 // use log::info;
+use log::debug;
 use std::path::{Path, PathBuf};
 use std::string::String;
-use log::debug;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 use crate::cfg::Config;
 use crate::cmd::Command;
@@ -47,6 +49,21 @@ fn upload(
 
     if config.verify_via_hash {
         debug!("Verifying upload..");
+        let stop_token = Arc::new(Mutex::new(false));
+        let stop_token_pbar = Arc::clone(&stop_token);
+        let spinner = thread::spawn(move || {
+            let spinner = crate::cli::spinner();
+            spinner.set_message("Verifying upload..");
+
+            while !*stop_token_pbar.lock().unwrap() {
+                spinner.inc(1);
+                std::thread::sleep(std::time::Duration::from_millis(25));
+            }
+            spinner.set_message("Verifying upload.. done");
+            spinner.inc(1);
+            spinner.finish_and_clear();
+        });
+
         let remote_hash = session.get_remote_hash(&target, prefix_length)?;
         if hash != remote_hash {
             session.remove_folder(&folder)?;
@@ -57,7 +74,9 @@ fn upload(
                 remote_hash
             );
         }
-        debug!("Done")
+        *stop_token.lock().unwrap() = true;
+        spinner.join().unwrap();
+        debug!("Done");
     }
 
     if let Some(group) = &session.host.group {

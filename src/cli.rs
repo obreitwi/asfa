@@ -1,5 +1,7 @@
 use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 
+use indicatif::ProgressStyle;
+
 use crate::cmd::{Clean, List, Push};
 
 #[derive(Clap, Debug)]
@@ -43,4 +45,20 @@ pub enum UserCommand {
 
     #[clap(name = "push")]
     Push(Push),
+}
+
+pub fn style_progress_bar() -> indicatif::ProgressStyle {
+    ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} @ {bytes_per_sec} ({eta})")
+        .progress_chars("#>-")
+}
+
+pub fn spinner() -> indicatif::ProgressBar {
+    let bar = indicatif::ProgressBar::new(!0);
+    bar.set_style(style_spinner());
+    bar
+}
+
+pub fn style_spinner() -> indicatif::ProgressStyle {
+    ProgressStyle::default_spinner().template("{spinner:.green} {msg}")
 }
