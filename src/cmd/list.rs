@@ -50,16 +50,32 @@ impl Command for List {
             selected
         };
 
+        let num_digits = {
+            let mut num_digits = 0;
+            let mut num = num_files;
+            while num > 0 {
+                num /= 10;
+                num_digits += 1;
+            }
+            num_digits
+        };
+
         if self.url_only {
             for (_, fd) in to_list {
                 println!("{}", host.get_url(fd)?);
             }
         } else {
             for (i, file) in to_list.iter() {
-                println!("[{}|{}] {}", i, *i as i64 - num_files, host.get_url(file)?);
+                println!(
+                    "[{idx:width$}|{rev_idx:rev_width$}] {url}",
+                    idx = i,
+                    rev_idx = *i as i64 - num_files,
+                    url = host.get_url(file)?,
+                    width = num_digits,
+                    rev_width = num_digits + 1
+                );
             }
         }
-
         Ok(())
     }
 }
