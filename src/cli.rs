@@ -1,5 +1,7 @@
 use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 
+use anyhow::{Context, Result};
+
 use indicatif::ProgressStyle;
 
 use crate::cmd::{Clean, List, Push};
@@ -49,7 +51,10 @@ pub enum UserCommand {
 
 pub fn style_progress_bar() -> indicatif::ProgressStyle {
     ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} @ {bytes_per_sec} ({eta})")
+        .template(
+            "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} \
+                   @ {bytes_per_sec} ({eta})",
+        )
         .progress_chars("#>-")
 }
 
@@ -61,4 +66,51 @@ pub fn spinner() -> indicatif::ProgressBar {
 
 pub fn style_spinner() -> indicatif::ProgressStyle {
     ProgressStyle::default_spinner().template("{spinner:.green} {msg}")
+}
+
+pub fn draw_boxed(
+    text: &str,
+    color_line: &console::Style,
+    color_box: &console::Style,
+) -> Result<()> {
+    let corner_top_left = color_box.apply_to("┌");
+    let corner_top_right = color_box.apply_to("┐");
+    let corner_bottom_left = color_box.apply_to("└");
+    let corner_bottom_right = color_box.apply_to("┘");
+
+    let line_len_max = text
+        .lines()
+        .map(|l| l.len())
+        .max()
+        .with_context(|| "No lines supplied.")?;
+    let length_horizontal = line_len_max + 2;
+
+    let line_horizontal = color_box.apply_to("─".repeat(length_horizontal));
+    let line_vertical = color_box.apply_to("│");
+
+    println!("{}{}{}", corner_top_left, line_horizontal, corner_top_right);
+    for line in text.lines() {
+        println!("{box} {line:<width$} {box}", line=color_line.apply_to(line), box=line_vertical, width=line_len_max);
+    }
+    println!(
+        "{}{}{}",
+        corner_bottom_left, line_horizontal, corner_bottom_right
+    );
+
+    Ok(())
+}
+
+#[allow(non_upper_case_globals)]
+pub mod color {
+
+    use console::Style;
+
+    lazy_static::lazy_static! {
+        // static ref heading : Style = console::Style::new().cyan().bright().bold();
+        // static ref frame : Style = console::Style::new().magenta();
+        pub static ref heading : Style = console::Style::new();
+        pub static ref frame : Style = console::Style::new().blue();
+        pub static ref entry : Style = console::Style::new().red().bright();
+        pub static ref dot : Style = console::Style::new().cyan();
+    }
 }

@@ -1,10 +1,11 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
-## v0.2.1
+## v0.3.0
 
 * Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
 * Add notifications for upload progress and remote verification
+* Add confirmation prior to cleaning (can be avoided by issuing `--no-confirm`)
 
 ## v0.2.0
 

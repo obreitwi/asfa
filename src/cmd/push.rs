@@ -33,7 +33,7 @@ fn upload(
     to_upload: &Path,
     target_name: &str,
 ) -> Result<()> {
-    let mut target = session.host.folder.clone();
+    let mut target = PathBuf::new();
     let prefix_length = session.host.prefix_length.unwrap_or(config.prefix_length);
     let hash = get_hash(to_upload, prefix_length)
         .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;

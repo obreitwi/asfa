@@ -9,7 +9,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IOError, ErrorKind};
 use std::net::TcpStream;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn ensure_port(hostname: &str) -> String {
     if hostname.contains(":") {
@@ -119,9 +119,9 @@ impl<'a> SshSession<'a> {
         }
     }
 
-    /// List all files present
-    pub fn list_files(&self, folder_remote: &Path) -> Result<Vec<String>> {
-        let cmd = format!("cd {} && ls -1rt */*", folder_remote.display());
+    /// List all files present (relative to the current host's base-folder).
+    pub fn list_files(&self) -> Result<Vec<PathBuf>> {
+        let cmd = format!("cd {} && ls -1rt */*", self.host.folder.display());
         let mut channel = self.raw.channel_session()?;
 
         channel
@@ -129,11 +129,13 @@ impl<'a> SshSession<'a> {
             .context("Could not execute listing command")?;
         let mut files = String::new();
         channel.read_to_string(&mut files)?;
-        Ok(files.lines().map(|s| s.to_string()).collect())
+        Ok(files.lines().map(|s| Path::new(s).to_path_buf()).collect())
     }
 
-    /// Make folder on the remote site if it does not exist.
+    /// Make folder on the remote site if it does not exist (relative to the current host's
+    /// base-folder).
     pub fn make_folder(&self, path: &Path) -> Result<()> {
+        let path = self.prepend_base_folder(path);
         let path_str = path.display();
         let cmd = format!("[ ! -d \"{}\" ] && mkdir \"{}\"", path_str, path_str);
         let mut channel = self.raw.channel_session()?;
@@ -142,8 +144,9 @@ impl<'a> SshSession<'a> {
             .with_context(|| format!("Could not create remote folder: {}", path_str))
     }
 
-    /// Get hash of the remote file
+    /// Get hash of the remote file (relative to the current host's base-folder).
     pub fn get_remote_hash(&self, path: &Path, length: u8) -> Result<String> {
+        let path = self.prepend_base_folder(path);
         let hasher = if length == 0 {
             bail!("Length cannot be zero!");
         } else if length <= 32 {
@@ -179,8 +182,16 @@ impl<'a> SshSession<'a> {
         Ok(full_hash[..length as usize].to_string())
     }
 
-    /// Remove the given folder and its contents
+    fn prepend_base_folder(&self, path: &Path) -> PathBuf {
+        let mut buf = PathBuf::new();
+        buf.push(&self.host.folder);
+        buf.push(path);
+        buf
+    }
+
+    /// Remove the given folder and its contents (relative to the current host's base-folder)
     pub fn remove_folder(&self, path: &Path) -> Result<()> {
+        let path = self.prepend_base_folder(path);
         let path_str = path.display();
         debug!("Removing: {}", path_str);
         let cmd = format!("[ -d \"{}\" ] && rm -rvf \"{}\"", path_str, path_str);
@@ -196,8 +207,10 @@ impl<'a> SshSession<'a> {
         Ok(())
     }
 
-    /// Upload the given local path to the given remote path
+    /// Upload the given local path to the given remote path (relative to the current host's
+    /// base-folder)
     pub fn upload_file(&self, path_local: &Path, path_remote: &Path) -> Result<()> {
+        let path_remote = self.prepend_base_folder(path_remote);
         debug!(
             "Uploading: '{}' → '{}'",
             path_local.display(),
@@ -211,7 +224,7 @@ impl<'a> SshSession<'a> {
 
         let mut remote_file = self
             .raw
-            .scp_send(path_remote, 0o644, size, None)
+            .scp_send(&path_remote, 0o644, size, None)
             .with_context(|| format!("Could not create remote file: {}", path_remote.display()))?;
 
         let bar = ProgressBar::new(local_file.metadata()?.len());

@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Clap;
 use log::info;
+use std::path::PathBuf;
 
 use crate::cfg::Config;
 use crate::cmd::Command;
@@ -28,10 +29,10 @@ impl Command for List {
 
         let host = &session.host;
 
-        let files = session.list_files(&host.folder)?;
+        let files = session.list_files()?;
         let num_files = files.len() as i64;
 
-        let to_list: Vec<(usize, &String)> = if self.indices.len() == 0 {
+        let to_list: Vec<(usize, &PathBuf)> = if self.indices.len() == 0 {
             if let Some(n) = self.last {
                 files
                     .iter()
@@ -61,8 +62,8 @@ impl Command for List {
         };
 
         if self.url_only {
-            for (_, fd) in to_list {
-                println!("{}", host.get_url(fd)?);
+            for (_, file) in to_list {
+                println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
         } else {
             for (i, file) in to_list.iter() {
@@ -70,7 +71,7 @@ impl Command for List {
                     "[{idx:width$}|{rev_idx:rev_width$}] {url}",
                     idx = i,
                     rev_idx = *i as i64 - num_files,
-                    url = host.get_url(file)?,
+                    url = host.get_url(&format!("{}", file.display()))?,
                     width = num_digits,
                     rev_width = num_digits + 1
                 );
