@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use log::{debug, error};
+use log::{error, trace};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -40,7 +40,7 @@ fn get_explicit_hash<Hasher: sha2::Digest>(path: &Path) -> Result<String> {
         let to_write = buf.len();
         if to_write > 0 {
             hash.update(buf);
-            debug!("Fed {} bytes to hasher..", to_write);
+            trace!("Fed {} bytes to hasher..", to_write);
             &reader.consume(to_write);
         } else {
             break;
@@ -103,7 +103,7 @@ pub fn get_optional<
     match getter(dict, name)? {
         Some(v) => Ok(Some(v)),
         None => {
-            debug!("Optional key '{}' not defined.", name);
+            trace!("Optional key '{}' not defined.", name);
             Ok(None)
         }
     }

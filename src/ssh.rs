@@ -199,7 +199,7 @@ impl<'a> SshSession<'a> {
     /// Upload the given local path to the given remote path
     pub fn upload_file(&self, path_local: &Path, path_remote: &Path) -> Result<()> {
         debug!(
-            "Uploading: {} -> {}",
+            "Uploading: '{}' → '{}'",
             path_local.display(),
             path_remote.display()
         );
@@ -227,7 +227,6 @@ impl<'a> SshSession<'a> {
                 remote_file
                     .write(buf)
                     .context("Failed to write chunk to remote file.")?;
-                debug!("Wrote {} bytes..", to_write);
                 &reader.consume(to_write);
                 bar.inc(to_write as u64);
             } else {

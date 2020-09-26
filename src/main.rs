@@ -10,7 +10,7 @@ mod util;
 
 use anyhow::{bail, Result};
 use cmd::Command;
-use log::debug;
+use log::trace;
 use ssh::SshSession;
 
 use simple_logger::SimpleLogger;
@@ -33,15 +33,15 @@ fn main() -> Result<()> {
 
     SimpleLogger::new().with_level(level).init()?;
 
-    debug!("Opts: {:?}", opts);
+    trace!("Opts: {:?}", opts);
 
     let env_cfg_path = std::env::var("ASFA_CONFIG").ok();
 
     let cfg = cfg::get(&opts.config.or(env_cfg_path))?;
     let host = cfg.get_host(opts.host)?;
 
-    debug!("Config file: {:?}", cfg);
-    debug!("Host: {:?}", host);
+    trace!("Config file: {:?}", cfg);
+    trace!("Host: {:?}", host);
 
     let session = SshSession::create(&host, &cfg.auth)?;
 
