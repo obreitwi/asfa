@@ -1,6 +1,10 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
+## v0.2.1
+
+* Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
+
 ## v0.2.0
 
 * Add option to specify prefix length

@@ -3,6 +3,7 @@ use clap::Clap;
 // use log::info;
 use std::path::{Path, PathBuf};
 use std::string::String;
+use log::debug;
 
 use crate::cfg::Config;
 use crate::cmd::Command;
@@ -45,6 +46,7 @@ fn upload(
     session.upload_file(&to_upload, &target)?;
 
     if config.verify_via_hash {
+        debug!("Verifying upload..");
         let remote_hash = session.get_remote_hash(&target, prefix_length)?;
         if hash != remote_hash {
             session.remove_folder(&folder)?;
@@ -55,13 +57,19 @@ fn upload(
                 remote_hash
             );
         }
+        debug!("Done")
     }
 
     if let Some(group) = &session.host.group {
         session.adjust_group(&folder, &group)?;
     };
 
-    println!("{}/{}/{}", session.host.url, &hash, target_name);
+    println!(
+        "{}",
+        session
+            .host
+            .get_url(&format!("{}/{}", &hash, &target_name))?
+    );
     Ok(())
 }
 
