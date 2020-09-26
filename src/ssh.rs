@@ -1,7 +1,7 @@
 use crate::cfg::{Auth, Host};
 
 use anyhow::{bail, Context, Result};
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressStyle};
 use log::{debug, error, info};
 use rpassword::prompt_password_stderr;
 use ssh2::Session as RawSession;
@@ -215,6 +215,9 @@ impl<'a> SshSession<'a> {
             .with_context(|| format!("Could not create remote file: {}", path_remote.display()))?;
 
         let bar = ProgressBar::new(local_file.metadata()?.len());
+        bar.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} @ {bytes_per_sec} ({eta})")
+        .progress_chars("#>-"));
         let mut reader = BufReader::new(local_file);
 
         loop {
