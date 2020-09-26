@@ -5,21 +5,14 @@
 <img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96">
 </p>
 
-Avoid sending file attachments by uploading them via SSH to a remote site and
-sending a publicly-accessible URL with non-guessable (hash-based) prefix
-instead.
-
 ```text
 $ asfa push my-file.txt
 https://my-domain.eu/my-uploads/999b7625/my-file.txt
 ```
 
-In case you have a webserver with ssh access, you can avoid sending files via
-email or peer-to-peer and send a link instead.
-
-As a small exercise for writing rust, I ported a small [python
-script](https://github.com/obreitwi/py-rpush) I had been using for a couple of
-years.
+* Upload files via `ssh` to a (linux-based) remote site.
+* Generate a non-guessable URL pointing to the file.
+* The URL can then be sent via mail or directly.
 
 ## Usage
 
@@ -28,7 +21,7 @@ Note: All commands can actually be abbreviated:
 * `l` for `list`
 * `c` for `clean`
 
-### Push
+#### Push
 
 Push (upload) a local file to the remote site and print the URL under which it is reachable:
 ```text
@@ -36,7 +29,7 @@ $ asfa push my-file.txt
 https://my-domain.eu/my-uploads/999b7625/my-file.txt
 ```
 
-### Push with alias
+#### Push with alias
 
 Push file to server under a different name. This is useful if you want to share
 a logfile or plot with a generic name.
@@ -60,7 +53,7 @@ https://my-domain.eu/my-uploads/999b7625/my-very-specific-file.txt
 https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
 ```
 
-### List
+#### List
 
 List all files currently available online:
 ```text
@@ -70,7 +63,7 @@ $ asfa list
 [1|-1] https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
 ```
 
-### Clean
+#### Clean
 
 Remove the file from remote site via index (negative indices need to be sepearated by `--`):
 ```text
@@ -87,6 +80,14 @@ $ asfa clean --file my-file-2.txt
 2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/f9d0c87a'
 ```
 Note that the file is deleted even though it was uploaded with an alias.
+
+## Requirements
+
+A remote server that
+* is accessible via ssh
+* has a webserver running
+* has writable folder served by your webserver
+* _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
 
 ## Install
 
@@ -178,7 +179,14 @@ _very_ easily access all uploaded files.
 location /my-uploads {
   autoindex off
 }
-````
+```
+
+## Background
+
+As a small exercise for writing rust, I ported a small [python
+script](https://github.com/obreitwi/py-rpush) I had been using for a couple of
+years.
+
 
 ## License
 
