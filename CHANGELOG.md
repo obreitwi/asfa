@@ -1,6 +1,8 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
+## v0.3.1-pre (under development)
+
 ## v0.3.0 (2020-09-27)
 
 * Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
