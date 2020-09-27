@@ -1,9 +1,11 @@
-
-# `asfa` - avoid sending file attachments
-
 <p align="center">
 <img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96">
 </p>
+
+# `asfa` - avoid sending file attachments
+
+![Crates.io](https://img.shields.io/crates/v/asfa)
+![Crates.io](https://img.shields.io/crates/l/asfa)
 
 ```text
 $ asfa push my-file.txt
