@@ -202,7 +202,7 @@ the previous hack required three connections (and confirmations) to perform its
 task. `asfa` is set up to only use one ssh-connection per invocation.
 
 [py-rpush]: https://github.com/obreitwi/py-rpush
-[ssh-agent-hijacking reasons]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
+[ssh-agent-hijacking]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
 
 ## License
 
