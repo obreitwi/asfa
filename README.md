@@ -16,6 +16,12 @@ https://my-domain.eu/my-uploads/999b7625/my-file.txt
 * Generate a non-guessable URL pointing to the file.
 * The URL can then be sent via mail or directly.
 
+`asfa` uses single a single `ssh`-connection for each invocation work which is
+convenient if you have [confirmations enabled][gpg-agent-confirm] for each
+ssh-agent usage (see [details](#background)).
+
+[gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
+
 ## Usage
 
 Note: All commands can actually be abbreviated:
@@ -186,9 +192,15 @@ location /my-uploads {
 ## Background
 
 As a small exercise for writing rust, I ported a small [python
-script](https://github.com/obreitwi/py-rpush) I had been using for a couple of
-years.
+script][py-rpush] I had been using for a couple of years.
 
+For [security reasons][ssh-agent-hijacking] I have my `gpg-agent` (acting as `ssh-agent`) set up to
+[confirm][gpg-agent-confirm] each usage upon connecting to remote servers and
+the previous hack required three connections (and confirmations) to perform its
+task. `asfa` is set up to only use one ssh-connection per invocation.
+
+[py-rpush]: https://github.com/obreitwi/py-rpush
+[ssh-agent-hijacking reasons]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
 
 ## License
 
