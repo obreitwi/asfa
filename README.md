@@ -4,8 +4,10 @@
 
 # `asfa` - avoid sending file attachments
 
-![Crates.io](https://img.shields.io/crates/v/asfa)
-![Crates.io](https://img.shields.io/crates/l/asfa)
+[![Crates.io](https://img.shields.io/crates/v/asfa)](https://crates.io/crates/asfa)
+[![Build Status](https://travis-ci.com/obreitwi/asfa.svg?branch=master)](https://travis-ci.com/obreitwi/asfa)
+[![](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa)
+[![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
 
 ```text
 $ asfa push my-file.txt
