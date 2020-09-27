@@ -1,7 +1,7 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
-## v0.3.0-pre
+## 0.3.0 (2020-09-27)
 
 * Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
 * Add notifications for upload progress and remote verification
