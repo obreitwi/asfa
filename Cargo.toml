@@ -45,8 +45,17 @@ sign-commit = true
 sign-tag = true
 dev-version-ext = "pre"
 push-remote = "git@github.com:obreitwi/asfa.git"
-pre-relase-commit-message = "New release: v{{version}}"
-pre-release-replacements = [
-  {file="CHANGELOG.md", search="## v[0-9]+\\.[0-9]+\\.[0-9]+-pre", replace="## v{{version}} ({{date}})", max=1}
-]
-post-relase-commit-message = "Next development iteration: v{{next-version}}"
+pre-release-commit-message = "Release: v{{version}}"
+post-release-commit-message = "Development iteration: v{{next_version}}"
+
+[[package.metadata.release.pre-release-replacements]]
+file="CHANGELOG.md"
+search="(?m)^## v[0-9]+\\.[0-9]+\\.[0-9]+-pre \\(under development\\)$"
+replace="## v{{version}} ({{date}})"
+exactly = 1
+
+[[package.metadata.release.post-release-replacements]]
+file = "CHANGELOG.md"
+search = "(?m)(?P<header>^# .*)$"
+replace = "$header\n\n## v{{next_version}} (under development)"
+exactly = 1
