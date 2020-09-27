@@ -10,7 +10,7 @@ categories = ["command-line-utilities"]
 readme = "README.md"
 homepage = "https://github.com/obreitwi/asfa"
 repository = "https://github.com/obreitwi/asfa.git"
-documentation = "https://github.com/obreitwi/asfa"
+documentation = "https://obreitwi.github.io/asfa"
 
 [features]
 doc = []
