@@ -68,7 +68,7 @@ pub struct Host {
     /// Length of prefix to use
     pub prefix_length: Option<u8>,
 
-    /// url-prefix to apply to random link
+    /// url-prefix to apply to file link
     pub url: String,
 
     /// The user to sign in, otherwise ssh config will be used.
