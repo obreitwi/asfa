@@ -18,9 +18,9 @@ https://my-domain.eu/my-uploads/999b7625/my-file.txt
 * Generate a non-guessable URL pointing to the file.
 * The URL can then be sent via mail or directly.
 
-`asfa` uses a single `ssh`-connection for each invocation work which is
-convenient if you have [confirmations enabled][gpg-agent-confirm] for each
-ssh-agent usage (see [details](#background)).
+`asfa` uses a single `ssh`-connection for each invocation which is convenient
+if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage
+(see [details](#background)).
 
 [gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
 
