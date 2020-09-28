@@ -35,6 +35,11 @@ thiserror = "1.0.20"
 whoami = "0.9.0"
 yaml-rust = "0.4.4"
 
+[dev-dependencies]
+# cmd_lib = { git = "https://github.com/rust-shell-script/rust_cmd_lib" }
+cmd_lib_core = "0.1.0"
+rand = "0.7.3"
+
 [package.metadata.docs.rs]
 features = ["doc"]
 targets = ["x86_64-unknown-linux-gnu"]
