@@ -22,12 +22,12 @@ pub fn yaml_string(s: &str) -> Yaml {
 pub fn get_hash(path: &Path, length: u8) -> Result<String> {
     let hash = if length == 0 {
         bail!("Length cannot be zero!");
-    } else if length <= 32 {
-        get_explicit_hash::<sha2::Sha256>(path)?
     } else if length <= 64 {
+        get_explicit_hash::<sha2::Sha256>(path)?
+    } else if length <= 128 {
         get_explicit_hash::<sha2::Sha512>(path)?
     } else {
-        bail!("Length should be smaller than 64.");
+        bail!("Length should be smaller than 128.");
     };
     Ok(hash[..length as usize].to_string())
 }
@@ -40,7 +40,6 @@ fn get_explicit_hash<Hasher: sha2::Digest>(path: &Path) -> Result<String> {
         let to_write = buf.len();
         if to_write > 0 {
             hash.update(buf);
-            trace!("Fed {} bytes to hasher..", to_write);
             &reader.consume(to_write);
         } else {
             break;

@@ -149,12 +149,12 @@ impl<'a> SshSession<'a> {
         let path = self.prepend_base_folder(path);
         let hasher = if length == 0 {
             bail!("Length cannot be zero!");
-        } else if length <= 32 {
-            "sha256sum"
         } else if length <= 64 {
+            "sha256sum"
+        } else if length <= 128 {
             "sha512sum"
         } else {
-            bail!("Length should be smaller than 64.");
+            bail!("Length should be smaller than 128.");
         };
 
         let mut channel = self.raw.channel_session()?;
