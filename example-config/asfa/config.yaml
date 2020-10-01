@@ -13,4 +13,4 @@ hosts:
     group: www-data
     auth:
       interactive: false
-      use_agent: true
+      private_key: /path/to/private/key/in/pem/format

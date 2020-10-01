@@ -1,6 +1,10 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
+## v0.3.2-pre (under development)
+
+* Add `private_key_file` to auth-option in order to specfiy private key file directly
+
 ## v0.3.1 (2020-10-03)
 
 * Fix prefix length limited to 64 -> now 128

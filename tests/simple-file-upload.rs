@@ -48,5 +48,6 @@ fn run_tests() -> Result<()> {
     fixture::ensure_env()?;
 
     simple_file_upload("asfa-ci-pw")?;
+    simple_file_upload("asfa-ci-key")?;
     Ok(())
 }

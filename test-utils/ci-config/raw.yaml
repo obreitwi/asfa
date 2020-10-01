@@ -7,9 +7,10 @@ hosts:
     folder: /var/www/default/uploads
     url: https://asfa-ci.nonexistant/uploads
     group: "1234"
+    user: asfa-ci-user
     auth:
-      interactive: false
       private_key_file: TEST_SSH_PRIVKEY_FILE
+      interactive: false
       use_agent: false
   asfa-ci-pw:
     hostname: localhost:2222

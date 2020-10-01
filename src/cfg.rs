@@ -2,6 +2,7 @@ use anyhow::{bail, Context, Result};
 use expanduser::expanduser;
 use log::{debug, warn};
 use std::collections::HashMap;
+use std::default::Default;
 use std::fmt::Display;
 use std::fs::{read_dir, read_to_string};
 use std::path::PathBuf;
@@ -38,7 +39,14 @@ pub struct Auth {
     /// Perform agent authentication
     pub use_agent: bool,
 
-    /// Perform interactive authentication
+    /// Perform authentication via explicit private key
+    pub private_key_file: Option<String>,
+
+    /// Explicit password for private key (unsafe)
+    pub private_key_file_password: Option<String>,
+
+    /// Perform interactive authentication (if private key is set password will be used for private
+    /// key instead).
     pub interactive: bool,
 }
 
@@ -236,10 +244,7 @@ impl Config {
                 }
             }
         } else {
-            Auth {
-                use_agent: true,
-                interactive: true,
-            }
+            Auth::default()
         };
 
         let default_host = get_string_from(config_yaml, "default_host")?.cloned();
@@ -344,11 +349,27 @@ impl Auth {
     fn from_yaml(dict: &Hash) -> Result<Auth, InvalidYamlTypeError> {
         let use_agent = get_bool_from(dict, "use_agent")?.cloned().unwrap_or(true);
         let interactive = get_bool_from(dict, "interactive")?.cloned().unwrap_or(true);
+        let private_key_file = get_string_from(dict, "private_key_file")?.cloned();
+        let private_key_file_password =
+            get_string_from(dict, "private_key_file_password")?.cloned();
 
         Ok(Auth {
             use_agent,
             interactive,
+            private_key_file,
+            private_key_file_password,
         })
+    }
+}
+
+impl Default for Auth {
+    fn default() -> Self {
+        Auth {
+            use_agent: true,
+            interactive: true,
+            private_key_file: None,
+            private_key_file_password: None,
+        }
     }
 }
 

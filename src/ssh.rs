@@ -26,16 +26,24 @@ pub struct SshSession<'a> {
 
 impl<'a> SshSession<'a> {
     fn auth(&self, auth: &Auth) -> Result<()> {
-        if let Some(password) = self.host.password.as_ref() {
-            debug!("Authenticating with plaintext password.");
-            self.raw
-                .userauth_password(&self.host.get_username(), &password)?;
-            Ok(())
-        } else if auth.use_agent {
+        if auth.use_agent {
             self.auth_agent()?;
+            Ok(())
+        } else if let Some(private_key_file) = auth.private_key_file.as_deref() {
+            self.auth_private_key(
+                &private_key_file,
+                auth.private_key_file_password.as_deref(),
+                &self.host.get_username(),
+                auth.interactive,
+            )?;
             Ok(())
         } else if auth.interactive {
             self.auth_interactive()?;
+            Ok(())
+        } else if let Some(password) = self.host.password.as_ref() {
+            debug!("Authenticating with plaintext password.");
+            self.raw
+                .userauth_password(&self.host.get_username(), &password)?;
             Ok(())
         } else {
             let msg = format!(
@@ -80,6 +88,32 @@ impl<'a> SshSession<'a> {
         ))?;
         self.raw
             .userauth_password(&self.host.get_username(), &password)?;
+        Ok(())
+    }
+
+    fn auth_private_key(
+        &self,
+        private_key_file: &str,
+        private_key_file_password: Option<&str>,
+        username: &str,
+        interactive: bool,
+    ) -> Result<()> {
+        let password = match private_key_file_password {
+            Some(pw) => Some(pw.to_owned()),
+            None if interactive => Some(prompt_password_stderr(&format!(
+                "Interactive authentication enabled. Enter password for {}:",
+                private_key_file
+            ))?),
+            None => None,
+        };
+
+        self.raw.userauth_pubkey_file(
+            username,
+            None,
+            Path::new(private_key_file),
+            password.as_deref(),
+        )?;
+
         Ok(())
     }
 

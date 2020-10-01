@@ -21,9 +21,11 @@ https://my-domain.eu/my-uploads/999b7625/my-file.txt
 
 `asfa` uses a single `ssh`-connection for each invocation which is convenient
 if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage
-(see [details](#background)).
+(see [details](#background)). Alternatively, private key files in [PEM
+format][pem] can be used directly.
 
 [gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
+[pem]: https://serverfault.com/a/706342
 
 ## Usage
 
