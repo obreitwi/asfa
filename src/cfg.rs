@@ -353,8 +353,8 @@ impl Auth {
 }
 
 fn check_prefix_length(length: i64) -> Result<()> {
-    if length < 8 || 64 < length {
-        bail! {"Prefix needs to be between 8 and 64 characters."};
+    if length < 8 || 128 < length {
+        bail! {"Prefix needs to be between 8 and 128 characters."};
     }
     Ok(())
 }
