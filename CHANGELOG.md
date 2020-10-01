@@ -3,6 +3,8 @@
 
 ## v0.3.1-pre (under development)
 
+* Fix prefix length limited to 64 -> now 128
+
 ## v0.3.0 (2020-09-27)
 
 * Fix unencoded-URL printed after push (only `list` reported correctly encoded URL)
