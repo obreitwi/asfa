@@ -1,4 +1,11 @@
-dist: trusty
+arch: amd64
+os: linux
+dist:
+  - bionic
+  - focal
+  - precise
+  - trusty
+  - xenial
 language: rust
 
 rust:
