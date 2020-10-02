@@ -6,6 +6,10 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
 testroot="${sourcedir}/../tmp-test"
 
+####################
+# Helper functions #
+####################
+
 export_var() {
     local name="$1"
     local value="$2"
@@ -21,24 +25,39 @@ ensure_folder() {
     fi
 }
 
+###############
+# Copy config #
+###############
+
 ensure_folder "${testroot}"
 export_var ASFA_TEST_ROOT "${testroot}"
-
-echo -n "${TEST_SSH_PRIVKEY_B64}" | openssl base64 -A -d > "${testroot}/test.key"
-echo "${TEST_SSH_PUBKEY}" > "${testroot}/test.pub"
 
 folder_config="${testroot}/config"
 ensure_folder "${folder_config}"
 
 cp "${sourcedir}/ci-config/raw.yaml" "${folder_config}/config.yaml"
 export_var ASFA_CONFIG "${folder_config}"
-sed -i "s:TEST_SSH_PRIVKEY_FILE:${TEST_SSH_PUBKEY}:" "${ASFA_CONFIG}/config.yaml"
+
+#########################
+# Restore test-ssh keys #
+#########################
+
+TEST_SSH_PRIVKEY_FILE="${ASFA_CONFIG}/test.key"
+
+echo -n "${TEST_SSH_PRIVKEY_B64}" | openssl base64 -A -d > "${TEST_SSH_PRIVKEY_FILE}"
+sed -i "s:TEST_SSH_PRIVKEY_FILE:${TEST_SSH_PRIVKEY_FILE}:" "${ASFA_CONFIG}/config.yaml"
+
+TEST_SSH_PUBKEY_FILE="${testroot}/test.pub"
+echo "${TEST_SSH_PUBKEY}" > "${TEST_SSH_PUBKEY_FILE}"
+
+#################
+# Set up docker #
+#################
 
 export_var ASFA_FOLDER_UPLOAD "${testroot}/uploads"
+ensure_folder "${ASFA_FOLDER_UPLOAD}"
 
 folder_docker_config="${testroot}/docker-cfg"
-
-ensure_folder "${ASFA_FOLDER_UPLOAD}"
 ensure_folder "${folder_docker_config}"
 
 if (( $(docker container ls -q | wc -l) == 0 )); then
