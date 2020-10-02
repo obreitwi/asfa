@@ -1,10 +1,6 @@
 dist: trusty
 language: rust
 
-env:
-  global:
-    - CRATE_NAME=rust
-
 rust:
   - stable
   - beta
