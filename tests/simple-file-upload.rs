@@ -1,5 +1,6 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use cmd_lib_core::{run_cmd, run_fun};
+use std::path::Path;
 
 mod fixture;
 
@@ -19,13 +20,23 @@ fn simple_file_upload(host: &str) -> Result<()> {
         "cargo run -- --loglevel debug -H {} push {} --alias {}",
         host, local, alias
     ))?;
-    run_cmd(format!(
-        "diff -q {} \"{}/{}/{}\"",
-        local,
+    let remote = format!(
+        "{}/{}/{}",
         std::env::var("ASFA_FOLDER_UPLOAD")?,
         hash,
         alias
+    );
+    if !Path::new(&remote).exists() {
+        bail!("Failed to upload path.");
+    }
+    run_cmd(format!("diff -q \"{}\" \"{}\"", local, remote,))?;
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
+        host, local
     ))?;
+    if Path::new(&remote).exists() {
+        bail!("Remote file not cleaned up!");
+    }
     Ok(())
 }
 
