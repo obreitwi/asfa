@@ -16,7 +16,7 @@ fn simple_file_upload(host: &str) -> Result<()> {
         .with_context(|| "Could not compute hash")?[..32]
         .to_string();
     run_cmd(format!(
-        "cargo run -- -H {} push {} --alias {}",
+        "cargo run -- --loglevel debug -H {} push {} --alias {}",
         host, local, alias
     ))?;
     run_cmd(format!(
