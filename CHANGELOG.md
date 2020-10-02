@@ -1,7 +1,7 @@
 
 # Changelog for `asfa` (https://github.com/obreitwi/asfa)
 
-## v0.3.1-pre (under development)
+## v0.3.1 (2020-10-03)
 
 * Fix prefix length limited to 64 -> now 128
 * Fix error when deleting file by hash (via `--file`).
