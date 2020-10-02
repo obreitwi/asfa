@@ -4,6 +4,7 @@
 ## v0.3.1-pre (under development)
 
 * Fix prefix length limited to 64 -> now 128
+* Fix error when deleting file by hash (via `--file`).
 
 ## v0.3.0 (2020-09-27)
 

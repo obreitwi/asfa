@@ -49,7 +49,7 @@ impl Command for Clean {
             files_to_delete.push(&remote_files[idx as usize]);
         }
 
-        for file in &self.files {
+        'to_delete: for file in &self.files {
             let hash = get_hash(
                 Path::new(file),
                 session.host.prefix_length.unwrap_or(config.prefix_length),
@@ -57,7 +57,7 @@ impl Command for Clean {
             for file in remote_files.iter() {
                 if file.starts_with(&hash) {
                     files_to_delete.push(&file);
-                    continue;
+                    continue 'to_delete;
                 }
             }
             bail!("No file with same hash found on server: {}", file);
