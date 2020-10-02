@@ -49,6 +49,7 @@ sign-commit = true
 sign-tag = true
 dev-version-ext = "pre"
 push-remote = "git@github.com:obreitwi/asfa.git"
+tag-message = "Release: v{{version}}"
 pre-release-commit-message = "Release: v{{version}}"
 post-release-commit-message = "Development iteration: v{{next_version}}"
 
