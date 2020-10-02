@@ -4,8 +4,6 @@ set -euo pipefail
 
 sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
-testroot="${sourcedir}/../tmp-test"
-
 ####################
 # Helper functions #
 ####################
@@ -24,6 +22,13 @@ ensure_folder() {
         mkdir -p "${folder}"
     fi
 }
+
+##########################
+# Setup test root folder #
+##########################
+
+testroot="${sourcedir}/../tmp-test"
+ensure_folder "${testroot}"
 
 ###############
 # Copy config #
