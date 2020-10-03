@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, bail};
 use cmd_lib_core::{run_cmd, run_fun};
 use std::path::Path;
+use std::fs;
 
 mod fixture;
 
@@ -37,6 +38,8 @@ fn simple_file_upload(host: &str) -> Result<()> {
     if Path::new(&remote).exists() {
         bail!("Remote file not cleaned up!");
     }
+    fs::remove_file(local)?;
+
     Ok(())
 }
 
