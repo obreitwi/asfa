@@ -18,12 +18,14 @@ pub fn ensure_env() -> Result<()> {
 
 /// Generate file with random data - if path is not absolute, file will be created in
 /// ASFA_TEST_ROOT.
-pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<()> {
+///
+/// Returns absolute path to created file.
+pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<PathBuf> {
     let path: PathBuf = if path.as_ref().is_absolute() {
         path.as_ref().to_owned()
     } else {
         let mut fullpath = PathBuf::new();
-        fullpath.push(std::env::var("ASFA_TEST_ROOT")?);
+        fullpath.push(test_root());
         fullpath.push(path.as_ref());
         fullpath
     };
@@ -33,7 +35,7 @@ pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<()> {
         path.display(),
         size
     ))?;
-    Ok(())
+    Ok(path.to_owned())
 }
 
 /// Generate random filename of size `len` with specified extension
@@ -47,7 +49,7 @@ pub fn random_filename(len: usize, extension: &str) -> String {
 }
 
 /// Get root folder where temporary test files should be placed
-pub fn testroot() -> &'static Path
+pub fn test_root() -> &'static Path
 {
     &TEST_ROOT
 }
