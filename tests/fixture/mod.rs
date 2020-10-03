@@ -16,22 +16,6 @@ pub fn ensure_env() -> Result<()> {
     Ok(())
 }
 
-/// Generate random filename of size `len` with specified extension
-pub fn random_filename(len: usize, extension: &str) -> String {
-    let mut rng = rand::thread_rng();
-    let chars: String = std::iter::repeat(())
-        .map(|()| rng.sample(rand::distributions::Alphanumeric))
-        .take(len)
-        .collect();
-    format!("{}.{}", chars, extension)
-}
-
-/// Get root folder where temporary test files should be placed
-pub fn testroot() -> &'static Path
-{
-    &TEST_ROOT
-}
-
 /// Generate file with random data - if path is not absolute, file will be created in
 /// ASFA_TEST_ROOT.
 pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<()> {
@@ -50,4 +34,20 @@ pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<()> {
         size
     ))?;
     Ok(())
+}
+
+/// Generate random filename of size `len` with specified extension
+pub fn random_filename(len: usize, extension: &str) -> String {
+    let mut rng = rand::thread_rng();
+    let chars: String = std::iter::repeat(())
+        .map(|()| rng.sample(rand::distributions::Alphanumeric))
+        .take(len)
+        .collect();
+    format!("{}.{}", chars, extension)
+}
+
+/// Get root folder where temporary test files should be placed
+pub fn testroot() -> &'static Path
+{
+    &TEST_ROOT
 }
