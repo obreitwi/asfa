@@ -27,7 +27,7 @@ ensure_folder() {
 # Setup test root folder #
 ##########################
 
-testroot="${sourcedir}/../tmp-test"
+testroot="$(mktemp -d)"
 ensure_folder "${testroot}"
 
 ###############
