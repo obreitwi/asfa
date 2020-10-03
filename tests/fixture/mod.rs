@@ -6,13 +6,13 @@ use std::path::{Path, PathBuf};
 
 lazy_static! {
     static ref IS_SET_UP: bool = run_cmd("docker container exec asfa-ci hostname").is_ok();
+    static ref TEST_ROOT: PathBuf = PathBuf::from(std::env::var("ASFA_TEST_ROOT").unwrap());
 }
 
 pub fn ensure_env() -> Result<()> {
     if !(*IS_SET_UP) {
         bail!("CI environment is not set up!");
     }
-    std::env::set_current_dir(std::env::var("ASFA_TEST_ROOT")?)?;
     Ok(())
 }
 
@@ -24,6 +24,12 @@ pub fn random_filename(len: usize, extension: &str) -> String {
         .take(len)
         .collect();
     format!("{}.{}", chars, extension)
+}
+
+/// Get root folder where temporary test files should be placed
+pub fn testroot() -> &'static Path
+{
+    &TEST_ROOT
 }
 
 /// Generate file with random data - if path is not absolute, file will be created in
