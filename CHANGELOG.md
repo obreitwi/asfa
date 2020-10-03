@@ -1,5 +1,5 @@
 
-# Changelog for `asfa` (https://github.com/obreitwi/asfa)
+# Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
 ## v0.3.2-pre (under development)
 
