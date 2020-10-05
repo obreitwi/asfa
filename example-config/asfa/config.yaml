@@ -1,16 +1,31 @@
-default_host: my-remote-site
-verify_via_hash: true
-length_prefix: 32
+default_host: my-remote-site  # optional, if only one host is defined, that one
+                              # will be used
+verify_via_hash: true  # defaults to true
+length_prefix: 32  # optional, defaults to 32, how many hex-digits of the hash
+                   # to print
 auth:
-  interactive: true
-  use_agent: true
-hosts:
+  interactive: true  # defaults to true
+  use_agent: true  # defaults to true
+  private_key_file: /path/to/private/key/file/in/pem/format # optional
+  private_key_file_password: foobar  # optional and highly discouraged, will be
+                                     # prompted for if interactive is set to
+                                     # true
+hosts:  # dictionary mapping host alias to host settings
+        # Each host can also be be defined in an `<alias>.yaml` file in a
+        # hosts-subfolder
   my-remote-site:
-    # note: port is optional and defaults to 22
-    hostname: my-hostname.eu:222
-    folder: /var/www/default/my-uploads
-    url: https://my-domain.eu/my-uploads
-    group: www-data
-    auth:
+    hostname: my-hostname.eu:222  # Defaults to alias name if unset.
+                                  # Note: port-suffix defaults to 22 if not
+                                  # specified
+    folder: /var/www/default/my-uploads  # target folder where to store data,
+                                         # needs to be writable
+    url: https://my-domain.eu/my-uploads  # URL that is prefixed when URLs are
+                                          # printed, this is of no functional
+                                          # relevance right now
+    group: www-data  # optional, group to assign to files after upload so that
+                     # they are readable by the webserver
+    password: foobar  # optional and highly discouraged, password to login to
+                      # server, stored in plaintext
+    auth:  # optional, overwrites global auth-config
       interactive: false
-      private_key: /path/to/private/key/in/pem/format
+      private_key_file: /path/to/private/key/in/pem/format

@@ -132,6 +132,9 @@ that the folder `/var/wwww/default/my-uploads` will be served at
 
 ### `asfa`-side
 
+A fully commented example config can be found
+[here](example-config/asfa).
+
 #### Minimal: `~/.config/asfa/hosts/my-remote-site.yaml`
 
 ```yaml
@@ -160,6 +163,7 @@ hosts:
     auth:
       interactive: false
       use_agent: true
+      private_key_file: /path/to/private/key/in/pem/format #optional
 ```
 
 ### Webserver
