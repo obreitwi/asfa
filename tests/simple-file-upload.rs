@@ -1,7 +1,7 @@
 use anyhow::{bail, Context, Result};
 use cmd_lib_core::{run_cmd, run_fun};
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 
 mod fixture;
 
@@ -19,7 +19,9 @@ fn simple_file_upload(host: &str) -> Result<()> {
         .to_string();
     run_cmd(format!(
         "cargo run -- --loglevel debug -H {} push {} --alias {}",
-        host, local.display(), alias
+        host,
+        local.display(),
+        alias
     ))?;
     let remote = format!(
         "{}/{}/{}",
@@ -33,7 +35,8 @@ fn simple_file_upload(host: &str) -> Result<()> {
     run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))?;
     run_cmd(format!(
         "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
-        host, local.display()
+        host,
+        local.display()
     ))?;
     if Path::new(&remote).exists() {
         bail!("Remote file not cleaned up!");

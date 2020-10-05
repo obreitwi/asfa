@@ -49,7 +49,6 @@ pub fn random_filename(len: usize, extension: &str) -> String {
 }
 
 /// Get root folder where temporary test files should be placed
-pub fn test_root() -> &'static Path
-{
+pub fn test_root() -> &'static Path {
     &TEST_ROOT
 }
