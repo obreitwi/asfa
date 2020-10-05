@@ -1,4 +1,5 @@
 use crate::cfg::{Auth, Host};
+use crate::util;
 
 use anyhow::{bail, Context, Result};
 use indicatif::ProgressBar;
@@ -164,6 +165,42 @@ impl<'a> SshSession<'a> {
         let mut files = String::new();
         channel.read_to_string(&mut files)?;
         Ok(files.lines().map(|s| Path::new(s).to_path_buf()).collect())
+    }
+
+    pub fn get_files_by(
+        &self,
+        indices: &[i64],
+        names: &[&str],
+        prefix_length: u8,
+    ) -> Result<Vec<PathBuf>> {
+        let remote_files = self.list_files()?;
+        let num_files = remote_files.len() as i64;
+
+        let mut selected: Vec<&Path> = Vec::new();
+
+        if indices.len() == 0 && names.len() == 0 {
+            for idx in 0..num_files {
+                selected.push(&remote_files[idx as usize]);
+            }
+        }
+
+        for idx in indices.iter() {
+            let idx = if *idx < 0 { num_files + *idx } else { *idx } as usize;
+            selected.push(&remote_files[idx as usize]);
+        }
+
+        'outer: for file in names {
+            let hash = util::get_hash(Path::new(file), prefix_length)?;
+            for file in remote_files.iter() {
+                if file.starts_with(&hash) {
+                    selected.push(&file);
+                    continue 'outer;
+                }
+            }
+            bail!("No file with same hash found on server: {}", file);
+        }
+
+        Ok(selected.iter().map(|&f| f.to_owned()).collect())
     }
 
     /// Make folder on the remote site if it does not exist (relative to the current host's

@@ -8,7 +8,6 @@ use crate::cfg::Config;
 use crate::cli::color;
 use crate::cmd::Command;
 use crate::ssh::SshSession;
-use crate::util::get_hash;
 
 /// Clear already uploaded files.
 #[derive(Clap, Debug)]
@@ -33,35 +32,12 @@ pub struct Clean {
 impl Command for Clean {
     fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         debug!("Cleaning remote files..");
-        let remote_files = session.list_files()?;
-        let num_files = remote_files.len() as i64;
 
-        let mut files_to_delete: Vec<&Path> = Vec::new();
-
-        if self.indices.len() == 0 && self.files.len() == 0 {
-            for idx in 0..num_files {
-                files_to_delete.push(&remote_files[idx as usize]);
-            }
-        }
-
-        for idx in self.indices.iter() {
-            let idx = if *idx < 0 { num_files + *idx } else { *idx } as usize;
-            files_to_delete.push(&remote_files[idx as usize]);
-        }
-
-        'to_delete: for file in &self.files {
-            let hash = get_hash(
-                Path::new(file),
-                session.host.prefix_length.unwrap_or(config.prefix_length),
-            )?;
-            for file in remote_files.iter() {
-                if file.starts_with(&hash) {
-                    files_to_delete.push(&file);
-                    continue 'to_delete;
-                }
-            }
-            bail!("No file with same hash found on server: {}", file);
-        }
+        let files_to_delete = session.get_files_by(
+            &self.indices,
+            &self.files.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
+            session.host.prefix_length.unwrap_or(config.prefix_length),
+        )?;
 
         let do_delete = self.no_confirm || {
             crate::cli::draw_boxed(
@@ -98,7 +74,7 @@ impl Command for Clean {
 
         if do_delete {
             for file in files_to_delete {
-                remove_file(file)?
+                remove_file(&file)?
             }
         }
 
