@@ -5,10 +5,11 @@ use anyhow::{bail, Context, Result};
 use indicatif::ProgressBar;
 use log::{debug, error, info};
 use rpassword::prompt_password_stderr;
-use ssh2::Session as RawSession;
+use ssh2::{Session as RawSession, Sftp};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IOError, ErrorKind};
+use std::iter::{IntoIterator, Iterator};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 
@@ -278,6 +279,15 @@ impl<'a> SshSession<'a> {
         Ok(())
     }
 
+    /// Get stats about a remote file (relative to the current host's base-folder)
+    pub fn stat<'b, I: IntoIterator<Item = &'b Path>>(
+        &self,
+        paths: I,
+    ) -> Result<FileStatIter<'b, I::IntoIter>> {
+        let sftp = self.raw.sftp()?;
+        Ok(FileStatIter::new(sftp, paths.into_iter()))
+    }
+
     /// Upload the given local path to the given remote path (relative to the current host's
     /// base-folder)
     pub fn upload_file(&self, path_local: &Path, path_remote: &Path) -> Result<()> {
@@ -317,5 +327,25 @@ impl<'a> SshSession<'a> {
         }
 
         Ok(())
+    }
+}
+
+struct FileStatIter<'a, I: Iterator<Item = &'a Path>> {
+    sftp: Sftp,
+    input_iter: I,
+}
+
+impl<'a, I: Iterator<Item = &'a Path>> FileStatIter<'a, I> {
+    fn new(sftp: Sftp, input_iter: I) -> Self {
+        Self { sftp, input_iter }
+    }
+}
+
+impl<'a, I: Iterator<Item = &'a Path>> Iterator for FileStatIter<'a, I> {
+    type Item = std::result::Result<ssh2::FileStat, ssh2::Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let elem = self.input_iter.next()?;
+        Some(self.sftp.stat(elem))
     }
 }
