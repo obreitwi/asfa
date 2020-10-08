@@ -173,35 +173,40 @@ impl<'a> SshSession<'a> {
         indices: &[i64],
         names: &[&str],
         prefix_length: u8,
-    ) -> Result<Vec<PathBuf>> {
-        let remote_files = self.list_files()?;
+    ) -> Result<FileListing> {
+        let remote_files: Vec<(usize, PathBuf)> =
+            self.list_files()?.into_iter().enumerate().collect();
         let num_files = remote_files.len() as i64;
 
-        let mut selected: Vec<&Path> = Vec::new();
+        let mut selected: Vec<(usize, PathBuf)> = Vec::new();
 
         if indices.len() == 0 && names.len() == 0 {
             for idx in 0..num_files {
-                selected.push(&remote_files[idx as usize]);
+                selected.push(remote_files[idx as usize].clone());
             }
         }
 
         for idx in indices.iter() {
             let idx = if *idx < 0 { num_files + *idx } else { *idx } as usize;
-            selected.push(&remote_files[idx as usize]);
+            selected.push(remote_files[idx as usize].clone());
         }
 
         'outer: for file in names {
             let hash = util::get_hash(Path::new(file), prefix_length)?;
             for file in remote_files.iter() {
-                if file.starts_with(&hash) {
-                    selected.push(&file);
+                if file.1.starts_with(&hash) {
+                    selected.push(file.clone());
                     continue 'outer;
                 }
             }
             bail!("No file with same hash found on server: {}", file);
         }
 
-        Ok(selected.iter().map(|&f| f.to_owned()).collect())
+        selected.sort_by_key(|e| e.0);
+        Ok(FileListing {
+            num_files: num_files as usize,
+            files: selected,
+        })
     }
 
     /// Make folder on the remote site if it does not exist (relative to the current host's
@@ -279,7 +284,7 @@ impl<'a> SshSession<'a> {
         Ok(())
     }
 
-    /// Get stats about a remote file (relative to the current host's base-folder)
+    /// Get stats about a remote files (relative to the current host's base-folder)
     pub fn stat<'b, I: IntoIterator<Item = &'b Path>>(
         &self,
         paths: I,
@@ -330,7 +335,12 @@ impl<'a> SshSession<'a> {
     }
 }
 
-struct FileStatIter<'a, I: Iterator<Item = &'a Path>> {
+pub struct FileListing {
+    pub num_files: usize,
+    pub files: Vec<(usize, PathBuf)>,
+}
+
+pub struct FileStatIter<'a, I: Iterator<Item = &'a Path>> {
     sftp: Sftp,
     input_iter: I,
 }

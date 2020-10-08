@@ -46,7 +46,7 @@ impl Command for Clean {
                 &color::frame,
             )?;
 
-            for file in files_to_delete.iter() {
+            for (_, file) in files_to_delete.files.iter() {
                 println!(
                     " {dot} {file}",
                     dot = color::dot.apply_to("*"),
@@ -73,7 +73,7 @@ impl Command for Clean {
             };
 
         if do_delete {
-            for file in files_to_delete {
+            for (_, file) in files_to_delete.files {
                 remove_file(&file)?
             }
         }

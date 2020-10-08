@@ -1,11 +1,10 @@
 use anyhow::Result;
 use clap::Clap;
 use log::info;
-use std::path::PathBuf;
 
 use crate::cfg::Config;
 use crate::cmd::Command;
-use crate::ssh::SshSession;
+use crate::ssh::{SshSession, FileListing};
 
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
@@ -24,36 +23,36 @@ pub struct List {
 }
 
 impl Command for List {
-    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         info!("Listing remote files:");
 
         let host = &session.host;
 
-        let files = session.list_files()?;
-        let num_files = files.len() as i64;
-
-        let to_list: Vec<(usize, &PathBuf)> = if self.indices.len() == 0 {
+        let to_list: FileListing = if self.indices.len() == 0 {
+            let files = session.list_files()?;
+            let num_files = files.len();
             if let Some(n) = self.last {
-                files
-                    .iter()
+                FileListing{ files: files
+                    .into_iter()
                     .enumerate()
                     .skip(num_files as usize - n)
-                    .collect()
+                    .collect(),
+                    num_files }
             } else {
-                files.iter().enumerate().collect()
+                FileListing{ files: files.into_iter().enumerate().collect(), num_files }
             }
         } else {
-            let mut selected = Vec::with_capacity(self.indices.len());
-            for i in &self.indices {
-                let idx = if *i < 0 { num_files + i } else { *i } as usize;
-                selected.push((idx, &files[idx]));
-            }
-            selected
+            session
+                .get_files_by(
+                    &self.indices,
+                    &[],
+                    session.host.prefix_length.unwrap_or(config.prefix_length),
+                )?
         };
 
         let num_digits = {
             let mut num_digits = 0;
-            let mut num = num_files;
+            let mut num = to_list.num_files;
             while num > 0 {
                 num /= 10;
                 num_digits += 1;
@@ -62,15 +61,15 @@ impl Command for List {
         };
 
         if self.url_only {
-            for (_, file) in to_list {
+            for (_, file) in to_list.files {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
         } else {
-            for (i, file) in to_list.iter() {
+            for (i, file) in to_list.files.iter() {
                 println!(
                     "[{idx:width$}|{rev_idx:rev_width$}] {url}",
                     idx = i,
-                    rev_idx = *i as i64 - num_files,
+                    rev_idx = *i as i64 - to_list.num_files as i64,
                     url = host.get_url(&format!("{}", file.display()))?,
                     width = num_digits,
                     rev_width = num_digits + 1
