@@ -1,8 +1,7 @@
-use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
-
 use anyhow::{Context, Result};
-
+use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 use indicatif::ProgressStyle;
+use std::iter::IntoIterator;
 
 use crate::cmd::{Clean, List, Push};
 
@@ -68,8 +67,9 @@ pub fn style_spinner() -> indicatif::ProgressStyle {
     ProgressStyle::default_spinner().template("{spinner:.green} {msg}")
 }
 
-pub fn draw_boxed(
-    text: &str,
+pub fn draw_boxed<'a, I: IntoIterator<Item = &'a str>>(
+    header: &'a str,
+    content: I,
     color_line: &console::Style,
     color_box: &console::Style,
 ) -> Result<()> {
@@ -77,24 +77,51 @@ pub fn draw_boxed(
     let corner_top_right = color_box.apply_to("┐");
     let corner_bottom_left = color_box.apply_to("└");
     let corner_bottom_right = color_box.apply_to("┘");
+    let header_left = color_box.apply_to("┤");
+    let header_right = color_box.apply_to("├");
 
-    let line_len_max = text
-        .lines()
-        .map(|l| l.len())
-        .max()
-        .with_context(|| "No lines supplied.")?;
-    let length_horizontal = line_len_max + 2;
+    let content: Vec<&str> = content.into_iter().collect();
 
-    let line_horizontal = color_box.apply_to("─".repeat(length_horizontal));
+    let line_len = {
+        let content_max = content
+            .iter()
+            .map(|l| console::strip_ansi_codes(l).len())
+            .max()
+            .with_context(|| "No lines supplied.")?;
+
+        [60, content_max + 2, header.len() + 2]
+            .iter()
+            .max()
+            .unwrap()
+            .clone()
+    };
+
+    let line_horizontal = |len: usize| color_box.apply_to("─".repeat(len));
     let line_vertical = color_box.apply_to("│");
 
-    println!("{}{}{}", corner_top_left, line_horizontal, corner_top_right);
-    for line in text.lines() {
-        println!("{box} {line:<width$} {box}", line=color_line.apply_to(line), box=line_vertical, width=line_len_max);
+    println!(
+        "{cl}{hl}{hdr}{hr}{fl}{cr}",
+        cl = corner_top_left,
+        cr = corner_top_right,
+        hl = header_left,
+        hr = header_right,
+        hdr = header,
+        fl = line_horizontal(line_len - 2 /* header left/right */ - header.len())
+    );
+    for line in content.iter() {
+        let pad_width = line_len-console::strip_ansi_codes(line).len() - 2 /* padding */;
+        println!(
+            "{border} {line}{pad} {border}",
+            line = line,
+            border = line_vertical,
+            pad = " ".repeat(pad_width)
+        );
     }
     println!(
-        "{}{}{}",
-        corner_bottom_left, line_horizontal, corner_bottom_right
+        "{cl}{l}{cr}",
+        cl = corner_bottom_left,
+        cr = corner_bottom_right,
+        l = line_horizontal(line_len)
     );
 
     Ok(())

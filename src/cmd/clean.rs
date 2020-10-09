@@ -40,19 +40,21 @@ impl Command for Clean {
         )?;
 
         let do_delete = self.no_confirm || {
+            let dot = color::dot.apply_to("*");
+            let formatted_files: Vec<String> =
+                files_to_delete.files.iter().map(|(_, f)|
+                format!(
+                    " {dot} {file}",
+                    dot = dot,
+                    file = color::entry.apply_to(f.display())
+                )).collect();
             crate::cli::draw_boxed(
                 "Will delete the following files:",
+                formatted_files.iter().map(|s| s.as_str()),
                 &color::heading,
                 &color::frame,
             )?;
 
-            for (_, file) in files_to_delete.files.iter() {
-                println!(
-                    " {dot} {file}",
-                    dot = color::dot.apply_to("*"),
-                    file = color::entry.apply_to(file.display())
-                )
-            }
             println!("");
             Confirm::new()
                 .with_prompt("Delete files?")
