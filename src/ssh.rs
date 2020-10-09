@@ -131,8 +131,8 @@ impl<'a> SshSession<'a> {
     /// Create a new SSH session from the given host configuration.
     ///
     /// First try authenticating with all agent identities then use an interactive password, if enabled.
-    pub fn create(host: &'a Host, global_auth_cfg: &Auth) -> Result<Self> {
-        let auth: &Auth = host.auth.as_ref().unwrap_or(global_auth_cfg);
+    pub fn create(host: &'a Host) -> Result<Self> {
+        let auth: &Auth = &host.auth;
 
         let tcp = TcpStream::connect(ensure_port(host.get_hostname()))?;
 

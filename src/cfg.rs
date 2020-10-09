@@ -34,7 +34,7 @@ pub struct Config {
 }
 
 /// Authentication configuration
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Auth {
     /// Perform agent authentication
     pub use_agent: bool,
@@ -57,7 +57,7 @@ pub struct Host {
     pub alias: String,
 
     /// Overwrite global authentication settings for this host.
-    pub auth: Option<Auth>,
+    pub auth: Auth,
 
     /// In which folder do we store files on the host.
     pub folder: PathBuf,
@@ -74,7 +74,7 @@ pub struct Host {
     pub password: Option<String>,
 
     /// Length of prefix to use
-    pub prefix_length: Option<u8>,
+    pub prefix_length: u8,
 
     /// url-prefix to apply to file link
     pub url: String,
@@ -87,13 +87,13 @@ fn default_config_directories() -> Vec<&'static str> {
     vec!["~/.config/asfa", "/etc/asfa"]
 }
 
-pub fn get<T: AsRef<str> + Display>(path: &Option<T>) -> Result<Config> {
+pub fn load<T: AsRef<str> + Display>(path: &Option<T>) -> Result<Config> {
     let possible_paths: Vec<&str> = match path {
         Some(path) => vec![path.as_ref()],
         None => default_config_directories(),
     };
     for path in possible_paths.iter() {
-        match Config::get(path)? {
+        match Config::load(path)? {
             None => continue,
             Some(cfg) => return Ok(cfg),
         }
@@ -115,8 +115,20 @@ pub fn dummy_host() -> Host {
     .unwrap()
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            auth: Auth::default(),
+            default_host: None,
+            hosts: HashMap::new(),
+            prefix_length: 32,
+            verify_via_hash: true,
+        }
+    }
+}
+
 impl Config {
-    pub fn get<T: AsRef<str> + Display>(dir: T) -> Result<Option<Config>> {
+    pub fn load<T: AsRef<str> + Display>(dir: T) -> Result<Option<Config>> {
         let config_dir = match expanduser(dir.as_ref()) {
             Ok(p) => p,
             Err(e) => {
@@ -196,6 +208,8 @@ impl Config {
             }
         };
 
+        let mut config = Config::default();
+
         let config_yaml = match &documents[0] {
             Yaml::Hash(h) => h,
             _ => {
@@ -203,14 +217,29 @@ impl Config {
             }
         };
 
-        let mut hosts = HashMap::new();
-        let prefix_length = {
+        config.prefix_length = {
             let length = get_int_from(config_yaml, "prefix_length")?
                 .cloned()
-                .unwrap_or(32);
+                .unwrap_or(config.prefix_length as i64);
             check_prefix_length(length)?;
             length as u8
         };
+
+        config.auth = if let Some(Yaml::Hash(auth)) = config_yaml.get(&yaml_string("auth")) {
+            match Auth::from_yaml(&auth) {
+                Ok(auth) => auth,
+                Err(e) => {
+                    bail!("Could not read global authentication settings: {}", e);
+                }
+            }
+        } else {
+            config.auth
+        };
+
+        config.default_host = get_string_from(config_yaml, "default_host")?.cloned();
+        config.verify_via_hash = get_bool_from(config_yaml, "verify_via_hash")?
+            .cloned()
+            .unwrap_or(config.verify_via_hash);
 
         match config_yaml.get(&yaml_string("hosts")) {
             Some(Yaml::Hash(dict)) => {
@@ -223,8 +252,8 @@ impl Config {
                         }
                     };
                     let host_yaml = entry.get();
-                    let host = Host::from_yaml(alias.clone(), host_yaml)?;
-                    hosts.insert(alias, host);
+                    let host = Host::from_yaml_with_config(alias.clone(), host_yaml, &config)?;
+                    config.hosts.insert(alias, host);
                 }
             }
             // Some(Yaml::Array(a)) => a,
@@ -236,29 +265,7 @@ impl Config {
             }
         };
 
-        let auth = if let Some(Yaml::Hash(auth)) = config_yaml.get(&yaml_string("auth")) {
-            match Auth::from_yaml(&auth) {
-                Ok(auth) => auth,
-                Err(e) => {
-                    bail!("Could not read global authentication settings: {}", e);
-                }
-            }
-        } else {
-            Auth::default()
-        };
-
-        let default_host = get_string_from(config_yaml, "default_host")?.cloned();
-        let verify_via_hash = get_bool_from(config_yaml, "verify_via_hash")?
-            .cloned()
-            .unwrap_or(true);
-
-        Ok(Config {
-            auth,
-            prefix_length,
-            hosts,
-            default_host,
-            verify_via_hash,
-        })
+        Ok(config)
     }
 
     pub fn get_host<T: AsRef<str>>(&self, alias: Option<T>) -> Result<&Host> {
@@ -286,6 +293,10 @@ impl Config {
 
 impl Host {
     fn from_yaml(alias: String, input: &Yaml) -> Result<Host> {
+        Self::from_yaml_with_config(alias, input, &Config::default())
+    }
+
+    fn from_yaml_with_config(alias: String, input: &Yaml, config: &Config) -> Result<Host> {
         if let Yaml::Hash(dict) = input {
             let url = get_required(dict, "url", get_string_from)?.clone();
 
@@ -298,16 +309,16 @@ impl Host {
             let group = get_optional(dict, "group", get_string_from)?.cloned();
 
             let auth = match get_optional(dict, "auth", get_dict_from)? {
-                Some(auth) => Some(Auth::from_yaml(auth)?),
-                None => None,
+                Some(auth) => Auth::from_yaml(auth)?,
+                None => config.auth.clone(),
             };
 
             let prefix_length = match get_optional(dict, "prefix_length", get_int_from)? {
                 Some(prefix) => {
                     check_prefix_length(*prefix)?;
-                    Some(*prefix as u8)
+                    *prefix as u8
                 }
-                None => None,
+                None => config.prefix_length.clone(),
             };
 
             let password = get_optional(dict, "password", get_string_from)?.cloned();
@@ -387,7 +398,7 @@ mod tests {
     #[test]
     fn load_example_config() {
         util::test::init().unwrap();
-        let cfg = crate::cfg::Config::get("example-config/asfa")
+        let cfg = crate::cfg::Config::load("example-config/asfa")
             .unwrap()
             .unwrap();
         log::debug!("Loaded: {:?}", cfg);

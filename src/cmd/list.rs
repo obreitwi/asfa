@@ -4,7 +4,7 @@ use log::info;
 
 use crate::cfg::Config;
 use crate::cmd::Command;
-use crate::ssh::{SshSession, FileListing};
+use crate::ssh::{FileListing, SshSession};
 
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
@@ -23,7 +23,7 @@ pub struct List {
 }
 
 impl Command for List {
-    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
         info!("Listing remote files:");
 
         let host = &session.host;
@@ -32,22 +32,22 @@ impl Command for List {
             let files = session.list_files()?;
             let num_files = files.len();
             if let Some(n) = self.last {
-                FileListing{ files: files
-                    .into_iter()
-                    .enumerate()
-                    .skip(num_files as usize - n)
-                    .collect(),
-                    num_files }
+                FileListing {
+                    files: files
+                        .into_iter()
+                        .enumerate()
+                        .skip(num_files as usize - n)
+                        .collect(),
+                    num_files,
+                }
             } else {
-                FileListing{ files: files.into_iter().enumerate().collect(), num_files }
+                FileListing {
+                    files: files.into_iter().enumerate().collect(),
+                    num_files,
+                }
             }
         } else {
-            session
-                .get_files_by(
-                    &self.indices,
-                    &[],
-                    session.host.prefix_length.unwrap_or(config.prefix_length),
-                )?
+            session.get_files_by(&self.indices, &[], session.host.prefix_length)?
         };
 
         let num_digits = {

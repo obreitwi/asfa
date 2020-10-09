@@ -30,24 +30,28 @@ pub struct Clean {
 }
 
 impl Command for Clean {
-    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
         debug!("Cleaning remote files..");
 
         let files_to_delete = session.get_files_by(
             &self.indices,
             &self.files.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
-            session.host.prefix_length.unwrap_or(config.prefix_length),
+            session.host.prefix_length,
         )?;
 
         let do_delete = self.no_confirm || {
             let dot = color::dot.apply_to("*");
-            let formatted_files: Vec<String> =
-                files_to_delete.files.iter().map(|(_, f)|
-                format!(
-                    " {dot} {file}",
-                    dot = dot,
-                    file = color::entry.apply_to(f.display())
-                )).collect();
+            let formatted_files: Vec<String> = files_to_delete
+                .files
+                .iter()
+                .map(|(_, f)| {
+                    format!(
+                        " {dot} {file}",
+                        dot = dot,
+                        file = color::entry.apply_to(f.display())
+                    )
+                })
+                .collect();
             crate::cli::draw_boxed(
                 "Will delete the following files:",
                 formatted_files.iter().map(|s| s.as_str()),

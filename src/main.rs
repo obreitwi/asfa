@@ -37,13 +37,13 @@ fn main() -> Result<()> {
 
     let env_cfg_path = std::env::var("ASFA_CONFIG").ok();
 
-    let cfg = cfg::get(&opts.config.or(env_cfg_path))?;
+    let cfg = cfg::load(&opts.config.or(env_cfg_path))?;
     let host = cfg.get_host(opts.host)?;
 
     trace!("Config file: {:?}", cfg);
     trace!("Host: {:?}", host);
 
-    let session = SshSession::create(&host, &cfg.auth)?;
+    let session = SshSession::create(&host)?;
 
     use cli::UserCommand::*;
     match opts.cmd {
