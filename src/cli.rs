@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 use indicatif::ProgressStyle;
 use std::iter::IntoIterator;
@@ -18,14 +18,25 @@ pub struct Opts {
     #[clap(short = 'c', long = "config")]
     pub config: Option<String>,
 
-    /// Set loglevel.
+    /// Make output more verbose.
+    /// Equivalent to loglevels 'debug' and 'trace' if (specified multiple times).
+    /// Should not be specified with `--loglevel`.
+    #[clap(short, long, parse(from_occurrences))]
+    pub verbose: i32,
+
+    /// Make output more quiet.
+    /// Equivalent to loglevels 'warn' and 'error' if (specified multiple times).
+    /// Should not be specified with `--loglevel`.
+    #[clap(short, long, parse(from_occurrences))]
+    pub quiet: i32,
+
+    /// Set loglevel. Defaults to 'info' if unset. Should not be specified with `--verbose`.
     #[clap(
         short,
         long,
-        default_value = "info",
         possible_values = &["trace", "debug", "info", "warn", "error"],
     )]
-    pub loglevel: String,
+    pub loglevel: Option<String>,
 
     /// Name of remote site to push to. Only relevant if several remote sites are configured.
     /// The default host can be set in config via `default_host`-option.
@@ -34,6 +45,23 @@ pub struct Opts {
 
     #[clap(subcommand)]
     pub cmd: UserCommand,
+}
+
+impl Opts {
+    pub fn verify(&self) -> Result<()> {
+        match (self.verbose, self.quiet, self.loglevel.as_deref()) {
+            (v, q, _) if v + q > 0 => {
+                bail!("Cannot specify --verbose and --quiet.");
+            }
+            (v, _, Some(_)) if v > 0 => {
+                bail!("Cannot specify --verbose and --loglevel");
+            }
+            (_, q, Some(_)) if q > 0 => {
+                bail!("Cannot specify --quiet and --loglevel");
+            }
+            _ => Ok(()),
+        }
+    }
 }
 
 #[derive(Clap, Debug)]
@@ -134,9 +162,8 @@ pub mod color {
     use console::Style;
 
     lazy_static::lazy_static! {
-        pub static ref heading : Style = console::Style::new();
-        pub static ref frame : Style = console::Style::new().blue();
-        pub static ref entry : Style = console::Style::new();
-        pub static ref dot : Style = console::Style::new().cyan();
+        pub static ref frame : Style = Style::new().blue();
+        pub static ref entry : Style = Style::new();
+        pub static ref dot : Style = Style::new().cyan();
     }
 }

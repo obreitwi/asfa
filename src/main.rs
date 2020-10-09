@@ -20,12 +20,19 @@ use clap::Clap;
 fn main() -> Result<()> {
     let opts = cli::Opts::parse();
 
-    let level = match opts.loglevel.as_str() {
-        "trace" => log::LevelFilter::Trace,
-        "debug" => log::LevelFilter::Debug,
-        "info" => log::LevelFilter::Info,
-        "warn" => log::LevelFilter::Warn,
-        "error" => log::LevelFilter::Error,
+    opts.verify()?;
+
+    let level = match (opts.loglevel.as_deref(), opts.verbose, opts.quiet) {
+        (Some("trace"), _, _) => log::LevelFilter::Trace,
+        (Some("debug"), _, _) => log::LevelFilter::Debug,
+        (Some("info"), _, _) => log::LevelFilter::Info,
+        (Some("warn"), _, _) => log::LevelFilter::Warn,
+        (Some("error"), _, _) => log::LevelFilter::Error,
+        (None, v, 0) if v > 1 => log::LevelFilter::Trace,
+        (None, 1, 0) => log::LevelFilter::Debug,
+        (None, 0, 0) => log::LevelFilter::Info,
+        (None, 0, 1) => log::LevelFilter::Warn,
+        (None, 0, q) if q > 1 => log::LevelFilter::Error,
         _ => {
             bail!("Restriction of loglevel in clap failed!");
         }

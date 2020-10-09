@@ -4,6 +4,8 @@
 ## v0.3.2-pre (under development)
 
 * Add `private_key_file` to auth-option in order to specfiy private key file directly
+* Add `--verbose` argument that increases loglevel
+* Add `--quiet` argument that decreases loglevel
 
 ## v0.3.1 (2020-10-03)
 
