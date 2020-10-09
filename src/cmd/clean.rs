@@ -52,14 +52,16 @@ impl Command for Clean {
                     )
                 })
                 .collect();
+
             crate::cli::draw_boxed(
-                "Will delete the following files:",
+                &format!(
+                    "Will {delete} the following files:",
+                    delete = console::Style::new().red().bright().apply_to("delete")
+                )
+                .as_str(),
                 formatted_files.iter().map(|s| s.as_str()),
-                &color::heading,
                 &color::frame,
             )?;
-
-            println!("");
             Confirm::new()
                 .with_prompt("Delete files?")
                 .default(false)

@@ -67,10 +67,9 @@ pub fn style_spinner() -> indicatif::ProgressStyle {
     ProgressStyle::default_spinner().template("{spinner:.green} {msg}")
 }
 
-pub fn draw_boxed<'a, I: IntoIterator<Item = &'a str>>(
-    header: &'a str,
+pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
+    header: H,
     content: I,
-    color_line: &console::Style,
     color_box: &console::Style,
 ) -> Result<()> {
     let corner_top_left = color_box.apply_to("┌");
@@ -82,6 +81,8 @@ pub fn draw_boxed<'a, I: IntoIterator<Item = &'a str>>(
 
     let content: Vec<&str> = content.into_iter().collect();
 
+    let header_len = console::strip_ansi_codes(header.as_ref()).len();
+
     let line_len = {
         let content_max = content
             .iter()
@@ -89,7 +90,7 @@ pub fn draw_boxed<'a, I: IntoIterator<Item = &'a str>>(
             .max()
             .with_context(|| "No lines supplied.")?;
 
-        [60, content_max + 2, header.len() + 2]
+        [60, content_max + 2, header_len + 2]
             .iter()
             .max()
             .unwrap()
@@ -105,8 +106,8 @@ pub fn draw_boxed<'a, I: IntoIterator<Item = &'a str>>(
         cr = corner_top_right,
         hl = header_left,
         hr = header_right,
-        hdr = header,
-        fl = line_horizontal(line_len - 2 /* header left/right */ - header.len())
+        hdr = header.as_ref(),
+        fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
     for line in content.iter() {
         let pad_width = line_len-console::strip_ansi_codes(line).len() - 2 /* padding */;
@@ -133,11 +134,9 @@ pub mod color {
     use console::Style;
 
     lazy_static::lazy_static! {
-        // static ref heading : Style = console::Style::new().cyan().bright().bold();
-        // static ref frame : Style = console::Style::new().magenta();
         pub static ref heading : Style = console::Style::new();
         pub static ref frame : Style = console::Style::new().blue();
-        pub static ref entry : Style = console::Style::new().red().bright();
+        pub static ref entry : Style = console::Style::new();
         pub static ref dot : Style = console::Style::new().cyan();
     }
 }
