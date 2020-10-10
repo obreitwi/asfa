@@ -17,6 +17,7 @@ doc = []
 
 [dependencies]
 anyhow = "1.0.32"
+base64 = "0.13.0"
 clap = "3.0.0-beta.2"
 console = "0.12.0"
 dialoguer = "0.6.2"

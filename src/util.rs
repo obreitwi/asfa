@@ -22,12 +22,12 @@ pub fn yaml_string(s: &str) -> Yaml {
 pub fn get_hash(path: &Path, length: u8) -> Result<String> {
     let hash = if length == 0 {
         bail!("Length cannot be zero!");
-    } else if length <= 64 {
+    } else if length <= 32 {
         get_explicit_hash::<sha2::Sha256>(path)?
-    } else if length <= 128 {
+    } else if length <= 64 {
         get_explicit_hash::<sha2::Sha512>(path)?
     } else {
-        bail!("Length should be smaller than 128.");
+        bail!("Length should be equal to or smaller than 64.");
     };
     Ok(hash[..length as usize].to_string())
 }
@@ -45,7 +45,7 @@ fn get_explicit_hash<Hasher: sha2::Digest>(path: &Path) -> Result<String> {
             break;
         }
     }
-    Ok(hex::encode(hash.finalize()))
+    Ok(base64::encode_config(hash.finalize(), base64::URL_SAFE))
 }
 
 macro_rules! make_yaml_getter {

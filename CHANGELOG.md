@@ -6,6 +6,8 @@
 * Add `private_key_file` to auth-option in order to specfiy private key file directly
 * Add `--verbose` argument that increases loglevel
 * Add `--quiet` argument that decreases loglevel
+* Encode hash in base64 in order to make needed URL prefix shorter at same "guessability".
+  → This causes the maximum prefix length to go down from 128 to 64 (4 bit per char → 8 bit per char)
 
 ## v0.3.1 (2020-10-03)
 

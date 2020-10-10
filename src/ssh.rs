@@ -226,12 +226,12 @@ impl<'a> SshSession<'a> {
         let path = self.prepend_base_folder(path);
         let hasher = if length == 0 {
             bail!("Length cannot be zero!");
-        } else if length <= 64 {
+        } else if length <= 32 {
             "sha256sum"
-        } else if length <= 128 {
+        } else if length <= 64 {
             "sha512sum"
         } else {
-            bail!("Length should be smaller than 128.");
+            bail!("Length should be equal to or smaller than 64.");
         };
 
         let mut channel = self.raw.channel_session()?;
@@ -256,7 +256,8 @@ impl<'a> SshSession<'a> {
             .split_whitespace()
             .next()
             .context("No hash found in output.")?;
-        Ok(full_hash[..length as usize].to_string())
+        let hash_base64 = base64::encode_config(hex::decode(full_hash)?, base64::URL_SAFE);
+        Ok(hash_base64[..length as usize].to_string())
     }
 
     fn prepend_base_folder(&self, path: &Path) -> PathBuf {

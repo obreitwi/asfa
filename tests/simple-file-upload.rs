@@ -11,12 +11,13 @@ fn simple_file_upload(host: &str) -> Result<()> {
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), file_size)?;
     let alias = fixture::random_filename(8, "txt");
 
-    // TODO: right now prefix length in ci-config is set to 32 -> read from config
     let hash = run_fun(format!("sha256sum {}", local.display()))?
         .split_whitespace()
         .next()
-        .with_context(|| "Could not compute hash")?[..32]
+        .with_context(|| "Could not compute hash")?
         .to_string();
+
+    let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
     run_cmd(format!(
         "cargo run -- --loglevel debug -H {} push {} --alias {}",
         host,
@@ -26,7 +27,7 @@ fn simple_file_upload(host: &str) -> Result<()> {
     let remote = format!(
         "{}/{}/{}",
         std::env::var("ASFA_FOLDER_UPLOAD")?,
-        hash,
+        &hash_b64[..32], // TODO: right now prefix length in ci-config is set to 32 -> read from config
         alias
     );
     if !Path::new(&remote).exists() {
