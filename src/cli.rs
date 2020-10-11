@@ -130,7 +130,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
     let line_horizontal = |len: usize| color_box.apply_to("─".repeat(len));
     let line_vertical = color_box.apply_to("│");
 
-    println!(
+    let header_raw = format!(
         "{cl}{hl}{hdr}{hr}{fl}{cr}",
         cl = corner_top_left,
         cr = corner_top_right,
@@ -139,6 +139,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         hdr = header.as_ref(),
         fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
+    println!("{}", join_frames(&content[0], &header_raw, '┬'));
     for line in content.iter() {
         let pad_width = line_len - console::strip_ansi_codes(line).chars().count();
         println!(
@@ -154,10 +155,19 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         cr = corner_bottom_right,
         l = line_horizontal(line_len)
     );
+    let last_line = join_frames(&content[content.len() - 1], &last_line_raw, '┴');
 
+    println!("{}", last_line);
+
+    Ok(())
+}
+
+/// Replace portions in raw that are a horizontal line ('─') with `joiner` where content contains a
+/// vertical line ('│').
+/// This makes it possible to join frames.
+fn join_frames(content: &str, raw: &str, joiner: char) -> String {
     // Make sure any frames drawn in last line are joined
-    let last_content_stripped: String =
-        console::strip_ansi_codes(&content[content.len() - 1]).to_string();
+    let last_content_stripped: String = console::strip_ansi_codes(content).to_string();
     let indices_separator: Vec<usize> = last_content_stripped
         .chars()
         .enumerate()
@@ -165,28 +175,21 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         .filter(|i| i.is_some())
         .map(|i| i.unwrap())
         .collect();
-    let last_line: String = {
-        let mut found_lines = 0;
-        last_line_raw
-            .chars()
-            .map(|c| {
-                if c == '─' {
-                    found_lines += 1;
-                    if indices_separator.contains(&(found_lines - 1)) {
-                        '┴'
-                    } else {
-                        c
-                    }
+    let mut found_lines = 0;
+    raw.chars()
+        .map(|c| {
+            if c == '─' {
+                found_lines += 1;
+                if indices_separator.contains(&(found_lines - 1)) {
+                    joiner
                 } else {
                     c
                 }
-            })
-            .collect()
-    };
-
-    println!("{}", last_line);
-
-    Ok(())
+            } else {
+                c
+            }
+        })
+        .collect()
 }
 
 #[allow(non_upper_case_globals)]
