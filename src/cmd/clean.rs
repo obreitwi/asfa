@@ -46,7 +46,7 @@ impl Command for Clean {
                 .iter()
                 .map(|(_, f)| {
                     format!(
-                        " {dot} {file}",
+                        " {dot} {file} ",
                         dot = dot,
                         file = color::entry.apply_to(f.display())
                     )
@@ -56,7 +56,7 @@ impl Command for Clean {
             crate::cli::draw_boxed(
                 &format!(
                     "Will {delete} the following files:",
-                    delete = console::Style::new().red().bright().apply_to("delete")
+                    delete = console::Style::new().bold().red().bright().apply_to("delete")
                 )
                 .as_str(),
                 formatted_files.iter().map(|s| s.as_str()),

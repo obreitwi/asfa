@@ -1,15 +1,18 @@
 use anyhow::Result;
 use clap::Clap;
+use console::Style;
 use log::info;
 
 use crate::cfg::Config;
+use crate::cli::{color,text};
+use crate::cli::draw_boxed;
 use crate::cmd::Command;
 use crate::ssh::{FileListing, SshSession};
 
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
 pub struct List {
-    /// Only list the remote URLs (useful for copying).
+    /// Only list the remote URLs (useful for copying and scripting).
     #[clap(short, long = "url-only")]
     url_only: bool,
 
@@ -65,16 +68,29 @@ impl Command for List {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
         } else {
-            for (i, file) in to_list.files.iter() {
-                println!(
-                    "[{idx:width$}|{rev_idx:rev_width$}] {url}",
-                    idx = i,
-                    rev_idx = *i as i64 - to_list.num_files as i64,
-                    url = host.get_url(&format!("{}", file.display()))?,
-                    width = num_digits,
-                    rev_width = num_digits + 1
-                );
-            }
+            let content: Result<Vec<String>> = to_list
+                .files
+                .iter()
+                .map(|(i, file)| -> Result<String> {
+                    Ok(format!(
+                        "{idx:width$}{sep}{rev_idx:rev_width$}{sep} {url} ",
+                        idx = i,
+                        rev_idx = *i as i64 - to_list.num_files as i64,
+                        url = host.get_url(&format!("{}", file.display()))?,
+                        width = num_digits,
+                        rev_width = num_digits + 1,
+                        sep=text::separator()
+                    ))
+                })
+                .collect();
+            draw_boxed(
+                format!(
+                    "{listing} remote files",
+                    listing = Style::new().bold().green().bright().apply_to("Listing")
+                ),
+                content?.iter().map(|s| s.as_ref()),
+                &color::frame,
+            )?;
         }
         Ok(())
     }

@@ -111,16 +111,16 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
 
     let content: Vec<&str> = content.into_iter().collect();
 
-    let header_len = console::strip_ansi_codes(header.as_ref()).len();
+    let header_len = console::strip_ansi_codes(header.as_ref()).chars().count();
 
     let line_len = {
         let content_max = content
             .iter()
-            .map(|l| console::strip_ansi_codes(l).len())
+            .map(|l| console::strip_ansi_codes(l).chars().count())
             .max()
             .with_context(|| "No lines supplied.")?;
 
-        [60, content_max + 2, header_len + 2]
+        [60, content_max, header_len + 2]
             .iter()
             .max()
             .unwrap()
@@ -140,20 +140,51 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
     for line in content.iter() {
-        let pad_width = line_len-console::strip_ansi_codes(line).len() - 2 /* padding */;
+        let pad_width = line_len - console::strip_ansi_codes(line).chars().count();
         println!(
-            "{border} {line}{pad} {border}",
+            "{border}{line}{pad}{border}",
             line = line,
             border = line_vertical,
             pad = " ".repeat(pad_width)
         );
     }
-    println!(
+    let last_line_raw = format!(
         "{cl}{l}{cr}",
         cl = corner_bottom_left,
         cr = corner_bottom_right,
         l = line_horizontal(line_len)
     );
+
+    // Make sure any frames drawn in last line are joined
+    let last_content_stripped: String =
+        console::strip_ansi_codes(&content[content.len() - 1]).to_string();
+    let indices_separator: Vec<usize> = last_content_stripped
+        .chars()
+        .enumerate()
+        .map(|(idx, c)| if c == '│' { Some(idx) } else { None })
+        .filter(|i| i.is_some())
+        .map(|i| i.unwrap())
+        .collect();
+    let last_line: String = {
+        let mut found_lines = 0;
+        last_line_raw
+            .chars()
+            .map(|c| {
+                if c == '─' {
+                    found_lines += 1;
+                    if indices_separator.contains(&(found_lines - 1)) {
+                        '┴'
+                    } else {
+                        c
+                    }
+                } else {
+                    c
+                }
+            })
+            .collect()
+    };
+
+    println!("{}", last_line);
 
     Ok(())
 }
@@ -167,5 +198,12 @@ pub mod color {
         pub static ref frame : Style = Style::new().blue();
         pub static ref entry : Style = Style::new();
         pub static ref dot : Style = Style::new().cyan();
+    }
+}
+
+#[allow(non_upper_case_globals)]
+pub mod text {
+    pub fn separator() -> String {
+        format!("{}", super::color::frame.apply_to("│"))
     }
 }
