@@ -50,6 +50,8 @@ pub struct Opts {
 impl Opts {
     pub fn verify(&self) -> Result<()> {
         match (self.verbose, self.quiet, self.loglevel.as_deref()) {
+            (_, 0, None) => Ok(()),
+            (0, _, None) => Ok(()),
             (v, q, _) if v + q > 0 => {
                 bail!("Cannot specify --verbose and --quiet.");
             }
