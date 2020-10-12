@@ -78,11 +78,22 @@ pub enum UserCommand {
     Push(Push),
 }
 
-pub fn style_progress_bar() -> indicatif::ProgressStyle {
+/// Progress bar style for file transfers
+pub fn style_progress_bar_transfer() -> indicatif::ProgressStyle {
     ProgressStyle::default_bar()
         .template(
             "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} \
                    @ {bytes_per_sec} ({eta})",
+        )
+        .progress_chars("#>-")
+}
+
+/// Progress bar style for counts
+pub fn style_progress_bar_count() -> indicatif::ProgressStyle {
+    ProgressStyle::default_bar()
+        .template(
+            "{spinner:.green} [{elapsed_precise}] {msg}[{bar:40.cyan/blue}] {pos} / {len} \
+                   @ {per_sec} ({eta})",
         )
         .progress_chars("#>-")
 }
@@ -139,7 +150,9 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         hdr = header.as_ref(),
         fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
-    println!("{}", join_frames(&content[0], &header_raw, '┬'));
+    // TODO: Currently bugged, fix me!
+    // println!("{}", join_frames(&content[0], &header_raw, '┬'));
+    println!("{}", &header_raw);
     for line in content.iter() {
         let pad_width = line_len - console::strip_ansi_codes(line).chars().count();
         println!(

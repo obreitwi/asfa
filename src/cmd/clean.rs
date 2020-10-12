@@ -56,7 +56,11 @@ impl Command for Clean {
             crate::cli::draw_boxed(
                 &format!(
                     "Will {delete} the following files:",
-                    delete = console::Style::new().bold().red().bright().apply_to("delete")
+                    delete = console::Style::new()
+                        .bold()
+                        .red()
+                        .bright()
+                        .apply_to("delete")
                 )
                 .as_str(),
                 formatted_files.iter().map(|s| s.as_str()),

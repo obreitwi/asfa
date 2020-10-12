@@ -5,7 +5,7 @@ use anyhow::{bail, Context, Result};
 use indicatif::ProgressBar;
 use log::{debug, error, info};
 use rpassword::prompt_password_stderr;
-use ssh2::{Session as RawSession, Sftp};
+use ssh2::Session as RawSession;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IOError, ErrorKind};
@@ -289,9 +289,23 @@ impl<'a> SshSession<'a> {
     pub fn stat<'b, I: IntoIterator<Item = &'b Path>>(
         &self,
         paths: I,
-    ) -> Result<FileStatIter<'b, I::IntoIter>> {
+    ) -> Result<Vec<ssh2::FileStat>> {
+        debug!("Getting remote stats…");
+        let paths: Vec<_> = paths.into_iter().collect();
+
+        let bar = ProgressBar::new(paths.len() as u64);
+        bar.set_style(crate::cli::style_progress_bar_count());
+        bar.set_message("Getting file stats: ");
+
         let sftp = self.raw.sftp()?;
-        Ok(FileStatIter::new(sftp, paths.into_iter()))
+        let mut filestats = Vec::new();
+        for elem in paths {
+            filestats.push(sftp.stat(&self.prepend_base_folder(elem))?);
+            bar.inc(1);
+        }
+        bar.finish_and_clear();
+        debug!("Getting remote stats… done");
+        Ok(filestats)
     }
 
     /// Upload the given local path to the given remote path (relative to the current host's
@@ -315,7 +329,7 @@ impl<'a> SshSession<'a> {
             .with_context(|| format!("Could not create remote file: {}", path_remote.display()))?;
 
         let bar = ProgressBar::new(local_file.metadata()?.len());
-        bar.set_style(crate::cli::style_progress_bar());
+        bar.set_style(crate::cli::style_progress_bar_transfer());
         let mut reader = BufReader::new(local_file);
 
         loop {
@@ -339,24 +353,4 @@ impl<'a> SshSession<'a> {
 pub struct FileListing {
     pub num_files: usize,
     pub files: Vec<(usize, PathBuf)>,
-}
-
-pub struct FileStatIter<'a, I: Iterator<Item = &'a Path>> {
-    sftp: Sftp,
-    input_iter: I,
-}
-
-impl<'a, I: Iterator<Item = &'a Path>> FileStatIter<'a, I> {
-    fn new(sftp: Sftp, input_iter: I) -> Self {
-        Self { sftp, input_iter }
-    }
-}
-
-impl<'a, I: Iterator<Item = &'a Path>> Iterator for FileStatIter<'a, I> {
-    type Item = std::result::Result<ssh2::FileStat, ssh2::Error>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let elem = self.input_iter.next()?;
-        Some(self.sftp.stat(elem))
-    }
 }
