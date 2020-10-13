@@ -5,6 +5,7 @@
 
 * Fix name of `prefix_length` in example config.
 * `list`: Add `-d`/`--details` switch that simply enables printing of all details.
+* Fix formatting error when displaying file sizes that are 1000 {K,M,G,T,…} exactly.
 
 ## v0.4.0 (2020-10-14)
 

@@ -224,7 +224,7 @@ impl List {
         let possible = ["", "K", "M", "G", "T", "P", "E"];
         let mut size: u64 = stat.size.with_context(|| "No file size defined!")?;
         for (i, s) in possible.iter().enumerate() {
-            if size > 1000 {
+            if size >= 1000 {
                 size = size >> 10;
                 continue;
             } else {
