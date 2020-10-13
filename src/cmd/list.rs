@@ -15,6 +15,10 @@ use crate::ssh::{FileListing, SshSession};
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
 pub struct List {
+    /// Show all details
+    #[clap(long, short)]
+    details: bool,
+
     /// Show no full urls but rather filenames only. Makes for more concise output.
     #[clap(long, short)]
     filenames: bool,
@@ -171,14 +175,14 @@ impl Command for List {
                         width = num_digits,
                         rev_width = num_digits_rev,
                         sep = text::separator(),
-                        size = if self.with_size {
+                        size = if self.details || self.with_size {
                             stat.as_ref()
                                 .map(|s| self.column_size(s))
                                 .unwrap_or(Ok("".to_string()))?
                         } else {
                             "".to_string()
                         },
-                        mtime = if self.with_time {
+                        mtime = if self.details || self.with_time {
                             stat.as_ref()
                                 .map(|s| self.column_time(s))
                                 .unwrap_or(Ok("".to_string()))?
@@ -204,7 +208,7 @@ impl Command for List {
 impl List {
     /// Return whether or not we need to fetch stats
     fn stats_needed(&self) -> bool {
-        self.with_size || self.sort_size || self.with_time
+        self.with_size || self.sort_size || self.with_time || self.details
     }
 
     fn column_time(&self, stat: &FileStat) -> Result<String> {

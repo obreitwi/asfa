@@ -4,6 +4,7 @@
 ## v0.4.1-pre (under development)
 
 * Fix name of `prefix_length` in example config.
+* `list`: Add `-d`/`--details` switch that simply enables printing of all details.
 
 ## v0.4.0 (2020-10-14)
 
