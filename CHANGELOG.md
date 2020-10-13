@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.4.1-pre (under development)
+
 ## v0.4.0 (2020-10-14)
 
 * Add `private_key_file` to auth-option in order to specfiy private key file directly
