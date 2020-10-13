@@ -64,8 +64,8 @@ exactly = 1
 
 [[package.metadata.release.pre-release-replacements]]
 file="README.md"
-search="(?:https://img\\.shields\\.io/github/commits-since/obreitwi/asfa/v)[0-9]+\\.[0-9]+\\.[0-9]+"
-replace="{{version}}"
+search="https://img\\.shields\\.io/github/commits-since/obreitwi/asfa/v[0-9]+\\.[0-9]+\\.[0-9]+"
+replace="https://img.shields.io/github/commits-since/obreitwi/asfa/v{{version}}"
 exactly = 1
 
 [[package.metadata.release.post-release-replacements]]
