@@ -150,9 +150,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         hdr = header.as_ref(),
         fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
-    // TODO: Currently bugged, fix me!
-    // println!("{}", join_frames(&content[0], &header_raw, '┬'));
-    println!("{}", &header_raw);
+    println!("{}", join_frames(&content[0], &header_raw, '┬'));
     for line in content.iter() {
         let pad_width = line_len - console::strip_ansi_codes(line).chars().count();
         println!(
@@ -180,29 +178,22 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
 /// This makes it possible to join frames.
 fn join_frames(content: &str, raw: &str, joiner: char) -> String {
     // Make sure any frames drawn in last line are joined
-    let last_content_stripped: String = console::strip_ansi_codes(content).to_string();
-    let indices_separator: Vec<usize> = last_content_stripped
+    let mut replacer = text::ColoredTextReplacer::new(raw.to_string());
+    let nocolor: Vec<_> = console::strip_ansi_codes(raw).chars().collect();
+    for idx_separator in console::strip_ansi_codes(content)
         .chars()
         .enumerate()
         .map(|(idx, c)| if c == '│' { Some(idx) } else { None })
         .filter(|i| i.is_some())
         .map(|i| i.unwrap())
-        .collect();
-    let mut found_lines = 0;
-    raw.chars()
-        .map(|c| {
-            if c == '─' {
-                found_lines += 1;
-                if indices_separator.contains(&(found_lines - 1)) {
-                    joiner
-                } else {
-                    c
-                }
-            } else {
-                c
-            }
-        })
-        .collect()
+    {
+        // replacer.replace_if(idx_separator, '─', joiner);
+        let idx = idx_separator + /* frame */ 1;
+        if nocolor[idx] == '─' {
+            replacer.replace(idx_separator + /* frame */ 1, joiner);
+        }
+    }
+    replacer.get()
 }
 
 #[allow(non_upper_case_globals)]
@@ -219,7 +210,58 @@ pub mod color {
 
 #[allow(non_upper_case_globals)]
 pub mod text {
+    use std::collections::HashMap;
+
     pub fn separator() -> String {
         format!("{}", super::color::frame.apply_to("│"))
+    }
+
+    /// Helper to replace text in colored text
+    pub struct ColoredTextReplacer {
+        original: String,
+        nocolor: String,
+        replacements: HashMap<usize, char>,
+    }
+
+    impl ColoredTextReplacer {
+        pub fn new(original: String) -> Self {
+            let nocolor = console::strip_ansi_codes(&original).to_string();
+            let replacements = HashMap::new();
+
+            Self {
+                original,
+                nocolor,
+                replacements,
+            }
+        }
+
+        /// Replace the char at position `idx` with replacement. The index counts chars in the
+        /// colorless variant.
+        pub fn replace(&mut self, idx: usize, replacement: char) -> &mut Self {
+            self.replacements.insert(idx, replacement);
+            self
+        }
+
+        /// Get the replaced string
+        pub fn get(&self) -> String {
+            let mut iter_nocolor = self.nocolor.chars().enumerate().peekable();
+
+            self.original
+                .chars()
+                .map(|char_orig| {
+                    let current_nocolor = iter_nocolor.peek().cloned();
+                    match current_nocolor {
+                        Some((idx_strip, char_nocolor)) if char_nocolor == char_orig => {
+                            iter_nocolor.next();
+                            self.replacements
+                                .get(&idx_strip)
+                                .unwrap_or(&char_orig)
+                                .clone()
+                        }
+                        _ => char_orig,
+                    }
+                })
+                .collect()
+        }
     }
 }

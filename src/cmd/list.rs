@@ -107,6 +107,24 @@ impl Command for List {
             num_digits
         };
 
+        // reverse digits
+        let num_digits_rev = {
+            let mut num_digits = 0;
+            let mut num = to_list.num_files
+                - to_list
+                    .files
+                    .iter()
+                    .map(|f| f.0)
+                    .min()
+                    .with_context(|| "No files to list.")
+                    .unwrap();
+            while num > 0 {
+                num /= 10;
+                num_digits += 1;
+            }
+            num_digits + 1 /* minus sign */
+        };
+
         if self.url_only {
             for (_, file) in to_list.files {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
@@ -151,7 +169,7 @@ impl Command for List {
                             host.get_url(&format!("{}", file.display()))?
                         },
                         width = num_digits,
-                        rev_width = num_digits + 1,
+                        rev_width = num_digits_rev,
                         sep = text::separator(),
                         size = if self.with_size {
                             stat.as_ref()
