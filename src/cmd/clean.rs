@@ -20,7 +20,7 @@ pub struct Clean {
     #[clap(long = "no-confirm")]
     no_confirm: bool,
 
-    /// Excplicit file to delete
+    /// Explicit file to delete
     #[clap(short, long = "file")]
     files: Vec<String>,
 
