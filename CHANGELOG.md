@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.4.1-pre (under development)
+## v0.4.1 (2020-10-14)
 
 * Fix name of `prefix_length` in example config.
 * `list`: Add `-d`/`--details` switch that simply enables printing of all details.
