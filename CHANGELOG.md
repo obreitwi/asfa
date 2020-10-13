@@ -8,8 +8,13 @@
 * Add `--quiet` argument that decreases loglevel
 * Encode hash in base64 in order to make needed URL prefix shorter at same "guessability".
   → This causes the maximum prefix length to go down from 128 to 64 (4 bit per char → 8 bit per char)
-* `list`: Add `--with-size`-switch to print file sizes.
-* `list`: Add `--filenames`-switch to print filenames instead of full urls in listing.
+* `list`:
+  * Add `-s`/`--with-size`-switch to print file sizes.
+  * Add `-f`/`--filenames`-switch to print filenames instead of full urls in listing.
+  * Add `-S`/`--sort-size`-switch to sort selected files by remote size.
+  * Add `-r`/`--reverse`-switch to reverse listing.
+  * Add `-F`/`--filter`-option to only display filenames matching a given regex.
+
 
 ## v0.3.1 (2020-10-03)
 
