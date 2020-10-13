@@ -15,22 +15,6 @@ use crate::ssh::{FileListing, SshSession};
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
 pub struct List {
-    /// Only list newest `n` entries. Note that entries are selected prior to sorting. That means
-    /// that if you want to get the largest files by size you should not specify `--last`.
-    /// Otherwise, only the last `<n>` files will be sorted by size.
-    #[clap(short = 'n', long)]
-    last: Option<usize>,
-
-    /// Specify indices of files to list (if none given, list all).
-    #[clap()]
-    indices: Vec<i64>,
-
-    /// Only print indices of files.
-    /// This is useful to supply as input to the clean command for instance:
-    /// Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
-    #[clap(long = "indices", short = 'i', conflicts_with = "url-only")]
-    print_indices: bool,
-
     /// Show no full urls but rather filenames only. Makes for more concise output.
     #[clap(long, short)]
     filenames: bool,
@@ -38,6 +22,22 @@ pub struct List {
     /// Filter filenames by regex. See https://docs.rs/regex/latest/regex/#syntax
     #[clap(long, short = 'F', value_name = "regex")]
     filter: Option<String>,
+
+    /// Specify indices of files to list (if none given, list all).
+    #[clap()]
+    indices: Vec<i64>,
+
+    /// Only list newest `n` entries. Note that entries are selected prior to sorting. That means
+    /// that if you want to get the largest files by size you should not specify `--last`.
+    /// Otherwise, only the last `<n>` files will be sorted by size.
+    #[clap(short = 'n', long)]
+    last: Option<usize>,
+
+    /// Only print indices of files.
+    /// This is useful to supply as input to the clean command for instance:
+    /// Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
+    #[clap(long = "indices", short = 'i', conflicts_with = "url-only")]
+    print_indices: bool,
 
     /// Reverse listing.
     #[clap(long, short)]
