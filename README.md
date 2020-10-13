@@ -12,7 +12,7 @@
 
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/999b7625/my-file.txt
+https://my-domain.eu/my-uploads/Ztkdz33N/my-file.txt
 ```
 
 * Upload files via `ssh` to a (linux-based) remote site.
@@ -39,7 +39,7 @@ Note: All commands can actually be abbreviated:
 Push (upload) a local file to the remote site and print the URL under which it is reachable:
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/999b7625/my-file.txt
+https://my-domain.eu/my-uploads/Ztkdz33N/my-file.txt
 ```
 
 #### Push with alias
@@ -49,21 +49,21 @@ a logfile or plot with a generic name.
 
 ```text
 $ asfa push my-file.txt -a my-very-specific-file.txt
-https://my-domain.eu/my-uploads/999b7625/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
 ```
 
 Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.
 ```text
 $ asfa push my-file.txt --alias=my-very-specific-file.txt my-file-2.txt --alias=my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/999b7625/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
+https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt
 ```
 
 Or specify the aliases afterwards.
 ```text
 $ asfa push my-file.txt my-file-2.txt --alias my-very-specific-file.txt my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/999b7625/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
+https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt
 ```
 
 #### List
@@ -71,10 +71,23 @@ https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
 List all files currently available online:
 ```text
 $ asfa list
-2020-09-11 20:13:25,214 INFO  [asfa::cmd::list] Listing remote files:
-[0|-2] https://my-domain.eu/my-uploads/999b7625/my-very-specific-file.txt
-[1|-1] https://my-domain.eu/my-uploads/f9d0c87a/my-very-specific-file-2.txt
+┌┤Listing remote files:├────────────────────────────────────────────────────────┐
+│ 0 │ -2 │ https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt   │
+│ 1 │ -1 │ https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt │
+└───┴────┴──────────────────────────────────────────────────────────────────────┘
 ```
+
+### Detailed list
+
+```text
+$ asfa list --details
+┌┤Listing remote files:├─────────────────┬──────────────────────────────────────────────────────────────────────┐
+│ 0 │ -2 │  32.00M │ 2020-10-14 00:54:35 │ https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt   │
+│ 1 │ -1 │  32.00M │ 2020-10-14 00:54:36 │ https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt │
+└───┴────┴─────────┴─────────────────────┴──────────────────────────────────────────────────────────────────────┘
+```
+
+List all files with meta data:
 
 #### Clean
 
@@ -82,15 +95,23 @@ Remove the file from remote site via index (negative indices need to be sepearat
 ```text
 $ asfa clean 0
 [ alternative: $ asfa clean -- -2 ]
-2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/999b7625/my-file.txt'
-2020-09-10 20:14:42,651 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/999b7625'
+┌┤Will delete the following files:├──────────────────────────┐
+│ * Ztkdz33N/my-very-specific-file.txt                       │
+└────────────────────────────────────────────────────────────┘
+Delete files? yes
+2020-10-14 01:00:36,529 INFO  [asfa::ssh] removed '/var/www/default/uploads/Ztkdz33N/my-very-specific-file.txt'
+2020-10-14 01:00:36,530 INFO  [asfa::ssh] removed directory '/var/www/default/uploads/Ztkdz33N'
 ```
 
 You can also ensure that a specific file is deleted by specifying `--file`:
 ```text
 $ asfa clean --file my-file-2.txt
-2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed '/var/www/default/my-uploads/f9d0c87a/my-very-specific-file-2.txt'
-2020-09-10 20:16:29,221 INFO  [asfa::ssh] removed directory '/var/www/default/my-uploads/f9d0c87a'
+┌┤Will delete the following files:├──────────────────────────┐
+│ * TVD7RO-0/my-very-specific-file-2.txt                     │
+└────────────────────────────────────────────────────────────┘
+Delete files? yes
+2020-10-14 01:01:05,224 INFO  [asfa::ssh] removed '/var/www/default/uploads/TVD7RO-0/my-very-specific-file-2.txt'
+2020-10-14 01:01:05,225 INFO  [asfa::ssh] removed directory '/var/www/default/uploads/TVD7RO-0'
 ```
 Note that the file is deleted even though it was uploaded with an alias.
 
