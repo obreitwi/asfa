@@ -24,6 +24,12 @@ pub struct List {
     #[clap()]
     indices: Vec<i64>,
 
+    /// Only print indices of files.
+    /// This is useful to supply as input to the clean command for instance:
+    /// Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
+    #[clap(long = "indices", short = 'i', conflicts_with = "url-only")]
+    print_indices: bool,
+
     /// Show no full urls but rather filenames only. Makes for more concise output.
     #[clap(long, short)]
     filenames: bool,
@@ -41,7 +47,7 @@ pub struct List {
     sort_size: bool,
 
     /// Only list the remote URLs (useful for copying and scripting).
-    #[clap(short, long = "url-only")]
+    #[clap(short, long = "url-only", conflicts_with = "indices")]
     url_only: bool,
 
     /// Print file sizes
@@ -100,6 +106,11 @@ impl Command for List {
             for (_, file) in to_list.files {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
+        } else if self.print_indices {
+            for (idx, _) in to_list.files {
+                print!("{} ", idx);
+            }
+            println!("");
         } else {
             let mut list_infos: Vec<(&(usize, PathBuf), Option<ssh2::FileStat>)> = {
                 if self.stats_needed() {

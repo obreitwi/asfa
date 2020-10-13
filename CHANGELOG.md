@@ -14,7 +14,9 @@
   * Add `-S`/`--sort-size`-switch to sort selected files by remote size.
   * Add `-r`/`--reverse`-switch to reverse listing.
   * Add `-F`/`--filter`-option to only display filenames matching a given regex.
-
+  * Add `-i`/`--indices`-switch to only print indices of files.
+    * This is useful to supply as input to the clean command for instance:
+    * Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
 
 ## v0.3.1 (2020-10-03)
 
