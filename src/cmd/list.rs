@@ -87,7 +87,7 @@ impl Command for List {
                 .iter()
                 .map(|((i, file), stat)| -> Result<String> {
                     Ok(format!(
-                        "{idx:width$}{sep}{rev_idx:rev_width$}{sep}{size} {url} ",
+                        " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{url} ",
                         idx = i,
                         rev_idx = *i as i64 - to_list.num_files as i64,
                         url = host.get_url(&format!("{}", file.display()))?,
@@ -106,7 +106,7 @@ impl Command for List {
                 .collect();
             draw_boxed(
                 format!(
-                    "{listing} remote files",
+                    "{listing} remote files:",
                     listing = Style::new().bold().green().bright().apply_to("Listing")
                 ),
                 content?.iter().map(|s| s.as_ref()),
@@ -132,10 +132,10 @@ impl List {
                 continue;
             } else {
                 return Ok(format!(
-                    "{:>6.2}{}{}",
-                    stat.size.unwrap() as f64 / (1 << (i * 10)) as f64,
-                    s,
-                    text::separator()
+                    "{size:>6.2}{suffix} {sep} ",
+                    size = stat.size.unwrap() as f64 / (1 << (i * 10)) as f64,
+                    suffix = s,
+                    sep = text::separator()
                 ));
             }
         }
