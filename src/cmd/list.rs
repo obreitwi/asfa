@@ -21,6 +21,10 @@ pub struct List {
     #[clap()]
     indices: Vec<i64>,
 
+    /// Show no full urls but rather filenames only. Makes for more concise output.
+    #[clap(long, short)]
+    filenames: bool,
+
     /// Only list the remote URLs (useful for copying and scripting).
     #[clap(short, long = "url-only")]
     url_only: bool,
@@ -90,7 +94,11 @@ impl Command for List {
                         " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{url} ",
                         idx = i,
                         rev_idx = *i as i64 - to_list.num_files as i64,
-                        url = host.get_url(&format!("{}", file.display()))?,
+                        url = if self.filenames {
+                            file.file_name().unwrap().to_string_lossy().to_string()
+                        } else {
+                            host.get_url(&format!("{}", file.display()))?
+                        },
                         width = num_digits,
                         rev_width = num_digits + 1,
                         sep = text::separator(),
