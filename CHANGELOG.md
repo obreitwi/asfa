@@ -17,6 +17,7 @@
   * Add `-i`/`--indices`-switch to only print indices of files.
     * This is useful to supply as input to the clean command for instance:
     * Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
+  * Add `-t`/`--with-time` to print modification times.
 
 ## v0.3.1 (2020-10-03)
 

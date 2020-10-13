@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use chrono::{Local, TimeZone};
 use clap::Clap;
 use console::Style;
 use regex::Regex;
@@ -49,6 +50,10 @@ pub struct List {
     /// Only list the remote URLs (useful for copying and scripting).
     #[clap(short, long = "url-only", conflicts_with = "indices")]
     url_only: bool,
+
+    /// Print remote modification time
+    #[clap(long, short = 't')]
+    with_time: bool,
 
     /// Print file sizes
     #[clap(long, short = 's')]
@@ -137,7 +142,7 @@ impl Command for List {
                 .iter()
                 .map(|((i, file), stat)| -> Result<String> {
                     Ok(format!(
-                        " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{url} ",
+                        " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{mtime}{url} ",
                         idx = i,
                         rev_idx = *i as i64 - to_list.num_files as i64,
                         url = if self.filenames {
@@ -150,7 +155,14 @@ impl Command for List {
                         sep = text::separator(),
                         size = if self.with_size {
                             stat.as_ref()
-                                .map(|s| self.size_column(s))
+                                .map(|s| self.column_size(s))
+                                .unwrap_or(Ok("".to_string()))?
+                        } else {
+                            "".to_string()
+                        },
+                        mtime = if self.with_time {
+                            stat.as_ref()
+                                .map(|s| self.column_time(s))
                                 .unwrap_or(Ok("".to_string()))?
                         } else {
                             "".to_string()
@@ -174,10 +186,19 @@ impl Command for List {
 impl List {
     /// Return whether or not we need to fetch stats
     fn stats_needed(&self) -> bool {
-        self.with_size || self.sort_size
+        self.with_size || self.sort_size || self.with_time
     }
 
-    fn size_column(&self, stat: &FileStat) -> Result<String> {
+    fn column_time(&self, stat: &FileStat) -> Result<String> {
+        let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
+        Ok(format!(
+            "{mtime} {sep} ",
+            mtime = mtime.format("%Y-%m-%d %H:%M:%S").to_string(),
+            sep = text::separator()
+        ))
+    }
+
+    fn column_size(&self, stat: &FileStat) -> Result<String> {
         let possible = ["", "K", "M", "G", "T", "P", "E"];
         let mut size: u64 = stat.size.with_context(|| "No file size defined!")?;
         for (i, s) in possible.iter().enumerate() {
