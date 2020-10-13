@@ -1,7 +1,7 @@
 default_host: my-remote-site  # optional, if only one host is defined, that one
                               # will be used
 verify_via_hash: true  # defaults to true
-length_prefix: 32  # optional, defaults to 32, how many hex-digits of the hash
+prefix_length: 32  # optional, defaults to 32, how many hex-digits of the hash
                    # to print
 auth:
   interactive: true  # defaults to true

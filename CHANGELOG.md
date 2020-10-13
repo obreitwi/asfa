@@ -3,6 +3,8 @@
 
 ## v0.4.1-pre (under development)
 
+* Fix name of `prefix_length` in example config.
+
 ## v0.4.0 (2020-10-14)
 
 * Add `private_key_file` to auth-option in order to specfiy private key file directly
