@@ -13,21 +13,21 @@ use crate::ssh::{FileListing, SshSession};
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
 pub struct List {
-    /// Only list the remote URLs (useful for copying and scripting).
-    #[clap(short, long = "url-only")]
-    url_only: bool,
-
     /// Only list last `n` entries
     #[clap(short = 'n', long)]
     last: Option<usize>,
 
-    /// Print file sizes
-    #[clap(long, short = 's')]
-    with_size: bool,
-
     /// Specify indices of files to list (if none given, list all).
     #[clap()]
     indices: Vec<i64>,
+
+    /// Only list the remote URLs (useful for copying and scripting).
+    #[clap(short, long = "url-only")]
+    url_only: bool,
+
+    /// Print file sizes
+    #[clap(long, short = 's')]
+    with_size: bool,
 }
 
 impl Command for List {
