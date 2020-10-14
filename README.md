@@ -10,10 +10,7 @@
 [![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
 
-```text
-$ asfa push my-file.txt
-https://my-domain.eu/my-uploads/Ztkdz33N/my-file.txt
-```
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif)
 
 * Upload files via `ssh` to a (linux-based) remote site.
 * Generate a non-guessable URL pointing to the file.
@@ -36,83 +33,55 @@ Note: All commands can actually be abbreviated:
 
 #### Push
 
-Push (upload) a local file to the remote site and print the URL under which it is reachable:
+Push (upload) a local file to the remote site and print the URL under which it
+is reachable.
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/Ztkdz33N/my-file.txt
+https://my-domain.eu/my-uploads/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
 ```
+See example at the top. Because the file is identified by its hash, uploading
+the same file twice will generate the same link.
 
 #### Push with alias
 
-Push file to server under a different name. This is useful if you want to share
-a logfile or plot with a generic name.
+Push a file to the server under a different name. This is useful if you want to
+share a logfile or plot with a generic name.
 
-```text
-$ asfa push my-file.txt -a my-very-specific-file.txt
-https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
-```
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif)
 
 Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.
-```text
-$ asfa push my-file.txt --alias=my-very-specific-file.txt my-file-2.txt --alias=my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt
-```
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif)
 
 Or specify the aliases afterwards.
 ```text
 $ asfa push my-file.txt my-file-2.txt --alias my-very-specific-file.txt my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt
+https://my-domain.eu/my-uploads/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
+https://my-domain.eu/my-uploads/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
 ```
 
 #### List
 
 List all files currently available online:
-```text
-$ asfa list
-┌┤Listing remote files:├────────────────────────────────────────────────────────┐
-│ 0 │ -2 │ https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt   │
-│ 1 │ -1 │ https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt │
-└───┴────┴──────────────────────────────────────────────────────────────────────┘
-```
 
-### Detailed list
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif)
 
-```text
-$ asfa list --details
-┌┤Listing remote files:├─────────────────┬──────────────────────────────────────────────────────────────────────┐
-│ 0 │ -2 │  32.00M │ 2020-10-14 00:54:35 │ https://my-domain.eu/my-uploads/Ztkdz33N/my-very-specific-file.txt   │
-│ 1 │ -1 │  32.00M │ 2020-10-14 00:54:36 │ https://my-domain.eu/my-uploads/TVD7RO-0/my-very-specific-file-2.txt │
-└───┴────┴─────────┴─────────────────────┴──────────────────────────────────────────────────────────────────────┘
-```
+#### Detailed list
 
-List all files with meta data:
+List all files with meta data via `--details`:
+
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif)
 
 #### Clean
 
 Remove the file from remote site via index (negative indices need to be sepearated by `--`):
-```text
-$ asfa clean 0
-[ alternative: $ asfa clean -- -2 ]
-┌┤Will delete the following files:├──────────────────────────┐
-│ * Ztkdz33N/my-very-specific-file.txt                       │
-└────────────────────────────────────────────────────────────┘
-Delete files? yes
-2020-10-14 01:00:36,529 INFO  [asfa::ssh] removed '/var/www/default/uploads/Ztkdz33N/my-very-specific-file.txt'
-2020-10-14 01:00:36,530 INFO  [asfa::ssh] removed directory '/var/www/default/uploads/Ztkdz33N'
-```
+
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif)
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif)
 
 You can also ensure that a specific file is deleted by specifying `--file`:
-```text
-$ asfa clean --file my-file-2.txt
-┌┤Will delete the following files:├──────────────────────────┐
-│ * TVD7RO-0/my-very-specific-file-2.txt                     │
-└────────────────────────────────────────────────────────────┘
-Delete files? yes
-2020-10-14 01:01:05,224 INFO  [asfa::ssh] removed '/var/www/default/uploads/TVD7RO-0/my-very-specific-file-2.txt'
-2020-10-14 01:01:05,225 INFO  [asfa::ssh] removed directory '/var/www/default/uploads/TVD7RO-0'
-```
+
+![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif)
+
 Note that the file is deleted even though it was uploaded with an alias.
 
 ## Requirements
