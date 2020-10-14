@@ -3,6 +3,11 @@
 
 ## v0.4.2-pre (under development)
 
+* Allow host selection via `$ASFA_HOST` environment variable. Priority for host selection is:
+  1. `-H`/`--host` supplied via command line.
+  2. `ASFA_HOST` environment variable.
+  3. `default_host` from config file.
+
 ## v0.4.1 (2020-10-14)
 
 * Fix name of `prefix_length` in example config.

@@ -236,7 +236,10 @@ impl Config {
             config.auth
         };
 
-        config.default_host = get_string_from(config_yaml, "default_host")?.cloned();
+        config.default_host =
+            std::env::var("ASFA_HOST")
+                .ok()
+                .or(get_string_from(config_yaml, "default_host")?.cloned());
         config.verify_via_hash = get_bool_from(config_yaml, "verify_via_hash")?
             .cloned()
             .unwrap_or(config.verify_via_hash);

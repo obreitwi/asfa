@@ -121,7 +121,7 @@ impl Command for List {
                     .map(|f| f.0)
                     .min()
                     .with_context(|| "No files to list.")
-                    .unwrap();
+                    .unwrap_or(0);
             while num > 0 {
                 num /= 10;
                 num_digits += 1;
