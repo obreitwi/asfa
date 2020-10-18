@@ -16,35 +16,56 @@ pub struct Clean {
     #[clap(long)]
     all: bool,
 
-    /// Disable confirming deletions
-    #[clap(long = "no-confirm")]
-    no_confirm: bool,
-
     /// Explicit file to delete
     #[clap(short, long = "file")]
     files: Vec<String>,
 
+    /// Filter filenames by regex. See https://docs.rs/regex/latest/regex/#syntax
+    #[clap(long, short = 'F', value_name = "regex")]
+    filter: Option<String>,
+
+    /// Delete last
+    #[clap(short = 'n', long)]
+    last: Option<usize>,
+
     /// Indices of files to delete as returned by `list` command.
     #[clap()]
     indices: Vec<i64>,
+
+    /// Disable confirming deletions
+    #[clap(long = "no-confirm")]
+    no_confirm: bool,
+
+    /// Sort by size (useful when specifying `--last`)
+    #[clap(long, short = 'S')]
+    sort_size: bool,
+
+    /// Reverse ordering (useful when specifying `--last` and `--sort-size`)
+    #[clap(long, short)]
+    reverse: bool,
 }
 
 impl Command for Clean {
     fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
         debug!("Cleaning remote files..");
 
-        let files_to_delete = session.get_files_by(
-            &self.indices,
-            &self.files.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
-            session.host.prefix_length,
-        )?;
+        let files: Vec<&str> = self.files.iter().map(|s| s.as_str()).collect();
+
+        let files_to_delete = session
+            .list_files()?
+            .add_all(self.all)
+            .by_indices(&self.indices[..])?
+            .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
+            .sort_by_size(self.sort_size)?
+            .revert(self.reverse)
+            .last(self.last)
+            .by_name(&files[..], session.host.prefix_length)?;
 
         let do_delete = self.no_confirm || {
             let dot = color::dot.apply_to("*");
             let formatted_files: Vec<String> = files_to_delete
-                .files
-                .iter()
-                .map(|(_, f)| {
+                .iter()?
+                .map(|(_, f, _)| {
                     format!(
                         " {dot} {file} ",
                         dot = dot,
@@ -85,7 +106,7 @@ impl Command for Clean {
             };
 
         if do_delete {
-            for (_, file) in files_to_delete.files {
+            for (_, file, _) in files_to_delete.iter()? {
                 remove_file(&file)?
             }
         }

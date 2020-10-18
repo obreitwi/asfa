@@ -2,11 +2,15 @@
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
 ## v0.4.2-pre (under development)
-
 * Allow host selection via `$ASFA_HOST` environment variable. Priority for host selection is:
   1. `-H`/`--host` supplied via command line.
   2. `ASFA_HOST` environment variable.
   3. `default_host` from config file.
+* `clean`-command:
+  * Add `-F`/`--filter`-option to clean files matching a given regex.
+  * Add `-n`/`--last`-switch from `list` command to clean the last `n` files
+  * Add `-S`/`--sort-size`-switch to sort files by remote size (useful for `-n`).
+  * Add `-r`/`--reverse`-switch to reverse listing (useful for `-n`).
 
 ## v0.4.1 (2020-10-14)
 

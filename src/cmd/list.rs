@@ -2,15 +2,13 @@ use anyhow::{bail, Context, Result};
 use chrono::{Local, TimeZone};
 use clap::Clap;
 use console::Style;
-use regex::Regex;
 use ssh2::FileStat;
-use std::path::PathBuf;
 
 use crate::cfg::Config;
 use crate::cli::draw_boxed;
 use crate::cli::{color, text};
 use crate::cmd::Command;
-use crate::ssh::{FileListing, SshSession};
+use crate::ssh::SshSession;
 
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
@@ -68,38 +66,14 @@ impl Command for List {
     fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
         let host = &session.host;
 
-        let mut to_list: FileListing = if self.indices.len() == 0 {
-            let files = session.list_files()?;
-            let num_files = files.len();
-            if let Some(n) = self.last {
-                FileListing {
-                    files: files
-                        .into_iter()
-                        .enumerate()
-                        .skip(num_files as usize - n)
-                        .collect(),
-                    num_files,
-                }
-            } else {
-                FileListing {
-                    files: files.into_iter().enumerate().collect(),
-                    num_files,
-                }
-            }
-        } else {
-            session.get_files_by(&self.indices, &[], session.host.prefix_length)?
-        };
-
-        if self.filter.is_some() {
-            let re = Regex::new(&self.filter.as_ref().unwrap())?;
-            to_list.files = to_list
-                .files
-                .into_iter()
-                .filter(|(_, path)| {
-                    re.is_match(&path.file_name().unwrap().to_string_lossy().to_string())
-                })
-                .collect()
-        }
+        let to_list = session
+            .list_files()?
+            .by_indices(&self.indices[..])?
+            .by_filter(self.filter.as_ref().map(|f| f.as_str()))?
+            .last(self.last)
+            .sort_by_size(self.sort_size)?
+            .revert(self.reverse)
+            .with_stats(self.details || self.with_time || self.with_size)?;
 
         let num_digits = {
             let mut num_digits = 0;
@@ -116,8 +90,7 @@ impl Command for List {
             let mut num_digits = 0;
             let mut num = to_list.num_files
                 - to_list
-                    .files
-                    .iter()
+                    .iter()?
                     .map(|f| f.0)
                     .min()
                     .with_context(|| "No files to list.")
@@ -130,43 +103,22 @@ impl Command for List {
         };
 
         if self.url_only {
-            for (_, file) in to_list.files {
+            for (_, file, _) in to_list.iter()? {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
         } else if self.print_indices {
-            for (idx, _) in to_list.files {
+            for idx in to_list.indices {
                 print!("{} ", idx);
             }
             println!("");
         } else {
-            let mut list_infos: Vec<(&(usize, PathBuf), Option<ssh2::FileStat>)> = {
-                if self.stats_needed() {
-                    let files = to_list.files.iter().map(|f| f.1.as_ref());
-                    to_list
-                        .files
-                        .iter()
-                        .zip(session.stat(files)?.into_iter().map(|s| Some(s)))
-                        .collect()
-                } else {
-                    to_list.files.iter().zip(std::iter::repeat(None)).collect()
-                }
-            };
-
-            if self.sort_size {
-                list_infos.sort_by_key(|(_, fs)| fs.as_ref().unwrap().size.unwrap());
-            }
-
-            if self.reverse {
-                list_infos.reverse();
-            }
-
-            let content: Result<Vec<String>> = list_infos
-                .iter()
-                .map(|((i, file), stat)| -> Result<String> {
+            let content: Result<Vec<String>> = to_list
+                .iter()?
+                .map(|(i, file, stat)| -> Result<String> {
                     Ok(format!(
                         " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{mtime}{url} ",
                         idx = i,
-                        rev_idx = *i as i64 - to_list.num_files as i64,
+                        rev_idx = i as i64 - to_list.num_files as i64,
                         url = if self.filenames {
                             file.file_name().unwrap().to_string_lossy().to_string()
                         } else {
@@ -206,11 +158,6 @@ impl Command for List {
 }
 
 impl List {
-    /// Return whether or not we need to fetch stats
-    fn stats_needed(&self) -> bool {
-        self.with_size || self.sort_size || self.with_time || self.details
-    }
-
     fn column_time(&self, stat: &FileStat) -> Result<String> {
         let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
         Ok(format!(

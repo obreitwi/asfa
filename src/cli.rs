@@ -183,9 +183,7 @@ fn join_frames(content: &str, raw: &str, joiner: char) -> String {
     for idx_separator in console::strip_ansi_codes(content)
         .chars()
         .enumerate()
-        .map(|(idx, c)| if c == '│' { Some(idx) } else { None })
-        .filter(|i| i.is_some())
-        .map(|i| i.unwrap())
+        .filter_map(|(idx, c)| if c == '│' { Some(idx) } else { None })
     {
         // replacer.replace_if(idx_separator, '─', joiner);
         let idx = idx_separator + /* frame */ 1;
