@@ -3,7 +3,7 @@ use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 use indicatif::ProgressStyle;
 use std::iter::IntoIterator;
 
-use crate::cmd::{Clean, List, Push};
+use crate::cmd::{Clean, List, Push, Verify};
 
 #[derive(Clap, Debug)]
 #[clap(
@@ -76,6 +76,9 @@ pub enum UserCommand {
 
     #[clap(name = "push")]
     Push(Push),
+
+    #[clap(name = "verify")]
+    Verify(Verify),
 }
 
 /// Progress bar style for file transfers

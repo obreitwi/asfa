@@ -12,6 +12,7 @@
   * Add `-n`/`--last`-switch from `list` command to clean the last `n` files
   * Add `-S`/`--sort-size`-switch to sort files by remote size (useful for `-n`).
   * Add `-r`/`--reverse`-switch to reverse listing (useful for `-n`).
+* Add `verify`-command
 
 ## v0.4.1 (2020-10-14)
 

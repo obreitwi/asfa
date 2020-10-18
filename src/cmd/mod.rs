@@ -6,10 +6,12 @@ use anyhow::Result;
 mod clean;
 mod list;
 mod push;
+mod verify;
 
 pub use clean::Clean;
 pub use list::List;
 pub use push::Push;
+pub use verify::Verify;
 
 pub trait Command {
     /// Run the given command

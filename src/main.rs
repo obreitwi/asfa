@@ -58,6 +58,7 @@ fn main() -> Result<()> {
         Clean(cmd) => cmd.run(&session, &cfg),
         List(cmd) => cmd.run(&session, &cfg),
         Push(cmd) => cmd.run(&session, &cfg),
+        Verify(cmd) => cmd.run(&session, &cfg),
     }?;
     Ok(())
 }

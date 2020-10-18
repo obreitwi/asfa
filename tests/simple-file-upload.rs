@@ -34,6 +34,7 @@ fn simple_file_upload(host: &str) -> Result<()> {
         bail!("Failed to upload path.");
     }
     run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))?;
+    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))?;
     run_cmd(format!(
         "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
         host,
