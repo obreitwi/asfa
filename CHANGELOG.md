@@ -2,6 +2,7 @@
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
 ## v0.4.2-pre (under development)
+
 * Allow host selection via `$ASFA_HOST` environment variable. Priority for host selection is:
   1. `-H`/`--host` supplied via command line.
   2. `ASFA_HOST` environment variable.
