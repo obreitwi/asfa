@@ -338,16 +338,6 @@ impl<'a> FileListing<'a> {
         })
     }
 
-    /// Simply select all files if argument is true
-    pub fn add_all(mut self, select_all: bool) -> Self {
-        if select_all {
-            let mut all: Vec<usize> = (0..self.num_files).collect();
-            self.indices.append(&mut all);
-            self.indices = Self::make_unique(self.indices.drain(..));
-        }
-        self
-    }
-
     /// Select all files which name matches regex
     pub fn by_filter(self, filter: Option<&str>) -> Result<Self> {
         match filter {
@@ -469,6 +459,25 @@ impl<'a> FileListing<'a> {
                 .sort_by_key(|idx| stats.get(idx).unwrap().size.unwrap());
         }
         Ok(self)
+    }
+
+    /// Simply select all files if argument is true
+    pub fn with_all(mut self, select_all: bool) -> Self {
+        if select_all {
+            let mut all: Vec<usize> = (0..self.num_files).collect();
+            self.indices.append(&mut all);
+            self.indices = Self::make_unique(self.indices.drain(..));
+        }
+        self
+    }
+
+    /// Add all if, so far, no files have been selected
+    pub fn with_all_if_none(self) -> Self {
+        if self.indices.len() == 0 {
+            self.with_all(true)
+        } else {
+            self
+        }
     }
 
     pub fn with_stats(mut self, with_stats: bool) -> Result<Self> {

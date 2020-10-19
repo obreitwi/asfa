@@ -53,7 +53,7 @@ impl Command for Clean {
 
         let files_to_delete = session
             .list_files()?
-            .add_all(self.all)
+            .with_all(self.all)
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
             .sort_by_size(self.sort_size)?

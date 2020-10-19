@@ -48,13 +48,11 @@ impl Command for Verify {
             .list_files()?
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
+            .with_all_if_none()
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
-
-        let no_files_selected = files_to_verify.iter()?.count() == 0;
-        let files_to_verify = files_to_verify.add_all(no_files_selected);
 
         for (_, file, _) in files_to_verify.iter()? {
             let hash_expected = file.parent().unwrap().to_string_lossy();

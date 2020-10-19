@@ -70,6 +70,7 @@ impl Command for List {
             .list_files()?
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|f| f.as_str()))?
+            .with_all_if_none()
             .last(self.last)
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
