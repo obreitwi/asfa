@@ -3,7 +3,7 @@ use clap::Clap;
 use log::debug;
 
 use crate::cfg::Config;
-use crate::cli::WaitingSpinner;
+use crate::cli::{color, WaitingSpinner};
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 
@@ -55,32 +55,59 @@ impl Command for Verify {
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
 
-        let spinner = WaitingSpinner::new("Verifying..".to_string());
+        let num_files = files_to_verify.num_files;
+        let message = "Verifying...";
+        let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
         let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();
+        let filename_max = files
+            .iter()
+            .map(|f| f.display().to_string().len())
+            .max()
+            .unwrap();
+
+        let chunk_size = 16;
         let hashes_actual = files[..]
-            .chunks(128)
-            .map(|c| {
-                session
-                    .get_remote_hashes(c, session.host.prefix_length)
-                    .map(|h| h.into_iter())
-            })
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .flatten();
+            .chunks(chunk_size)
+            .map(|c| session.get_remote_hashes(c, session.host.prefix_length));
 
-        for (file, hash_actual) in files.iter().zip(hashes_actual) {
-            let hash_expected = file.parent().unwrap().to_string_lossy();
-
-            if *hash_actual != hash_expected {
-                bail!(
-                    "'{}': Expected '{}', but found '{}'",
-                    file.file_name().unwrap().to_string_lossy(),
-                    hash_expected,
-                    hash_actual
-                );
+        let mut failure = Vec::new();
+        for (idx, (files, hashes_actual)) in
+            files[..].chunks(chunk_size).zip(hashes_actual).enumerate()
+        {
+            spinner.set_message(format!("{} {}/{}", message, idx * chunk_size, &num_files))?;
+            let hashes_actual = hashes_actual?;
+            for (file, hash_actual) in files.iter().zip(hashes_actual) {
+                let hash_expected = file.parent().unwrap().to_string_lossy();
+                let filename = file.file_name().unwrap().to_string_lossy();
+                if hash_actual != hash_expected {
+                    let msg = format!(
+                        "{} {} {} Expected: {} Found: {}",
+                        color::failure.apply_to("✗"),
+                        color::filename.apply_to(&filename),
+                        ".".repeat(filename_max - filename.len() - 1 /* space */),
+                        color::success.apply_to(hash_expected),
+                        color::failure.apply_to(hash_actual),
+                    );
+                    spinner.println(msg)?;
+                    failure.push(file);
+                } else {
+                    spinner.println(format!(
+                        "{} {} {} {}.",
+                        color::success.apply_to("✓"),
+                        color::filename.apply_to(file.file_name().unwrap().to_string_lossy()),
+                        ".".repeat(filename_max - filename.len() - 1 /* space */),
+                        color::success.apply_to("Verified"),
+                    ))?;
+                }
             }
         }
+        spinner.set_message("Verifying.. done".to_string())?;
         spinner.finish();
-        Ok(())
+
+        if failure.len() > 0 {
+            bail!("{} files failed to verify.", failure.len());
+        } else {
+            Ok(())
+        }
     }
 }

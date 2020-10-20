@@ -7,6 +7,7 @@ mod fixture;
 
 fn simple_file_upload(host: &str) -> Result<()> {
     let file_size: usize = 32 * 1024 * 1024;
+    log::info!("Uploading to host: {}", host);
 
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), file_size)?;
     let alias = fixture::random_filename(8, "txt");
@@ -23,7 +24,10 @@ fn simple_file_upload(host: &str) -> Result<()> {
         host,
         local.display(),
         alias
-    ))?;
+    ))
+    .with_context(|| "Could not push.")?;
+    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
+        .with_context(|| "Could not verify.")?;
     let remote = format!(
         "{}/{}/{}",
         std::env::var("ASFA_FOLDER_UPLOAD")?,
@@ -33,13 +37,16 @@ fn simple_file_upload(host: &str) -> Result<()> {
     if !Path::new(&remote).exists() {
         bail!("Failed to upload path.");
     }
-    run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))?;
-    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))?;
+    run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))
+        .with_context(|| "Files differ")?;
+    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
+        .with_context(|| "Could not verify.")?;
     run_cmd(format!(
         "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
         host,
         local.display()
-    ))?;
+    ))
+    .with_context(|| "Could not clean.")?;
     if Path::new(&remote).exists() {
         bail!("Remote file not cleaned up!");
     }

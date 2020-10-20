@@ -2,6 +2,8 @@ use anyhow::{bail, Context, Result};
 use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 use indicatif::ProgressStyle;
 use std::iter::IntoIterator;
+use std::sync::mpsc;
+use std::sync::mpsc::channel;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -201,12 +203,19 @@ fn join_frames(content: &str, raw: &str, joiner: char) -> String {
 
 /// Spinner that spins until finish() is called.
 pub struct WaitingSpinner {
-    stop_token: Arc<Mutex<bool>>,
     handle: thread::JoinHandle<()>,
+    stop_token: Arc<Mutex<bool>>,
+    tx: mpsc::Sender<SpinnerSetting>,
+}
+
+enum SpinnerSetting {
+    Println(String),
+    Message(String),
 }
 
 impl WaitingSpinner {
     pub fn new(message: String) -> Self {
+        let (tx, rx) = channel();
         let stop_token = Arc::new(Mutex::new(false));
         let stop_token_pbar = Arc::clone(&stop_token);
         let handle = thread::spawn(move || {
@@ -214,14 +223,33 @@ impl WaitingSpinner {
             spinner.set_message(&message);
 
             while !*stop_token_pbar.lock().unwrap() {
+                while let Ok(msg) = rx.try_recv() {
+                    match msg {
+                        SpinnerSetting::Message(msg) => spinner.set_message(&msg),
+                        SpinnerSetting::Println(msg) => spinner.println(&msg),
+                    }
+                }
                 spinner.inc(1);
                 std::thread::sleep(std::time::Duration::from_millis(25));
             }
-            spinner.set_message("Verifying upload.. done");
             spinner.inc(1);
             spinner.finish_and_clear();
         });
-        Self { stop_token, handle }
+        Self {
+            handle,
+            stop_token,
+            tx,
+        }
+    }
+
+    pub fn set_message(&self, message: String) -> Result<()> {
+        self.tx.send(SpinnerSetting::Message(message))?;
+        Ok(())
+    }
+
+    pub fn println(&self, msg: String) -> Result<()> {
+        self.tx.send(SpinnerSetting::Println(msg))?;
+        Ok(())
     }
 
     pub fn finish(self) {
@@ -236,9 +264,12 @@ pub mod color {
     use console::Style;
 
     lazy_static::lazy_static! {
-        pub static ref frame : Style = Style::new().blue();
-        pub static ref entry : Style = Style::new();
         pub static ref dot : Style = Style::new().cyan();
+        pub static ref entry : Style = Style::new();
+        pub static ref failure : Style = Style::new().red().bright();
+        pub static ref filename : Style = Style::new().blue().bright();
+        pub static ref frame : Style = Style::new().blue();
+        pub static ref success : Style = Style::new().green().bright();
     }
 }
 
