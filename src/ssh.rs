@@ -191,7 +191,19 @@ impl<'a> SshSession<'a> {
 
     /// Get hash of the remote file (relative to the current host's base-folder).
     pub fn get_remote_hash(&self, path: &Path, length: u8) -> Result<String> {
-        let path = self.prepend_base_folder(path);
+        let path = [path];
+        self.get_remote_hashes(&path[..], length)
+            .map(|v| v.into_iter().next().unwrap())
+    }
+
+    /// Get hash of the remote file (relative to the current host's base-folder).
+    pub fn get_remote_hashes(&self, paths: &[&Path], length: u8) -> Result<Vec<String>> {
+        let mut paths: Vec<String> = paths
+            .iter()
+            .map(|p| self.prepend_base_folder(p))
+            .map(|p| format!("\"{}\"", p.display()))
+            .collect();
+        let num_paths = paths.len();
         let hasher = if length == 0 {
             bail!("Length cannot be zero!");
         } else if length <= 32 {
@@ -201,9 +213,10 @@ impl<'a> SshSession<'a> {
         } else {
             bail!("Length should be equal to or smaller than 64.");
         };
+        paths.insert(0, hasher.to_string());
 
         let mut channel = self.raw.channel_session()?;
-        let cmd = format!("{} \"{}\"", hasher, path.display());
+        let cmd = paths.join(" ");
         channel.exec(&cmd)?;
         let mut stdout = String::new();
         let mut stderr = String::new();
@@ -220,12 +233,18 @@ impl<'a> SshSession<'a> {
                 stderr
             ),
         }
-        let full_hash = stdout
-            .split_whitespace()
-            .next()
-            .context("No hash found in output.")?;
-        let hash_base64 = base64::encode_config(hex::decode(full_hash)?, base64::URL_SAFE);
-        Ok(hash_base64[..length as usize].to_string())
+        let hashes: Vec<_> = stdout
+            .lines()
+            .filter_map(|l| l.split_whitespace().next())
+            .filter_map(|h| hex::decode(h).ok())
+            .map(|h| base64::encode_config(h, base64::URL_SAFE)[..length as usize].to_string())
+            .collect();
+
+        if hashes.len() != num_paths {
+            bail!("Computed {} hashes for {} paths.", hashes.len(), num_paths);
+        }
+
+        Ok(hashes)
     }
 
     fn prepend_base_folder(&self, path: &Path) -> PathBuf {

@@ -3,6 +3,7 @@ use clap::Clap;
 use log::debug;
 
 use crate::cfg::Config;
+use crate::cli::WaitingSpinner;
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 
@@ -54,19 +55,32 @@ impl Command for Verify {
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
 
-        for (_, file, _) in files_to_verify.iter()? {
-            let hash_expected = file.parent().unwrap().to_string_lossy();
-            let hash_actual = session.get_remote_hash(file, hash_expected.len() as u8)?;
+        let spinner = WaitingSpinner::new("Verifying..".to_string());
+        let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();
+        let hashes_actual = files[..]
+            .chunks(128)
+            .map(|c| {
+                session
+                    .get_remote_hashes(c, session.host.prefix_length)
+                    .map(|h| h.into_iter())
+            })
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten();
 
-            if hash_actual != hash_expected {
+        for (file, hash_actual) in files.iter().zip(hashes_actual) {
+            let hash_expected = file.parent().unwrap().to_string_lossy();
+
+            if *hash_actual != hash_expected {
                 bail!(
-                    "{}: Expected '{}', but found '{}'",
-                    file.display(),
+                    "'{}': Expected '{}', but found '{}'",
+                    file.file_name().unwrap().to_string_lossy(),
                     hash_expected,
                     hash_actual
                 );
             }
         }
+        spinner.finish();
         Ok(())
     }
 }

@@ -4,10 +4,9 @@ use clap::Clap;
 use log::debug;
 use std::path::{Path, PathBuf};
 use std::string::String;
-use std::sync::{Arc, Mutex};
-use std::thread;
 
 use crate::cfg::Config;
+use crate::cli::WaitingSpinner;
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 use crate::util::get_hash;
@@ -49,20 +48,7 @@ fn upload(
 
     if config.verify_via_hash {
         debug!("Verifying upload..");
-        let stop_token = Arc::new(Mutex::new(false));
-        let stop_token_pbar = Arc::clone(&stop_token);
-        let spinner = thread::spawn(move || {
-            let spinner = crate::cli::spinner();
-            spinner.set_message("Verifying upload..");
-
-            while !*stop_token_pbar.lock().unwrap() {
-                spinner.inc(1);
-                std::thread::sleep(std::time::Duration::from_millis(25));
-            }
-            spinner.set_message("Verifying upload.. done");
-            spinner.inc(1);
-            spinner.finish_and_clear();
-        });
+        let spinner = WaitingSpinner::new("Verifying upload..".to_string());
 
         let remote_hash = session.get_remote_hash(&target, prefix_length)?;
         if hash != remote_hash {
@@ -74,8 +60,7 @@ fn upload(
                 remote_hash
             );
         }
-        *stop_token.lock().unwrap() = true;
-        spinner.join().unwrap();
+        spinner.finish();
         debug!("Done");
     }
 
