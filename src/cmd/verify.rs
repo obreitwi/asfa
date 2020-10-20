@@ -55,10 +55,10 @@ impl Command for Verify {
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
 
-        let num_files = files_to_verify.num_files;
         let message = "Verifying...";
-        let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
         let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();
+        let num_files = files.len();
+        let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
         let filename_max = files
             .iter()
             .map(|f| f.display().to_string().len())
