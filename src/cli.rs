@@ -222,16 +222,21 @@ impl WaitingSpinner {
             let spinner = crate::cli::spinner();
             spinner.set_message(&message);
 
-            while !*stop_token_pbar.lock().unwrap() {
+            let handle_messages = || {
                 while let Ok(msg) = rx.try_recv() {
                     match msg {
                         SpinnerSetting::Message(msg) => spinner.set_message(&msg),
                         SpinnerSetting::Println(msg) => spinner.println(&msg),
                     }
                 }
+            };
+
+            while !*stop_token_pbar.lock().unwrap() {
+                handle_messages();
                 spinner.inc(1);
                 std::thread::sleep(std::time::Duration::from_millis(25));
             }
+            handle_messages();
             spinner.inc(1);
             spinner.finish_and_clear();
         });
