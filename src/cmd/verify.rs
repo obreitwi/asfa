@@ -61,9 +61,9 @@ impl Command for Verify {
         let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
         let filename_max = files
             .iter()
-            .map(|f| f.display().to_string().len())
+            .map(|f| f.file_name().unwrap().to_string_lossy().chars().count())
             .max()
-            .unwrap();
+            .unwrap() + 1;
 
         let chunk_size = 16;
         let hashes_actual = files[..]
@@ -79,12 +79,14 @@ impl Command for Verify {
             for (file, hash_actual) in files.iter().zip(hashes_actual) {
                 let hash_expected = file.parent().unwrap().to_string_lossy();
                 let filename = file.file_name().unwrap().to_string_lossy();
+                let filename_len = filename.chars().count();
+                let separator_len = filename_max - filename_len;
                 if hash_actual != hash_expected {
                     let msg = format!(
                         "{} {} {} Expected: {} Found: {}",
                         color::failure.apply_to("✗"),
                         color::filename.apply_to(&filename),
-                        ".".repeat(filename_max - filename.len() - 1 /* space */),
+                        ".".repeat(separator_len),
                         color::success.apply_to(hash_expected),
                         color::failure.apply_to(hash_actual),
                     );
@@ -95,7 +97,7 @@ impl Command for Verify {
                         "{} {} {} {}.",
                         color::success.apply_to("✓"),
                         color::filename.apply_to(file.file_name().unwrap().to_string_lossy()),
-                        ".".repeat(filename_max - filename.len() - 1 /* space */),
+                        ".".repeat(separator_len),
                         color::success.apply_to("Verified"),
                     ))?;
                 }
