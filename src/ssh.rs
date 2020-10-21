@@ -485,6 +485,16 @@ impl<'a> FileListing<'a> {
         Ok(self)
     }
 
+    pub fn sort_by_time(mut self, sort_by_time: bool) -> Result<Self> {
+        if sort_by_time {
+            self.ensure_stats()?;
+            let stats = self.stats.as_ref().unwrap();
+            self.indices
+                .sort_by_key(|idx| stats.get(idx).unwrap().mtime.unwrap());
+        }
+        Ok(self)
+    }
+
     /// Simply select all files if argument is true
     pub fn with_all(mut self, select_all: bool) -> Self {
         if select_all {

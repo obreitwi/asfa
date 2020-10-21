@@ -49,6 +49,10 @@ pub struct List {
     #[clap(long, short = 'S')]
     sort_size: bool,
 
+    /// Sort listing by modification time (useful when using `--filter` and `--last`).
+    #[clap(long, short = 'T')]
+    sort_time: bool,
+
     /// Only list the remote URLs (useful for copying and scripting).
     #[clap(short, long = "url-only", conflicts_with = "indices")]
     url_only: bool,
@@ -71,9 +75,10 @@ impl Command for List {
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|f| f.as_str()))?
             .with_all_if_none()
-            .last(self.last)
             .sort_by_size(self.sort_size)?
+            .sort_by_time(self.sort_time)?
             .revert(self.reverse)
+            .last(self.last)
             .with_stats(self.details || self.with_time || self.with_size)?;
 
         let num_digits = {

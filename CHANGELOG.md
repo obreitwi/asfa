@@ -10,9 +10,12 @@
 * `clean`-command:
   * Add `-F`/`--filter`-option to clean files matching a given regex.
   * Add `-n`/`--last`-switch from `list` command to clean the last `n` files
-  * Add `-S`/`--sort-size`-switch to sort files by remote size (useful for `-n`).
   * Add `-r`/`--reverse`-switch to reverse listing (useful for `-n`).
-* Add `verify`-command
+  * Add `-S`/`--sort-size`-switch to sort files by remote size (useful for `-n`).
+  * Add `-T`/`--sort-time`-switch to sort selected files by modification time.
+* `list`-command:
+  * Add `-T`/`--sort-time`-switch to sort selected files by modification time.
+* Add `verify`-command with same file selection arguments as `clean`/`list`.
 
 ## v0.4.1 (2020-10-14)
 

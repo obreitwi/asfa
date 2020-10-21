@@ -36,11 +36,15 @@ pub struct Clean {
     #[clap(long = "no-confirm")]
     no_confirm: bool,
 
-    /// Sort by size (useful when specifying `--last`)
+    /// Sort by size (useful when specifying `--filter`/`--last`)
     #[clap(long, short = 'S')]
     sort_size: bool,
 
-    /// Reverse ordering (useful when specifying `--last` and `--sort-size`)
+    /// Sort by modification time (useful when using `--filter` and `--last`).
+    #[clap(long, short = 'T')]
+    sort_time: bool,
+
+    /// Reverse ordering (useful when specifying `--last` and `--sort-{size,time}`)
     #[clap(long, short)]
     reverse: bool,
 }
@@ -57,6 +61,7 @@ impl Command for Clean {
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
             .sort_by_size(self.sort_size)?
+            .sort_by_time(self.sort_time)?
             .revert(self.reverse)
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
