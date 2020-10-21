@@ -30,6 +30,7 @@ Note: All commands can actually be abbreviated:
 * `p` for `push`
 * `l` for `list`
 * `c` for `clean`
+* `v` for `verify`
 
 #### Push
 
@@ -83,6 +84,18 @@ You can also ensure that a specific file is deleted by specifying `--file`:
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif)
 
 Note that the file is deleted even though it was uploaded with an alias.
+
+### Verify
+
+In case an upload gets canceled early, all files can be checked for validity via `verify`:
+
+```text
+$ asfa verify
+✓ my-very-specific-file.txt ... Verified.
+✓ my-very-specific-file-2.txt . Verified.
+```
+
+Since the prefix is the checksum, the check can be performed whether the file exists locally or not.
 
 ## Requirements
 
