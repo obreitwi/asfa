@@ -57,13 +57,19 @@ impl Command for Verify {
 
         let message = "Verifying...";
         let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();
+
         let num_files = files.len();
+        if num_files == 0 {
+            bail!("No files to verify..");
+        }
+
         let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
         let filename_max = files
             .iter()
             .map(|f| f.file_name().unwrap().to_string_lossy().chars().count())
             .max()
-            .unwrap() + 1;
+            .unwrap()
+            + 1;
 
         let chunk_size = 16;
         let hashes_actual = files[..]
