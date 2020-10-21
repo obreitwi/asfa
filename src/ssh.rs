@@ -456,7 +456,12 @@ impl<'a> FileListing<'a> {
     pub fn last(self, n: Option<usize>) -> Self {
         match n {
             Some(n) => {
-                let indices = self.indices.into_iter().skip(self.num_files - n).collect();
+                let num_indices = self.indices.len();
+                let indices = self
+                    .indices
+                    .into_iter()
+                    .skip(if num_indices > n { num_indices - n } else { 0 })
+                    .collect();
                 Self { indices, ..self }
             }
             None => self,
