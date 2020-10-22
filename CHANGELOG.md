@@ -4,6 +4,7 @@
 ## v0.5.1-pre (under development)
 
 * Fix: Remove unused `--no-confirm`-switch from verify command.
+* Fix: Colorful output for clean-confirmation.
 
 ## v0.5.0 (2020-10-22)
 

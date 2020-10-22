@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use clap::Clap;
-use dialoguer::Confirm;
+use dialoguer::{theme::ColorfulTheme, Confirm};
 use log::debug;
 use std::path::Path;
 
@@ -92,7 +92,7 @@ impl Command for Clean {
                 formatted_files.iter().map(|s| s.as_str()),
                 &color::frame,
             )?;
-            Confirm::new()
+            Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Delete files?")
                 .default(false)
                 .interact()?
