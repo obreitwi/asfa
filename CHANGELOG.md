@@ -3,6 +3,8 @@
 
 ## v0.5.1-pre (under development)
 
+* Fix: Remove unused `--no-confirm`-switch from verify command.
+
 ## v0.5.0 (2020-10-22)
 
 * Allow host selection via `$ASFA_HOST` environment variable. Priority for host selection is:

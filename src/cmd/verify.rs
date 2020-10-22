@@ -26,10 +26,6 @@ pub struct Verify {
     #[clap()]
     indices: Vec<i64>,
 
-    /// Disable confirming deletions
-    #[clap(long = "no-confirm")]
-    no_confirm: bool,
-
     /// Sort by size (useful when specifying `--last`)
     #[clap(long, short = 'S')]
     sort_size: bool,
