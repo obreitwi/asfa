@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.5.1-pre (under development)
+
 ## v0.5.0 (2020-10-22)
 
 * Allow host selection via `$ASFA_HOST` environment variable. Priority for host selection is:
