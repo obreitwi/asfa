@@ -12,6 +12,7 @@
   1. `-H`/`--host` supplied via command line.
   2. `ASFA_HOST` environment variable.
   3. `default_host` from config file.
+  4. Single host if there is only one defined.
 * `clean`-command:
   * Add `-F`/`--filter`-option to clean files matching a given regex.
   * Add `-n`/`--last`-switch from `list` command to clean the last `n` files
