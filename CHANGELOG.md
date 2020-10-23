@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.5.2-pre (under development)
+
 ## v0.5.1 (2020-10-23)
 
 * Fix: Remove unused `--no-confirm`-switch from verify command.
