@@ -2,7 +2,7 @@ use crate::cfg::{Auth, Host};
 use crate::util;
 
 use anyhow::{bail, Context, Result};
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressIterator};
 use itertools::Itertools;
 use log::{debug, error, info};
 use regex::Regex;
@@ -282,12 +282,10 @@ impl<'a> SshSession<'a> {
         bar.set_message("Getting file stats: ");
 
         let sftp = self.raw.sftp()?;
-        let mut filestats = Vec::new();
-        for elem in paths {
+        let mut filestats = Vec::with_capacity(paths.len());
+        for elem in paths.iter().progress_with(bar) {
             filestats.push(sftp.stat(&self.prepend_base_folder(elem))?);
-            bar.inc(1);
         }
-        bar.finish_and_clear();
         debug!("Getting remote stats… done");
         Ok(filestats)
     }
