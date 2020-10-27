@@ -3,6 +3,11 @@
 
 ## v0.5.2-pre (under development)
 
+* Improve stat retrieval speed from < 50 entries/s to near instant.
+  * Needs `find`, `xargs` and `stat` on the remote site.
+  * Falls back to retrieving stats via sftp-interface if needed tools not
+    available.
+
 ## v0.5.1 (2020-10-23)
 
 * Fix: Remove unused `--no-confirm`-switch from verify command.

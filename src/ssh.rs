@@ -9,7 +9,7 @@ use regex::Regex;
 use rpassword::prompt_password_stderr;
 use ssh2::FileStat;
 use ssh2::Session as RawSession;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IOError, ErrorKind};
@@ -274,19 +274,86 @@ impl<'a> SshSession<'a> {
 
     /// Get stats about a remote files (relative to the current host's base-folder)
     pub fn stat<'b, I: IntoIterator<Item = &'b Path>>(&self, paths: I) -> Result<Vec<FileStat>> {
-        debug!("Getting remote stats…");
+        if self.stat_bulk_available()? {
+            self.stat_bulk(paths)
+        } else {
+            self.stat_fallback(paths)
+        }
+    }
+
+    /// Get stats about a remote files (relative to the current host's base-folder)
+    ///
+    /// Faster version getting relevant information en bulk via find and xargs.
+    pub fn stat_bulk<'b, I: IntoIterator<Item = &'b Path>>(
+        &self,
+        paths: I,
+    ) -> Result<Vec<FileStat>> {
+        // It is easier to simply check all files and then filter later..
+        let mut channel = self.raw.channel_session()?;
+        let cmd = format!(
+            "find '{}' -mindepth 2 -maxdepth 2 -type f -print0 | xargs -0 stat -c '%Y %s %n'",
+            &self.host.folder.display()
+        );
+        channel.exec(&cmd)?;
+        let mut raw = String::new();
+        channel.read_to_string(&mut raw)?;
+        let paths: HashSet<_> = paths
+            .into_iter()
+            .map(|p| {
+                let path = self.prepend_base_folder(p);
+                log::trace!("Requesting: {}", path.display());
+                path
+            })
+            .collect();
+        let stats: Vec<_> = raw
+            .lines()
+            .filter_map(|l| {
+                let mut parts = l.split(" ");
+                let mtime: Option<u64> = parts.next().and_then(|s| s.parse().ok());
+                let size: Option<u64> = parts.next().and_then(|s| s.parse().ok());
+                let name: String = parts.join(" ");
+                if paths.contains(Path::new(&name)) {
+                    Some(FileStat {
+                        size,
+                        uid: None,
+                        gid: None,
+                        perm: None,
+                        atime: None,
+                        mtime,
+                    })
+                } else {
+                    log::trace!("Not requested: {}", name);
+                    None
+                }
+            })
+            .collect();
+
+        if stats.len() != paths.len() {
+            bail!("Expected {} stats, only got {}.", paths.len(), stats.len());
+        }
+        Ok(stats)
+    }
+
+    /// Get stats about a remote files (relative to the current host's base-folder)
+    ///
+    /// Slower fallback that only relies on sftp functionality.
+    pub fn stat_fallback<'b, I: IntoIterator<Item = &'b Path>>(
+        &self,
+        paths: I,
+    ) -> Result<Vec<FileStat>> {
+        debug!("Getting remote stats (fallback)…");
         let paths: Vec<_> = paths.into_iter().collect();
 
         let bar = ProgressBar::new(paths.len() as u64);
         bar.set_style(crate::cli::style_progress_bar_count());
-        bar.set_message("Getting file stats: ");
+        bar.set_message("Getting file stats (fallback): ");
 
         let sftp = self.raw.sftp()?;
         let mut filestats = Vec::with_capacity(paths.len());
         for elem in paths.iter().progress_with(bar) {
             filestats.push(sftp.stat(&self.prepend_base_folder(elem))?);
         }
-        debug!("Getting remote stats… done");
+        debug!("Getting remote stats (fallback)… done");
         Ok(filestats)
     }
 
@@ -329,6 +396,14 @@ impl<'a> SshSession<'a> {
         }
 
         Ok(())
+    }
+
+    /// Check if necessary utilities for fast stat generation are available.
+    fn stat_bulk_available(&self) -> Result<bool> {
+        let mut channel = self.raw.channel_session()?;
+        let check = "which find && which xargs && which stat";
+        channel.exec(check)?;
+        Ok(channel.exit_status()? == 0)
     }
 }
 
