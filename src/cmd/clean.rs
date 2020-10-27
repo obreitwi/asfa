@@ -7,7 +7,7 @@ use std::path::Path;
 use crate::cfg::Config;
 use crate::cli::color;
 use crate::cmd::Command;
-use crate::ssh::SshSession;
+use crate::ssh::{SshSession, FileListing};
 
 /// Clear already uploaded files.
 #[derive(Clap, Debug)]
@@ -66,37 +66,7 @@ impl Command for Clean {
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?;
 
-        let do_delete = self.no_confirm || {
-            let dot = color::dot.apply_to("*");
-            let formatted_files: Vec<String> = files_to_delete
-                .iter()?
-                .map(|(_, f, _)| {
-                    format!(
-                        " {dot} {file} ",
-                        dot = dot,
-                        file = color::entry.apply_to(f.display())
-                    )
-                })
-                .collect();
-
-            crate::cli::draw_boxed(
-                &format!(
-                    "Will {delete} the following files:",
-                    delete = console::Style::new()
-                        .bold()
-                        .red()
-                        .bright()
-                        .apply_to("delete")
-                )
-                .as_str(),
-                formatted_files.iter().map(|s| s.as_str()),
-                &color::frame,
-            )?;
-            Confirm::with_theme(&ColorfulTheme::default())
-                .with_prompt("Delete files?")
-                .default(false)
-                .interact()?
-        };
+        let do_delete = self.no_confirm || self.user_confirm_deletion(&files_to_delete)?;
 
         let remove_file =
             |file_to_delete: &Path| -> Result<()> {
@@ -117,5 +87,42 @@ impl Command for Clean {
         }
 
         Ok(())
+    }
+
+}
+
+impl Clean {
+    /// Have the user confirm deletions
+    fn user_confirm_deletion(&self, files: &FileListing) -> Result<bool>
+    {
+        let dot = color::dot.apply_to("*");
+        let formatted_files: Vec<String> = files
+            .iter()?
+            .map(|(_, f, _)| {
+                format!(
+                    " {dot} {file} ",
+                    dot = dot,
+                    file = color::entry.apply_to(f.display())
+                )
+            })
+        .collect();
+
+        crate::cli::draw_boxed(
+            &format!(
+                "Will {delete} the following files:",
+                delete = console::Style::new()
+                .bold()
+                .red()
+                .bright()
+                .apply_to("delete")
+            )
+            .as_str(),
+            formatted_files.iter().map(|s| s.as_str()),
+            &color::frame,
+        )?;
+        Ok(Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Delete files?")
+            .default(false)
+            .interact()?)
     }
 }
