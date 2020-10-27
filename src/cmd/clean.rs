@@ -7,7 +7,7 @@ use std::path::Path;
 use crate::cfg::Config;
 use crate::cli::color;
 use crate::cmd::Command;
-use crate::ssh::{SshSession, FileListing};
+use crate::ssh::{FileListing, SshSession};
 
 /// Clear already uploaded files.
 #[derive(Clap, Debug)]
@@ -88,13 +88,11 @@ impl Command for Clean {
 
         Ok(())
     }
-
 }
 
 impl Clean {
     /// Have the user confirm deletions
-    fn user_confirm_deletion(&self, files: &FileListing) -> Result<bool>
-    {
+    fn user_confirm_deletion(&self, files: &FileListing) -> Result<bool> {
         let dot = color::dot.apply_to("*");
         let formatted_files: Vec<String> = files
             .iter()?
@@ -105,16 +103,16 @@ impl Clean {
                     file = color::entry.apply_to(f.display())
                 )
             })
-        .collect();
+            .collect();
 
         crate::cli::draw_boxed(
             &format!(
                 "Will {delete} the following files:",
                 delete = console::Style::new()
-                .bold()
-                .red()
-                .bright()
-                .apply_to("delete")
+                    .bold()
+                    .red()
+                    .bright()
+                    .apply_to("delete")
             )
             .as_str(),
             formatted_files.iter().map(|s| s.as_str()),
