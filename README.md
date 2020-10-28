@@ -12,9 +12,50 @@
 
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif)
 
-* Upload files via `ssh` to a (linux-based) remote site.
-* Generate a non-guessable URL pointing to the file.
-* The URL can then be sent via mail or directly.
+Since I handle my emails mostly via ssh on a remote server (shoutout to
+[neomutt](https://neomutt.org/), [OfflineIMAP](http://www.offlineimap.org/) and
+[msmtp](https://marlam.de/msmtp/)), I needed a quick and easy possibility to
+attach files to emails. As email attachments are rightfully frowned upon, I did
+not want to simply copy files over to the remote site to attach them.
+Furthermore, I often need to share generated files (such as plots or logfiles)
+on our group-internal [mattermost](https://www.mattermost.org) or any other
+form of text-based communication. Ideally, I want to do this from the folder I
+am already in on the terminal - and not by to navigating back to it from the
+browser's "file open" menu…
+
+Therefore, I needed a quick tool that let's me
+
+* [send][gif-send] a link instead of the file.
+* support [aliases][gif-aliases] because sometimes
+  `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`,
+  especially a few weeks later.
+* have the link "just work" for non-tech-savvy people, i.e. not have the file
+  be password-protected, but still only accessible for people who possess the
+  link. Here it is helpful to own a domain somewhat resembling your last name.
+* [keep][gif-list-details] track of which files I shared.
+* easily clean files by [signed][gif-clean-signed] [index][gif-clean], regex or
+  [checksum][gif-clean-checksum].
+* verify that all files uploaded correctly.
+* do everything from the command line.
+* have an excuse to to use [Rust](https://www.rust-lang.org/) for something
+  other than [Advent of Code](https://adventofcode.com/).
+* (have a name that can only be typed with the left hand without moving.)
+
+[gif-send]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif
+[gif-aliases]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
+[gif-list]: (https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif)
+[gif-list-details]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif
+[gif-clean-signed]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif
+[gif-clean]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif
+[gif-clean-checksum]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif
+
+`asfa` works by uploading the given file to a publicly reachable location on
+the remote server via SSH. The link prefix of variable length is then generated
+from the checksum of the uploaded file. Hence, it is non-guessable (only people
+with the correct link can access it) and can be used to verify the file
+uploaded correctly.
+
+The emitted link can then be copied and pasted.
 
 `asfa` uses a single `ssh`-connection for each invocation which is convenient
 if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage
@@ -64,24 +105,24 @@ https://my-domain.eu/my-uploads/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specifi
 
 List all files currently available online:
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif)
+![][gif-list]
 
 #### Detailed list
 
 List all files with meta data via `--details`:
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif)
+![][gif-list-details]
 
 #### Clean
 
 Remove the file from remote site via index (negative indices need to be sepearated by `--`):
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif)
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif)
+![][gif-clean]
+![][gif-clean-signed]
 
 You can also ensure that a specific file is deleted by specifying `--file`:
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif)
+![][gif-clean-checksum]
 
 Note that the file is deleted even though it was uploaded with an alias.
 
