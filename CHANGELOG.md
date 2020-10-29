@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.5.3-pre (under development)
+
 ## v0.5.2 (2020-10-29)
 
 * Improve stat retrieval speed from < 50 entries/s to near instant.
