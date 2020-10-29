@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.5.2-pre (under development)
+## v0.5.2 (2020-10-29)
 
 * Improve stat retrieval speed from < 50 entries/s to near instant.
   * Needs `find`, `xargs` and `stat` on the remote site.
