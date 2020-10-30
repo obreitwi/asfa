@@ -15,9 +15,10 @@ hosts:  # dictionary mapping host alias to host settings
         # Each host can also be be defined in an `<alias>.yaml` file in a
         # hosts-subfolder
   my-remote-site:
-    hostname: my-hostname.eu:222  # Defaults to alias name if unset.
+    hostname: my-hostname.eu:222  # defaults to alias name if unset
                                   # Note: port-suffix defaults to 22 if not
                                   # specified
+    user: my-remote-user  # defaults to current user if not set
     folder: /var/www/default/my-uploads  # target folder where to store data,
                                          # needs to be writable
     url: https://my-domain.eu/my-uploads  # URL that is prefixed when URLs are
