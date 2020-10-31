@@ -7,7 +7,7 @@ prefix_length: 32  # optional, defaults to 32, how many hex-digits of the hash
 auth:
   interactive: true  # defaults to true
   use_agent: true  # defaults to true
-  private_key_file: /path/to/private/key/file/in/pem/format # optional
+  private_key_file: /path/to/private/key/file/in/pem/format  # optional
   private_key_file_password: foobar  # optional and highly discouraged, will be
                                      # prompted for if interactive is set to
                                      # true
