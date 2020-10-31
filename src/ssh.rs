@@ -7,8 +7,8 @@ use itertools::Itertools;
 use log::{debug, error, info};
 use regex::Regex;
 use rpassword::prompt_password_stderr;
-use ssh2::FileStat;
 use ssh2::Session as RawSession;
+use ssh2::{FileStat, KeyboardInteractivePrompt, Prompt};
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
@@ -53,29 +53,72 @@ impl<'a> SshSession<'a> {
         Ok(files.lines().map(|s| Path::new(s).to_path_buf()).collect())
     }
 
+    /// Try all defined authentication methods in order
     fn auth(&self, auth: &Auth) -> Result<()> {
-        if auth.use_agent {
-            self.auth_agent()?;
-            Ok(())
-        } else if let Some(private_key_file) = auth.private_key_file.as_deref() {
-            self.auth_private_key(
-                &private_key_file,
-                auth.private_key_file_password.as_deref(),
-                &self.host.get_username(),
-                auth.interactive,
-            )?;
-            Ok(())
-        } else if auth.interactive {
-            self.auth_interactive()?;
-            Ok(())
-        } else if let Some(password) = self.host.password.as_ref() {
-            debug!("Authenticating with plaintext password.");
-            self.raw
-                .userauth_password(&self.host.get_username(), &password)?;
+        let mut methods = self.get_auth_methods()?;
+
+        let supports_pubkey = methods.contains("publickey");
+        if auth.use_agent && supports_pubkey {
+            if let Err(e) = self.auth_agent() {
+                log::debug!("Agent authentication failed: {}", e);
+            } else if !self.raw.authenticated() {
+                // If we are not yet authenticated after successful password authentication we
+                // might require a second, now available step
+                methods = self.get_auth_methods()?;
+            }
+        }
+
+        if !self.raw.authenticated() && supports_pubkey {
+            if let Some(private_key_file) = auth.private_key_file.as_deref() {
+                if let Err(e) = self.auth_private_key(
+                    &private_key_file,
+                    auth.private_key_file_password.as_deref(),
+                    &self.host.get_username(),
+                    auth.interactive,
+                ) {
+                    log::debug!("Private key authenication failed: {}", e);
+                }
+            } else if !self.raw.authenticated() {
+                // If we are not yet authenticated after successful password authentication we
+                // might require a second, now available step
+                methods = self.get_auth_methods()?;
+            }
+        }
+
+        if !self.raw.authenticated() && methods.contains("password") {
+            if let Some(password) = self.host.password.as_ref() {
+                debug!("Authenticating with plaintext password.");
+                if let Err(e) = self
+                    .raw
+                    .userauth_password(&self.host.get_username(), &password)
+                {
+                    log::debug!("Password authenication failed: {}", e);
+                }
+            } else if !self.raw.authenticated() {
+                // If we are not yet authenticated after successful password authentication we
+                // might require a second, now available step
+                methods = self.get_auth_methods()?;
+            }
+        }
+
+        if !self.raw.authenticated() && auth.interactive && methods.contains("password") {
+            if let Err(e) = self.auth_interactive() {
+                log::debug!("Interactive password authenication failed: {}", e);
+            }
+        }
+
+        if !self.raw.authenticated() && auth.interactive && methods.contains("keyboard-interactive")
+        {
+            if let Err(e) = self.auth_keyboard_interactive() {
+                log::debug!("Interactive password authenication failed: {}", e);
+            }
+        }
+
+        if self.raw.authenticated() {
             Ok(())
         } else {
             let msg = format!(
-                "No authentication method defined for host {}",
+                "No authentication method successful for host {}. Run in loglevel debug for clues.",
                 self.host.alias
             );
             error!("{}", &msg);
@@ -117,6 +160,13 @@ impl<'a> SshSession<'a> {
         self.raw
             .userauth_password(&self.host.get_username(), &password)?;
         Ok(())
+    }
+
+    fn auth_keyboard_interactive(&self) -> Result<()> {
+        Ok(self.raw.userauth_keyboard_interactive(
+            &self.host.get_username(),
+            &mut InteractivePrompt::default(),
+        )?)
     }
 
     fn auth_private_key(
@@ -187,6 +237,16 @@ impl<'a> SshSession<'a> {
         channel
             .exec(&cmd)
             .with_context(|| format!("Could not create remote folder: {}", path_str))
+    }
+
+    /// Get all available authentication methods
+    pub fn get_auth_methods(&self) -> Result<HashSet<String>> {
+        Ok(self
+            .raw
+            .auth_methods(&self.host.get_username())?
+            .split(',')
+            .map(String::from)
+            .collect())
     }
 
     /// Get hash of the remote file (relative to the current host's base-folder).
@@ -643,5 +703,41 @@ impl<'a> Iterator for FileListingIter<'a> {
         let stat = self.stats.map(|s| s.get(&idx).unwrap());
 
         Some((idx, file, stat))
+    }
+}
+
+struct InteractivePrompt {}
+
+impl Default for InteractivePrompt {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+impl KeyboardInteractivePrompt for InteractivePrompt {
+    fn prompt<'a>(
+        &mut self,
+        username: &str,
+        instructions: &str,
+        prompts: &[Prompt<'a>],
+    ) -> Vec<String> {
+        debug!("Performing keyboard-interactive auth for {}", username);
+        if instructions.len() > 0 {
+            info!("{}", instructions);
+        }
+        prompts
+            .iter()
+            .map(|p| {
+                if p.echo {
+                    dialoguer::Input::new()
+                        .with_prompt(&p.text.to_string())
+                        .allow_empty(true)
+                        .interact_text()
+                        .unwrap_or_default()
+                } else {
+                    prompt_password_stderr(&p.text).unwrap_or_default()
+                }
+            })
+            .collect()
     }
 }

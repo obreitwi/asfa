@@ -3,6 +3,10 @@
 
 ## v0.5.3-pre (under development)
 
+* Rework authentication procedure to only try authentication methods that the server advertises.
+* Add support for keyboard-interactive authentication if the user enables interactive input.
+  -> Allows for two factor authentication (e.g., with pam-based google-authenticator)
+
 ## v0.5.2 (2020-10-29)
 
 * Improve stat retrieval speed from < 50 entries/s to near instant.
