@@ -2,6 +2,7 @@ use crate::cfg::{Auth, Host};
 use crate::util;
 
 use anyhow::{bail, Context, Result};
+use expanduser::expanduser;
 use indicatif::{ProgressBar, ProgressIterator};
 use itertools::Itertools;
 use log::{debug, error, info};
@@ -71,7 +72,7 @@ impl<'a> SshSession<'a> {
         if !self.raw.authenticated() && supports_pubkey {
             if let Some(private_key_file) = auth.private_key_file.as_deref() {
                 if let Err(e) = self.auth_private_key(
-                    &private_key_file,
+                    &expanduser(private_key_file)?.to_string_lossy(),
                     auth.private_key_file_password.as_deref(),
                     &self.host.get_username(),
                     auth.interactive,
