@@ -72,7 +72,7 @@ impl<'a> SshSession<'a> {
         if !self.raw.authenticated() && supports_pubkey {
             if let Some(private_key_file) = auth.private_key_file.as_deref() {
                 if let Err(e) = self.auth_private_key(
-                    &expanduser(private_key_file)?.to_string_lossy(),
+                    &expanduser(private_key_file)?,
                     auth.private_key_file_password.as_deref(),
                     &self.host.get_username(),
                     auth.interactive,
@@ -131,6 +131,7 @@ impl<'a> SshSession<'a> {
     }
 
     fn auth_agent(&self) -> Result<()> {
+        log::debug!("Trying to authenticate via agent..");
         let mut agent = self.raw.agent().unwrap();
         agent.connect().unwrap();
         agent.list_identities().unwrap();
@@ -172,16 +173,17 @@ impl<'a> SshSession<'a> {
 
     fn auth_private_key(
         &self,
-        private_key_file: &str,
+        private_key_file: &Path,
         private_key_file_password: Option<&str>,
         username: &str,
         interactive: bool,
     ) -> Result<()> {
+        log::debug!("Trying to authenticate via private key file: {}", private_key_file.display());
         let password = match private_key_file_password {
             Some(pw) => Some(pw.to_owned()),
             None if interactive => Some(prompt_password_stderr(&format!(
                 "Interactive authentication enabled. Enter password for {}:",
-                private_key_file
+                private_key_file.display()
             ))?),
             None => None,
         };
@@ -189,7 +191,7 @@ impl<'a> SshSession<'a> {
         self.raw.userauth_pubkey_file(
             username,
             None,
-            Path::new(private_key_file),
+            private_key_file,
             password.as_deref(),
         )?;
 
@@ -242,12 +244,16 @@ impl<'a> SshSession<'a> {
 
     /// Get all available authentication methods
     pub fn get_auth_methods(&self) -> Result<HashSet<String>> {
-        Ok(self
+        let methods = self
             .raw
             .auth_methods(&self.host.get_username())?
             .split(',')
             .map(String::from)
-            .collect())
+            .collect();
+
+        log::trace!("Advertised auth methods: {:?}", methods);
+
+        Ok(methods)
     }
 
     /// Get hash of the remote file (relative to the current host's base-folder).
