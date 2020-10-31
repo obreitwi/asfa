@@ -192,7 +192,7 @@ impl Config {
 
                 let host_yaml = YamlLoader::load_from_str(&read_to_string(&possible_host)?)?;
                 let error = format!("Invalid host-file for host {}", &alias);
-                let host = Host::from_yaml(alias, &host_yaml[0]).context(error)?;
+                let host = Host::from_yaml_with_config(alias, &host_yaml[0], &config).context(error)?;
 
                 config.hosts.insert(host.alias.clone(), host);
             }

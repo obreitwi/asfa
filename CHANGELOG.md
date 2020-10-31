@@ -6,6 +6,7 @@
 * Rework authentication procedure to only try authentication methods that the server advertises.
 * Add support for keyboard-interactive authentication if the user enables interactive input.
   -> Allows for two factor authentication (e.g., with pam-based google-authenticator)
+* Fix host settings defined in separate file not falling back to defaults set in `config.yaml`
 
 ## v0.5.2 (2020-10-29)
 
