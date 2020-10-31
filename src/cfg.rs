@@ -300,6 +300,7 @@ impl Host {
     }
 
     fn from_yaml_with_config(alias: String, input: &Yaml, config: &Config) -> Result<Host> {
+        log::trace!("Reading host: {}", alias);
         if let Yaml::Hash(dict) = input {
             let url = get_required(dict, "url", get_string_from)?.clone();
 
