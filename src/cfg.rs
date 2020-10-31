@@ -10,7 +10,7 @@ use whoami::username;
 use yaml_rust::{yaml::Hash, Yaml, YamlLoader};
 
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
-const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
+const CONTROLS_ENHANCED: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 
 use crate::util::*;
 
@@ -354,7 +354,7 @@ impl Host {
         Ok(format!(
             "{}/{}",
             &self.url,
-            utf8_percent_encode(file, FRAGMENT)
+            utf8_percent_encode(file, CONTROLS_ENHANCED)
         ))
     }
 }
