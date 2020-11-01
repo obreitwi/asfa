@@ -62,10 +62,6 @@ impl<'a> SshSession<'a> {
         if auth.use_agent && supports_pubkey {
             if let Err(e) = self.auth_agent() {
                 log::debug!("Agent authentication failed: {}", e);
-            } else if !self.raw.authenticated() {
-                // If we are not yet authenticated after successful password authentication we
-                // might require a second, now available step
-                methods = self.get_auth_methods()?;
             }
         }
 
@@ -77,12 +73,8 @@ impl<'a> SshSession<'a> {
                     &self.host.get_username(),
                     auth.interactive,
                 ) {
-                    log::debug!("Private key authenication failed: {}", e);
+                    log::debug!("Private key authenication (seemingly) failed: {}", e);
                 }
-            } else if !self.raw.authenticated() {
-                // If we are not yet authenticated after successful password authentication we
-                // might require a second, now available step
-                methods = self.get_auth_methods()?;
             }
         }
 
@@ -95,11 +87,13 @@ impl<'a> SshSession<'a> {
                 {
                     log::debug!("Password authenication failed: {}", e);
                 }
-            } else if !self.raw.authenticated() {
-                // If we are not yet authenticated after successful password authentication we
-                // might require a second, now available step
-                methods = self.get_auth_methods()?;
             }
+        }
+
+        if !self.raw.authenticated() {
+            // Update auth methods to discover keyboard-interactive as possible second
+            // authentication step
+            methods = self.get_auth_methods()?;
         }
 
         if !self.raw.authenticated() && auth.interactive && methods.contains("password") {
@@ -178,7 +172,10 @@ impl<'a> SshSession<'a> {
         username: &str,
         interactive: bool,
     ) -> Result<()> {
-        log::debug!("Trying to authenticate via private key file: {}", private_key_file.display());
+        log::debug!(
+            "Trying to authenticate via private key file: {}",
+            private_key_file.display()
+        );
         let password = match private_key_file_password {
             Some(pw) => Some(pw.to_owned()),
             None if interactive => Some(prompt_password_stderr(&format!(
@@ -188,12 +185,8 @@ impl<'a> SshSession<'a> {
             None => None,
         };
 
-        self.raw.userauth_pubkey_file(
-            username,
-            None,
-            private_key_file,
-            password.as_deref(),
-        )?;
+        self.raw
+            .userauth_pubkey_file(username, None, private_key_file, password.as_deref())?;
 
         Ok(())
     }
