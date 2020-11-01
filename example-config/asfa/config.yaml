@@ -8,9 +8,11 @@ auth:
   interactive: true  # defaults to true
   use_agent: true  # defaults to true
   private_key_file: /path/to/private/key/file/in/pem/format  # optional
-  private_key_file_password: foobar  # optional and highly discouraged, will be
-                                     # prompted for if interactive is set to
-                                     # true
+  private_key_file_password: foobar  # optional, but highly discouraged
+                                     # * will be prompted for if interactive is
+                                     #   set to true and not given here
+                                     # * set explicitly to "" in order to
+                                     #   indicate private key without password
 hosts:  # dictionary mapping host alias to host settings
         # Each host can also be be defined in an `<alias>.yaml` file in a
         # hosts-subfolder
@@ -28,6 +30,6 @@ hosts:  # dictionary mapping host alias to host settings
                      # they are readable by the webserver
     password: foobar  # optional and highly discouraged, password to login to
                       # server, stored in plaintext
-    auth:  # optional, overwrites global auth-config
+    auth:  # optional, overwrites global auth-config, see auth above!
       interactive: false
       private_key_file: /path/to/private/key/in/pem/format
