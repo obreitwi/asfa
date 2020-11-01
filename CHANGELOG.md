@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.5.3-pre (under development)
+## v0.5.3 (2020-11-01)
 
 * Rework authentication procedure to only try authentication methods that the server advertises.
 * Add support for keyboard-interactive authentication if the user enables interactive input.
