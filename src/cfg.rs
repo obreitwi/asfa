@@ -308,7 +308,7 @@ impl Host {
 
             let user = get_optional(dict, "user", get_string_from)?.cloned();
 
-            let folder = PathBuf::from(get_required(dict, "folder", get_string_from)?);
+            let folder = expanduser(get_required(dict, "folder", get_string_from)?)?;
 
             let group = get_optional(dict, "group", get_string_from)?.cloned();
 
