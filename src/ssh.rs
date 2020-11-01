@@ -721,7 +721,14 @@ impl KeyboardInteractivePrompt for InteractivePrompt {
         instructions: &str,
         prompts: &[Prompt<'a>],
     ) -> Vec<String> {
-        debug!("Performing keyboard-interactive auth for {}", username);
+        debug!(
+            "Performing keyboard-interactive auth{}.",
+            if username.len() > 0 {
+                format!(" for {}", username)
+            } else {
+                "".to_string()
+            }
+        );
         if instructions.len() > 0 {
             info!("{}", instructions);
         }
