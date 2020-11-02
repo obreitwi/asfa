@@ -68,12 +68,16 @@ impl<'a> SshSession<'a> {
         if !self.raw.authenticated() && supports_pubkey {
             if let Some(private_key_file) = auth.private_key_file.as_deref() {
                 if let Err(e) = self.auth_private_key(
-                    &expanduser(private_key_file)?,
+                    private_key_file,
                     auth.private_key_file_password.as_deref(),
                     &self.host.get_username(),
                     auth.interactive,
                 ) {
-                    log::debug!("Private key authenication (seemingly) failed: {}", e);
+                    log::debug!(
+                        "Private key authenication for '{}' (seemingly) failed: {}",
+                        private_key_file,
+                        e
+                    );
                 }
             }
         }
@@ -167,24 +171,25 @@ impl<'a> SshSession<'a> {
 
     fn auth_private_key(
         &self,
-        private_key_file: &Path,
+        private_key_file: &str,
         private_key_file_password: Option<&str>,
         username: &str,
         interactive: bool,
     ) -> Result<()> {
         log::debug!(
             "Trying to authenticate via private key file: {}",
-            private_key_file.display()
+            private_key_file
         );
         let password = match private_key_file_password {
             Some(pw) => Some(pw.to_owned()),
             None if interactive => Some(prompt_password_stderr(&format!(
                 "Interactive authentication enabled. Enter password for {}:",
-                private_key_file.display()
+                private_key_file
             ))?),
             None => None,
         };
 
+        let private_key_file = &expanduser(private_key_file)?;
         self.raw
             .userauth_pubkey_file(username, None, private_key_file, password.as_deref())?;
 
