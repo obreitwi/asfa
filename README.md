@@ -60,7 +60,8 @@ The emitted link can then be copied and pasted.
 `asfa` uses a single `ssh`-connection for each invocation which is convenient
 if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage
 (see [details](#background)). Alternatively, private key files in [PEM
-format][pem] can be used directly.
+format][pem] or openssh-format (i.e., private key starts with
+`-----BEGIN OPENSSH PRIVATE KEY-----`) can be used directly.
 
 [gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
 [pem]: https://serverfault.com/a/706342
