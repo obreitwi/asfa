@@ -65,6 +65,7 @@ impl<'a> SshSession<'a> {
             }
         }
 
+        // Check private key from user configuration
         if !self.raw.authenticated() && supports_pubkey {
             if let Some(private_key_file) = auth.private_key_file.as_deref() {
                 if let Err(e) = self.auth_private_key(
@@ -208,7 +209,10 @@ impl<'a> SshSession<'a> {
         sess.set_tcp_stream(tcp);
         sess.handshake()?;
 
-        let ssh_session = SshSession { raw: sess, host };
+        let ssh_session = SshSession {
+            raw: sess,
+            host,
+        };
 
         ssh_session.auth(auth)?;
 

@@ -36,8 +36,9 @@ pub struct Config {
 /// Authentication configuration
 #[derive(Debug, Clone)]
 pub struct Auth {
-    /// Perform agent authentication
-    pub use_agent: bool,
+    /// Perform interactive authentication (if private key is set password will be used for private
+    /// key instead).
+    pub interactive: bool,
 
     /// Perform authentication via explicit private key
     pub private_key_file: Option<String>,
@@ -45,9 +46,8 @@ pub struct Auth {
     /// Explicit password for private key (unsafe)
     pub private_key_file_password: Option<String>,
 
-    /// Perform interactive authentication (if private key is set password will be used for private
-    /// key instead).
-    pub interactive: bool,
+    /// Perform agent authentication
+    pub use_agent: bool,
 }
 
 /// A host entry
@@ -192,7 +192,8 @@ impl Config {
 
                 let host_yaml = YamlLoader::load_from_str(&read_to_string(&possible_host)?)?;
                 let error = format!("Invalid host-file for host {}", &alias);
-                let host = Host::from_yaml_with_config(alias, &host_yaml[0], &config).context(error)?;
+                let host =
+                    Host::from_yaml_with_config(alias, &host_yaml[0], &config).context(error)?;
 
                 config.hosts.insert(host.alias.clone(), host);
             }
@@ -226,7 +227,7 @@ impl Config {
         };
 
         config.auth = if let Some(Yaml::Hash(auth)) = config_yaml.get(&yaml_string("auth")) {
-            match Auth::from_yaml(&auth) {
+            match Auth::from_yaml(&auth, None) {
                 Ok(auth) => auth,
                 Err(e) => {
                     bail!("Could not read global authentication settings: {}", e);
@@ -313,7 +314,7 @@ impl Host {
             let group = get_optional(dict, "group", get_string_from)?.cloned();
 
             let auth = match get_optional(dict, "auth", get_dict_from)? {
-                Some(auth) => Auth::from_yaml(auth)?,
+                Some(auth) => Auth::from_yaml(auth, Some(&config.auth))?,
                 None => config.auth.clone(),
             };
 
@@ -361,18 +362,27 @@ impl Host {
 }
 
 impl Auth {
-    fn from_yaml(dict: &Hash) -> Result<Auth, InvalidYamlTypeError> {
-        let use_agent = get_bool_from(dict, "use_agent")?.cloned().unwrap_or(true);
-        let interactive = get_bool_from(dict, "interactive")?.cloned().unwrap_or(true);
-        let private_key_file = get_string_from(dict, "private_key_file")?.cloned();
-        let private_key_file_password =
-            get_string_from(dict, "private_key_file_password")?.cloned();
+    fn from_yaml(dict: &Hash, default: Option<&Auth>) -> Result<Auth, InvalidYamlTypeError> {
+        let auth_default = Self::default();
+        let default = default.unwrap_or(&auth_default);
+        let use_agent = get_bool_from(dict, "use_agent")?
+            .cloned()
+            .unwrap_or(default.use_agent);
+        let interactive = get_bool_from(dict, "interactive")?
+            .cloned()
+            .unwrap_or(default.interactive);
+        let private_key_file = get_string_from(dict, "private_key_file")?
+            .cloned()
+            .or_else(|| default.private_key_file.clone());
+        let private_key_file_password = get_string_from(dict, "private_key_file_password")?
+            .cloned()
+            .or_else(|| default.private_key_file_password.clone());
 
         Ok(Auth {
-            use_agent,
             interactive,
             private_key_file,
             private_key_file_password,
+            use_agent,
         })
     }
 }
@@ -380,10 +390,10 @@ impl Auth {
 impl Default for Auth {
     fn default() -> Self {
         Auth {
-            use_agent: true,
             interactive: true,
             private_key_file: None,
             private_key_file_password: None,
+            use_agent: true,
         }
     }
 }

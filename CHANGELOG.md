@@ -3,6 +3,9 @@
 
 ## v0.5.4-pre (under development)
 
+* Fix host-specific auth settings falling back on the default Auth-settings
+  instead of the global Auth-settings defined in `config.yaml`.
+
 ## v0.5.3 (2020-11-01)
 
 * Rework authentication procedure to only try authentication methods that the server advertises.
