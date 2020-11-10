@@ -1,4 +1,5 @@
 use crate::cfg::{Auth, Host};
+use crate::openssh::OpenSshConfig;
 use crate::util;
 
 use anyhow::{bail, Context, Result};
@@ -29,6 +30,7 @@ fn ensure_port(hostname: &str) -> String {
 pub struct SshSession<'a> {
     raw: RawSession,
     pub host: &'a Host,
+    cfg_openssh: Option<OpenSshConfig>,
 }
 
 impl<'a> SshSession<'a> {
@@ -80,6 +82,8 @@ impl<'a> SshSession<'a> {
                         e
                     );
                 }
+            } else if auth.from_openssh {
+                self.auth_private_keys_openssh()?;
             }
         }
 
@@ -197,11 +201,52 @@ impl<'a> SshSession<'a> {
         Ok(())
     }
 
+    /// Try to authenticate with private keys defined in openssh
+    fn auth_private_keys_openssh(&self) -> Result<()> {
+        let should_perform = || -> Result<bool> {
+            Ok(self.get_auth_methods()?.contains("publickey") && !self.raw.authenticated())
+        };
+
+        if self.cfg_openssh.is_none() {
+            log::trace!("No openSSH config found, skipping private key authentication.");
+            return Ok(());
+        }
+
+        for private_key in self.cfg_openssh.as_ref().unwrap().private_key_files() {
+            if !should_perform()? {
+                return Ok(());
+            }
+            if !Path::new(private_key).exists() {
+                continue;
+            }
+            if let Err(e) =
+                self.auth_private_key(private_key, None, &self.host.get_username(), false)
+            {
+                log::debug!(
+                    "Private key authenication for '{}' (seemingly) failed: {}",
+                    private_key,
+                    e
+                );
+            }
+        }
+        Ok(())
+    }
+
     /// Create a new SSH session from the given host configuration.
     ///
     /// First try authenticating with all agent identities then use an interactive password, if enabled.
     pub fn create(host: &'a Host) -> Result<Self> {
         let auth: &Auth = &host.auth;
+
+        let cfg_openssh = {
+            match OpenSshConfig::new(&host.alias) {
+                Ok(cfg) => Some(cfg),
+                Err(e) => {
+                    log::debug!("Could not load openSSH-config for host: {}", e);
+                    None
+                }
+            }
+        };
 
         let tcp = TcpStream::connect(ensure_port(host.get_hostname()))?;
 
@@ -212,6 +257,7 @@ impl<'a> SshSession<'a> {
         let ssh_session = SshSession {
             raw: sess,
             host,
+            cfg_openssh,
         };
 
         ssh_session.auth(auth)?;

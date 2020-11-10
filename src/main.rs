@@ -5,6 +5,7 @@
 mod cfg;
 mod cli;
 mod cmd;
+mod openssh;
 mod ssh;
 mod util;
 

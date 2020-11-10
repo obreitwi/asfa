@@ -36,6 +36,9 @@ pub struct Config {
 /// Authentication configuration
 #[derive(Debug, Clone)]
 pub struct Auth {
+    /// Try to use auth information for the given host from openssh settings
+    pub from_openssh: bool,
+
     /// Perform interactive authentication (if private key is set password will be used for private
     /// key instead).
     pub interactive: bool,
@@ -377,8 +380,12 @@ impl Auth {
         let private_key_file_password = get_string_from(dict, "private_key_file_password")?
             .cloned()
             .or_else(|| default.private_key_file_password.clone());
+        let from_openssh = get_bool_from(dict, "from_openssh")?
+            .cloned()
+            .unwrap_or(default.from_openssh);
 
         Ok(Auth {
+            from_openssh,
             interactive,
             private_key_file,
             private_key_file_password,
@@ -390,6 +397,7 @@ impl Auth {
 impl Default for Auth {
     fn default() -> Self {
         Auth {
+            from_openssh: true,
             interactive: true,
             private_key_file: None,
             private_key_file_password: None,
