@@ -5,6 +5,11 @@ verify_via_hash: true  # defaults to true
 prefix_length: 32  # optional, defaults to 32, how many hex-digits of the hash
                    # to print
 auth:
+  # If set, asfa will try to extract configuration parameters set from openSSH.
+  # Settings are looked up for the alias of the host entry.
+  # Currently, the following settings are read:
+  # * private keys
+  from_openssh: true  # defaults to true
   interactive: true  # defaults to true
   use_agent: true  # defaults to true
   private_key_file: /path/to/private/key/file/in/pem/format  # optional

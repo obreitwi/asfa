@@ -8,6 +8,7 @@
 * Add support to obtain settings from openSSH.
 * If user-supplied settings to do suffice to authenticate against the remote
   server, try using private keys listed in openSSH.
+  * This can be toggled via a new `from_openssh`-boolean flag in `auth`-section.
 
 ## v0.5.3 (2020-11-01)
 
