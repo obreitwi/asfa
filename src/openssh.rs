@@ -39,10 +39,11 @@ pub enum OpenSshError {
 
 impl OpenSshConfig {
     pub fn new(host: &str) -> Result<Self, OpenSshError> {
+        log::trace!("Reading openSSH config for {}", host);
         if !Self::check_prerequisites()? {
             return Err(OpenSshError::ExecutableNotFound);
         }
-        let output = String::from_utf8(Command::new("ssh").args(&["-g", host]).output()?.stdout)?;
+        let output = String::from_utf8(Command::new("ssh").args(&["-G", host]).output()?.stdout)?;
 
         use OpenSshConfigEntry::*;
 
