@@ -18,9 +18,9 @@ doc = []
 [dependencies]
 anyhow = "1.0.33"
 base64 = "0.13.0"
+chrono = "0.4.19"
 clap = "3.0.0-beta.2"
 console = "0.13.0"
-chrono = "0.4.19"
 dialoguer = "0.7.1"
 expanduser = "1.2.1"
 hex = "0.4.2"
