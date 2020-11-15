@@ -9,7 +9,7 @@ auth:
   # Settings are looked up for the alias of the host entry.
   # Currently, the following settings are read:
   # * private keys
-  from_openssh: true  # defaults to true
+  from_openssh: true  # defaults to false until next minor release
   interactive: true  # defaults to true
   use_agent: true  # defaults to true
   private_key_file: /path/to/private/key/file/in/pem/format  # optional
