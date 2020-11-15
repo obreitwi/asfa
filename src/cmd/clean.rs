@@ -7,7 +7,8 @@ use std::path::Path;
 use crate::cfg::Config;
 use crate::cli::color;
 use crate::cmd::Command;
-use crate::ssh::{FileListing, SshSession};
+use crate::ssh::SshSession;
+use crate::file_listing::FileListing;
 
 /// Clear already uploaded files.
 #[derive(Clap, Debug)]
