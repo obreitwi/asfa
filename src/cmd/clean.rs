@@ -37,6 +37,16 @@ pub struct Clean {
     #[clap(long = "no-confirm")]
     no_confirm: bool,
 
+    /// Select files newer than the given duration. Durations can be:seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    #[clap(long = "newer")]
+    select_newer: Option<String>,
+
+    /// Select files older than the given duration. Durations can be:seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    #[clap(long = "older")]
+    select_older: Option<String>,
+
     /// Sort by size (useful when specifying `--filter`/`--last`)
     #[clap(long, short = 'S')]
     sort_size: bool,
@@ -61,6 +71,9 @@ impl Command for Clean {
             .with_all(self.all)
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
+            .with_all_if_none(self.select_newer.is_some() || self.select_older.is_some())
+            .select_newer(self.select_newer.as_deref())?
+            .select_older(self.select_older.as_deref())?
             .sort_by_size(self.sort_size)?
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)

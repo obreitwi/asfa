@@ -45,7 +45,7 @@ impl Command for Verify {
             .list_files()?
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
-            .with_all_if_none()
+            .with_all_if_none(true)
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
             .last(self.last)

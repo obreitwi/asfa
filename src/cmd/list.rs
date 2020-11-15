@@ -84,7 +84,7 @@ impl Command for List {
             .list_files()?
             .by_indices(&self.indices[..])?
             .by_filter(self.filter.as_deref())?
-            .with_all_if_none()
+            .with_all_if_none(true)
             .select_newer(self.select_newer.as_deref())?
             .select_older(self.select_older.as_deref())?
             .sort_by_size(self.sort_size)?

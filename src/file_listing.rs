@@ -188,9 +188,9 @@ impl<'a> FileListing<'a> {
         self
     }
 
-    /// Add all if, so far, no files have been selected
-    pub fn with_all_if_none(self) -> Self {
-        if self.indices.len() == 0 {
+    /// Add all if, so far, no files have been selected and the boolean switch is set.
+    pub fn with_all_if_none(self, doit: bool) -> Self {
+        if doit && self.indices.len() == 0 {
             self.with_all(true)
         } else {
             self
