@@ -1,6 +1,6 @@
 use crate::cfg::{Auth, Host};
-use crate::openssh::OpenSshConfig;
 use crate::file_listing::FileListing;
+use crate::openssh::OpenSshConfig;
 
 use anyhow::{bail, Context, Result};
 use expanduser::expanduser;
@@ -10,7 +10,7 @@ use log::{debug, error, info};
 use rpassword::prompt_password_stderr;
 use ssh2::Session as RawSession;
 use ssh2::{FileStat, KeyboardInteractivePrompt, Prompt};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IOError, ErrorKind};
@@ -388,7 +388,10 @@ impl<'a> SshSession<'a> {
     }
 
     /// Get stats about a remote files (relative to the current host's base-folder)
-    pub fn stat<'b, I: IntoIterator<Item = &'b Path>>(&self, paths: I) -> Result<Vec<FileStat>> {
+    pub fn stat<'b, I: IntoIterator<Item = &'b Path> + Clone>(
+        &self,
+        paths: I,
+    ) -> Result<Vec<FileStat>> {
         if self.stat_bulk_available()? {
             self.stat_bulk(paths)
         } else {
@@ -399,7 +402,7 @@ impl<'a> SshSession<'a> {
     /// Get stats about a remote files (relative to the current host's base-folder)
     ///
     /// Faster version getting relevant information en bulk via find and xargs.
-    pub fn stat_bulk<'b, I: IntoIterator<Item = &'b Path>>(
+    pub fn stat_bulk<'b, I: IntoIterator<Item = &'b Path> + Clone>(
         &self,
         paths: I,
     ) -> Result<Vec<FileStat>> {
@@ -412,39 +415,40 @@ impl<'a> SshSession<'a> {
         channel.exec(&cmd)?;
         let mut raw = String::new();
         channel.read_to_string(&mut raw)?;
-        let paths: HashSet<_> = paths
-            .into_iter()
-            .map(|p| {
-                let path = self.prepend_base_folder(p);
-                log::trace!("Requesting: {}", path.display());
-                path
-            })
-            .collect();
-        let stats: Vec<_> = raw
+
+        // Generate stats for all retrieved files
+        let stats_map: HashMap<_, _> = raw
             .lines()
-            .filter_map(|l| {
+            .map(|l| {
                 let mut parts = l.split(" ");
                 let mtime: Option<u64> = parts.next().and_then(|s| s.parse().ok());
                 let size: Option<u64> = parts.next().and_then(|s| s.parse().ok());
                 let name: String = parts.join(" ");
-                if paths.contains(Path::new(&name)) {
-                    Some(FileStat {
+                let path = PathBuf::from(&name);
+                (
+                    path,
+                    FileStat {
                         size,
                         uid: None,
                         gid: None,
                         perm: None,
                         atime: None,
                         mtime,
-                    })
-                } else {
-                    log::trace!("Not requested: {}", name);
-                    None
-                }
+                    },
+                )
             })
             .collect();
 
-        if stats.len() != paths.len() {
-            bail!("Expected {} stats, only got {}.", paths.len(), stats.len());
+        let num_paths = paths.clone().into_iter().count();
+
+        // Re-order results to match requested files
+        let stats: Vec<_> = paths
+            .into_iter()
+            .filter_map(|p| stats_map.get(&self.prepend_base_folder(p)).cloned())
+            .collect();
+
+        if stats.len() != num_paths {
+            bail!("Expected {} stats, only got {}.", num_paths, stats.len());
         }
         Ok(stats)
     }

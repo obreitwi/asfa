@@ -9,6 +9,7 @@
 * If user-supplied settings to do suffice to authenticate against the remote
   server, try using private keys listed in openSSH.
   * This can be toggled via a new `from_openssh`-boolean flag in `auth`-section.
+* Ensure bulk-requesting of file stats returning retrieved stats in correct order.
 
 ## v0.5.3 (2020-11-01)
 
