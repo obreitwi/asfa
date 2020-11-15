@@ -1,12 +1,13 @@
 use crate::ssh::SshSession;
 use crate::util;
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 use itertools::Itertools;
 use regex::Regex;
 use ssh2::FileStat;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Helper structure to avoid re-implementing file listing capabilities for all commands.
 pub struct FileListing<'a> {
@@ -149,6 +150,14 @@ impl<'a> FileListing<'a> {
         self
     }
 
+    pub fn select_newer(self, user_duration: Option<&str>) -> Result<Self> {
+        self.filter_by_time(user_duration, false)
+    }
+
+    pub fn select_older(self, user_duration: Option<&str>) -> Result<Self> {
+        self.filter_by_time(user_duration, true)
+    }
+
     pub fn sort_by_size(mut self, sort_by_size: bool) -> Result<Self> {
         if sort_by_size {
             self.ensure_stats()?;
@@ -210,6 +219,43 @@ impl<'a> FileListing<'a> {
 
     fn make_unique<I: IntoIterator<Item = usize>>(indices: I) -> Vec<usize> {
         indices.into_iter().unique().collect()
+    }
+
+    /// Helper function that filters selected files by date.
+    ///
+    /// If select_older == true, then only files older than user_duration will be kept;
+    /// if false, only files newer than user_duration will be kept.
+    fn filter_by_time(mut self, user_duration: Option<&str>, select_older: bool) -> Result<Self> {
+        if let Some(user_duration) = user_duration {
+            let duration = humantime::parse_duration(user_duration)?;
+            self.ensure_stats()?;
+            let stats = self.stats.as_ref().unwrap();
+
+            let now = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards.");
+            let cutoff = now
+                .checked_sub(duration)
+                .context("Invalid duration specified.")?;
+            let cutoff_s = cutoff.as_secs();
+
+            let indices: Vec<_> = self
+                .indices
+                .into_iter()
+                .filter(|idx| {
+                    let mtime = stats.get(idx).unwrap().mtime.unwrap();
+                    if select_older {
+                        mtime <= cutoff_s
+                    } else {
+                        mtime >= cutoff_s
+                    }
+                })
+                .collect();
+
+            Ok(Self { indices, ..self })
+        } else {
+            Ok(self)
+        }
     }
 }
 

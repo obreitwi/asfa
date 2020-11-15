@@ -45,6 +45,16 @@ pub struct List {
     #[clap(long, short)]
     reverse: bool,
 
+    /// Select files newer than the given duration. Durations can be:seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    #[clap(long = "newer")]
+    select_newer: Option<String>,
+
+    /// Select files older than the given duration. Durations can be:seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    #[clap(long = "older")]
+    select_older: Option<String>,
+
     /// Sort listing by size
     #[clap(long, short = 'S')]
     sort_size: bool,
@@ -73,8 +83,10 @@ impl Command for List {
         let to_list = session
             .list_files()?
             .by_indices(&self.indices[..])?
-            .by_filter(self.filter.as_ref().map(|f| f.as_str()))?
+            .by_filter(self.filter.as_deref())?
             .with_all_if_none()
+            .select_newer(self.select_newer.as_deref())?
+            .select_older(self.select_older.as_deref())?
             .sort_by_size(self.sort_size)?
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)
