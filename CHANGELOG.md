@@ -6,8 +6,8 @@
 * Fix host-specific auth settings falling back on the default Auth-settings
   instead of the global Auth-settings defined in `config.yaml`.
 * Add support to obtain settings from openSSH.
-* If user-supplied settings to do suffice to authenticate against the remote
-  server, try using private keys listed in openSSH.
+* If user-supplied settings fail to authenticate against the remote server, try
+  using private keys listed in openSSH.
   * This can be toggled via a new `from_openssh`-boolean flag in `auth`-section.
   * For now, this defaults to false - will be changed to true in next
     non-bugfix release.
