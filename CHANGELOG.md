@@ -11,7 +11,7 @@
   * This can be toggled via a new `from_openssh`-boolean flag in `auth`-section.
   * For now, this defaults to false - will be changed to true in next
     non-bugfix release.
-* Ensure bulk-requesting of file stats returning retrieved stats in correct order.
+* Ensure bulk-requested file stats are in correct order.
 
 ## v0.5.3 (2020-11-01)
 
