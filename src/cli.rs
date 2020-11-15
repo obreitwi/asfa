@@ -136,7 +136,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
             .iter()
             .map(|l| console::strip_ansi_codes(l).chars().count())
             .max()
-            .with_context(|| "No lines supplied.")?;
+            .with_context(|| "Nothing to show.")?;
 
         [60, content_max, header_len + 2]
             .iter()
