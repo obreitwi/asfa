@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.5.4-pre (under development)
+## v0.5.4 (2020-11-15)
 
 * Fix host-specific auth settings falling back on the default Auth-settings
   instead of the global Auth-settings defined in `config.yaml`.
