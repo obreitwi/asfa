@@ -3,6 +3,14 @@
 
 ## v0.5.5-pre (under development)
 
+* `clean`/`list`/`verify`-commands: Add `--newer`/`--older`-flags
+  * They take a duration (seconds, minutes, hours, weeks, months, years) and filter the otherwise selected files
+  * [Supported formats](https://docs.rs/humantime/2.0.1/humantime/fn.parse_duration.html): 
+    -> tl;dr: Quantity and unit are NOT seperated by spaces
+  * Examples:
+    * List all files uploaded in the last three days: `asfa list --newer 3weeks`
+    * Clean all files older than a month: `asfa clean --older 1month`
+
 ## v0.5.4 (2020-11-15)
 
 * Fix host-specific auth settings falling back on the default Auth-settings
