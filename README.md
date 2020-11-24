@@ -139,6 +139,23 @@ $ asfa verify
 
 Since the prefix is the checksum, the check can be performed whether the file exists locally or not.
 
+### Filtering by upload date
+
+All commands accept a `--newer`/`--older` `<n>{min,hour,day,week,month}`
+argument that can be used to narrow down the number of files.
+
+Cleaning all files older than a month can, for example, be achieved via
+```text
+$ asfa clean --older 1month
+$ asfa clean --older 1M
+```
+
+All files uploaded within the last five minutes can be listed via
+```text
+$ asfa list --newer 5min
+$ asfa list --newer 5m
+```
+
 ## Requirements
 
 A remote server that
