@@ -1,12 +1,10 @@
-use anyhow::{bail, Context, Result};
-use chrono::{Local, TimeZone};
+use anyhow::Result;
 use clap::Clap;
 use console::Style;
-use ssh2::FileStat;
 
 use crate::cfg::Config;
+use crate::cli::color;
 use crate::cli::draw_boxed;
-use crate::cli::{color, text};
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 
@@ -93,32 +91,7 @@ impl Command for List {
             .last(self.last)
             .with_stats(self.details || self.with_time || self.with_size)?;
 
-        let num_digits = {
-            let mut num_digits = 0;
-            let mut num = to_list.num_files;
-            while num > 0 {
-                num /= 10;
-                num_digits += 1;
-            }
-            num_digits
-        };
-
         // reverse digits
-        let num_digits_rev = {
-            let mut num_digits = 0;
-            let mut num = to_list.num_files
-                - to_list
-                    .iter()?
-                    .map(|f| f.0)
-                    .min()
-                    .with_context(|| "No files to list.")
-                    .unwrap_or(0);
-            while num > 0 {
-                num /= 10;
-                num_digits += 1;
-            }
-            num_digits + 1 /* minus sign */
-        };
 
         if self.url_only {
             for (_, file, _) in to_list.iter()? {
@@ -130,44 +103,18 @@ impl Command for List {
             }
             println!("");
         } else {
-            let content: Result<Vec<String>> = to_list
-                .iter()?
-                .map(|(i, file, stat)| -> Result<String> {
-                    Ok(format!(
-                        " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{mtime}{url} ",
-                        idx = i,
-                        rev_idx = i as i64 - to_list.num_files as i64,
-                        url = if self.filenames {
-                            file.file_name().unwrap().to_string_lossy().to_string()
-                        } else {
-                            host.get_url(&format!("{}", file.display()))?
-                        },
-                        width = num_digits,
-                        rev_width = num_digits_rev,
-                        sep = text::separator(),
-                        size = if self.details || self.with_size {
-                            stat.as_ref()
-                                .map(|s| self.column_size(s))
-                                .unwrap_or(Ok("".to_string()))?
-                        } else {
-                            "".to_string()
-                        },
-                        mtime = if self.details || self.with_time {
-                            stat.as_ref()
-                                .map(|s| self.column_time(s))
-                                .unwrap_or(Ok("".to_string()))?
-                        } else {
-                            "".to_string()
-                        }
-                    ))
-                })
-                .collect();
+            let content = to_list.format_files(
+                Some(&session.host),
+                self.filenames,
+                self.details || self.with_size,
+                self.details || self.with_time,
+            )?;
             draw_boxed(
                 format!(
                     "{listing} remote files:",
                     listing = Style::new().bold().green().bright().apply_to("Listing")
                 ),
-                content?.iter().map(|s| s.as_ref()),
+                content.iter().map(|s| s.as_ref()),
                 &color::frame,
             )?;
         }
@@ -175,32 +122,4 @@ impl Command for List {
     }
 }
 
-impl List {
-    fn column_time(&self, stat: &FileStat) -> Result<String> {
-        let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
-        Ok(format!(
-            "{mtime} {sep} ",
-            mtime = mtime.format("%Y-%m-%d %H:%M:%S").to_string(),
-            sep = text::separator()
-        ))
-    }
-
-    fn column_size(&self, stat: &FileStat) -> Result<String> {
-        let possible = ["", "K", "M", "G", "T", "P", "E"];
-        let mut size: u64 = stat.size.with_context(|| "No file size defined!")?;
-        for (i, s) in possible.iter().enumerate() {
-            if size >= 1000 {
-                size = size >> 10;
-                continue;
-            } else {
-                return Ok(format!(
-                    "{size:>6.2}{suffix} {sep} ",
-                    size = stat.size.unwrap() as f64 / (1 << (i * 10)) as f64,
-                    suffix = s,
-                    sep = text::separator()
-                ));
-            }
-        }
-        bail!("Invalid size argument provided.")
-    }
-}
+impl List {}

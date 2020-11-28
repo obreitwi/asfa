@@ -5,11 +5,14 @@
 
 * `clean`/`list`/`verify`-commands: Add `--newer`/`--older`-flags
   * They take a duration (seconds, minutes, hours, weeks, months, years) and filter the otherwise selected files
-  * [Supported formats](https://docs.rs/humantime/2.0.1/humantime/fn.parse_duration.html): 
+  * [Supported formats](https://docs.rs/humantime/2.0.1/humantime/fn.parse_duration.html):
     -> tl;dr: Quantity and unit are NOT seperated by spaces
   * Examples:
     * List all files uploaded in the last three days: `asfa list --newer 3weeks`
     * Clean all files older than a month: `asfa clean --older 1month`
+* `clean`-command:
+  * Make output in confirmation dialog similar to `list`-command.
+  * Add `-d`/`--details` to force displaying of file details in confirmation like `list` command.
 
 ## v0.5.4 (2020-11-15)
 

@@ -1,7 +1,10 @@
+use crate::cfg::Host;
+use crate::cli::text;
 use crate::ssh::SshSession;
 use crate::util;
 
 use anyhow::{bail, Context, Result};
+use chrono::{Local, TimeZone};
 use itertools::Itertools;
 use regex::Regex;
 use ssh2::FileStat;
@@ -121,6 +124,11 @@ impl<'a> FileListing<'a> {
         }
     }
 
+    /// Check if file listing has stats
+    pub fn has_stats(&self) -> bool {
+        self.stats.is_some()
+    }
+
     pub fn iter(&'a self) -> Result<FileListingIter<'a>> {
         let stats = self.stats.as_ref();
         let paths = &self.all_files;
@@ -141,6 +149,53 @@ impl<'a> FileListing<'a> {
             }
             None => self,
         }
+    }
+
+    /// Get formatted lines to be printed with draw_boxed()
+    ///
+    /// If filename_only is specified, prints url if host is specified, otherwise the relative
+    /// path.
+    pub fn format_files(
+        &self,
+        host: Option<&Host>,
+        filename_only: bool,
+        with_size: bool,
+        with_time: bool,
+    ) -> Result<Vec<String>> {
+        let (num_digits, num_digits_rev) = (self.get_num_digits(), self.get_num_digits_rev()?);
+        self.iter()?
+            .map(|(i, file, stat)| -> Result<String> {
+                Ok(format!(
+                    " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{mtime}{url} ",
+                    idx = i,
+                    rev_idx = i as i64 - self.num_files as i64,
+                    url = if filename_only {
+                        file.file_name().unwrap().to_string_lossy().to_string()
+                    } else if let Some(host) = host {
+                        host.get_url(&format!("{}", file.display()))?
+                    } else {
+                        file.display().to_string()
+                    },
+                    width = num_digits,
+                    rev_width = num_digits_rev,
+                    sep = text::separator(),
+                    size = if with_size {
+                        stat.as_ref()
+                            .map(|s| self.column_size(s))
+                            .unwrap_or(Ok("".to_string()))?
+                    } else {
+                        "".to_string()
+                    },
+                    mtime = if with_time {
+                        stat.as_ref()
+                            .map(|s| self.column_time(s))
+                            .unwrap_or(Ok("".to_string()))?
+                    } else {
+                        "".to_string()
+                    }
+                ))
+            })
+            .collect()
     }
 
     pub fn revert(mut self, do_revert: bool) -> Self {
@@ -204,6 +259,34 @@ impl<'a> FileListing<'a> {
         Ok(self)
     }
 
+    fn column_size(&self, stat: &FileStat) -> Result<String> {
+        let possible = ["", "K", "M", "G", "T", "P", "E"];
+        let mut size: u64 = stat.size.with_context(|| "No file size defined!")?;
+        for (i, s) in possible.iter().enumerate() {
+            if size >= 1000 {
+                size = size >> 10;
+                continue;
+            } else {
+                return Ok(format!(
+                    "{size:>6.2}{suffix} {sep} ",
+                    size = stat.size.unwrap() as f64 / (1 << (i * 10)) as f64,
+                    suffix = s,
+                    sep = text::separator()
+                ));
+            }
+        }
+        bail!("Invalid size argument provided.")
+    }
+
+    fn column_time(&self, stat: &FileStat) -> Result<String> {
+        let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
+        Ok(format!(
+            "{mtime} {sep} ",
+            mtime = mtime.format("%Y-%m-%d %H:%M:%S").to_string(),
+            sep = text::separator()
+        ))
+    }
+
     fn ensure_stats(&mut self) -> Result<()> {
         if self.stats.is_none() {
             let paths = self
@@ -219,6 +302,34 @@ impl<'a> FileListing<'a> {
 
     fn make_unique<I: IntoIterator<Item = usize>>(indices: I) -> Vec<usize> {
         indices.into_iter().unique().collect()
+    }
+
+    /// Get number of digits for index
+    fn get_num_digits(&self) -> usize {
+        let mut num_digits = 0;
+        let mut num = self.num_files;
+        while num > 0 {
+            num /= 10;
+            num_digits += 1;
+        }
+        num_digits
+    }
+
+    /// Get number of digits for reverse index
+    fn get_num_digits_rev(&self) -> Result<usize> {
+        let mut num_digits = 0;
+        let mut num = self.num_files
+            - self
+                .iter()?
+                .map(|f| f.0)
+                .min()
+                .with_context(|| "No files to list.")
+                .unwrap_or(0);
+        while num > 0 {
+            num /= 10;
+            num_digits += 1;
+        }
+        Ok(num_digits + 1) /* minus sign */
     }
 
     /// Helper function that filters selected files by date.

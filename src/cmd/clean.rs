@@ -17,6 +17,10 @@ pub struct Clean {
     #[clap(long)]
     all: bool,
 
+    /// Show all details in confirmation
+    #[clap(long, short)]
+    details: bool,
+
     /// Explicit file to delete
     #[clap(short, long = "file")]
     files: Vec<String>,
@@ -78,7 +82,8 @@ impl Command for Clean {
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(&files[..], session.host.prefix_length)?;
+            .by_name(&files[..], session.host.prefix_length)?
+            .with_stats(self.details && !self.no_confirm)?;
 
         let do_delete = self.no_confirm || self.user_confirm_deletion(&files_to_delete)?;
 
@@ -107,17 +112,9 @@ impl Command for Clean {
 impl Clean {
     /// Have the user confirm deletions
     fn user_confirm_deletion(&self, files: &FileListing) -> Result<bool> {
-        let dot = color::dot.apply_to("*");
-        let formatted_files: Vec<String> = files
-            .iter()?
-            .map(|(_, f, _)| {
-                format!(
-                    " {dot} {file} ",
-                    dot = dot,
-                    file = color::entry.apply_to(f.display())
-                )
-            })
-            .collect();
+        let with_stats = files.has_stats();
+        // If we have stats, print only the filename to shorten the line
+        let formatted_files = files.format_files(None, with_stats, with_stats, with_stats)?;
 
         crate::cli::draw_boxed(
             &format!(
