@@ -24,57 +24,70 @@ pub struct Push {
     /// File(s) to upload.
     #[clap()]
     files: Vec<PathBuf>,
+
+    /// Limit upload speed (in MBit/s).
+    #[clap(short, long)]
+    limit_mbits: Option<f64>,
 }
 
-fn upload(
-    session: &SshSession,
-    config: &Config,
-    to_upload: &Path,
-    target_name: &str,
-) -> Result<()> {
-    let mut target = PathBuf::new();
-    let prefix_length = session.host.prefix_length;
-    let hash = get_hash(to_upload, prefix_length)
-        .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
+impl Push {
+    fn upload(
+        &self,
+        session: &SshSession,
+        config: &Config,
+        to_upload: &Path,
+        target_name: &str,
+    ) -> Result<()> {
+        let mut target = PathBuf::new();
+        let prefix_length = session.host.prefix_length;
+        let hash = get_hash(to_upload, prefix_length)
+            .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
 
-    target.push(&hash);
-    let folder = target.clone();
-    session.make_folder(&folder)?;
+        target.push(&hash);
+        let folder = target.clone();
+        session.make_folder(&folder)?;
 
-    target.push(target_name);
+        target.push(target_name);
 
-    // TODO: Maybe check if file exists already.
-    session.upload_file(&to_upload, &target)?;
+        // TODO: Maybe check if file exists already.
+        session.upload_file(
+            &to_upload,
+            &target,
+            self.limit_mbits.map(|f| {
+                (f * 1024.0 /* mega */ * 1024.0/* kilo */ / 8.0/* bit -> bytes */) as usize
+            }),
+        )?;
 
-    if config.verify_via_hash {
-        debug!("Verifying upload..");
-        let spinner = WaitingSpinner::new("Verifying upload..".to_string());
+        if config.verify_via_hash {
+            debug!("Verifying upload..");
+            let spinner = WaitingSpinner::new("Verifying upload..".to_string());
 
-        let remote_hash = session.get_remote_hash(&target, prefix_length)?;
-        if hash != remote_hash {
-            session.remove_folder(&folder)?;
-            bail!(
-                "[{}] Hashes differ: local={} remote={}",
-                to_upload.display(),
-                hash,
-                remote_hash
-            );
+            let remote_hash = session.get_remote_hash(&target, prefix_length)?;
+            if hash != remote_hash {
+                session.remove_folder(&folder)?;
+                bail!(
+                    "[{}] Hashes differ: local={} remote={}",
+                    to_upload.display(),
+                    hash,
+                    remote_hash
+                );
+            }
+            spinner.finish();
+            debug!("Done");
         }
-        spinner.finish();
-        debug!("Done");
+
+        if let Some(group) = &session.host.group {
+            session.adjust_group(&folder, &group)?;
+        };
+
+        println!(
+            "{}",
+            session
+                .host
+                .get_url(&format!("{}/{}", &hash, &target_name))?
+        );
+        Ok(())
     }
-
-    if let Some(group) = &session.host.group {
-        session.adjust_group(&folder, &group)?;
-    };
-
-    println!(
-        "{}",
-        session
-            .host
-            .get_url(&format!("{}/{}", &hash, &target_name))?
-    );
-    Ok(())
 }
 
 impl Command for Push {
@@ -104,8 +117,12 @@ impl Command for Push {
             aliases = self.alias.clone();
         }
 
+        if let Some(limit) = self.limit_mbits {
+            debug!("Limiting upload to {} MBit/s", limit);
+        }
+
         for (to_upload, alias) in self.files.iter().zip(aliases.iter()) {
-            upload(session, config, to_upload, alias)?;
+            self.upload(session, config, to_upload, alias)?;
         }
 
         Ok(())

@@ -17,6 +17,7 @@ use std::io::{BufReader, Error as IOError, ErrorKind};
 use std::iter::{IntoIterator, Iterator};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
 
 fn ensure_port(hostname: &str) -> String {
     if hostname.contains(":") {
@@ -478,7 +479,12 @@ impl<'a> SshSession<'a> {
 
     /// Upload the given local path to the given remote path (relative to the current host's
     /// base-folder)
-    pub fn upload_file(&self, path_local: &Path, path_remote: &Path) -> Result<()> {
+    pub fn upload_file(
+        &self,
+        path_local: &Path,
+        path_remote: &Path,
+        limit_speed_bytes_per_second: Option<usize>,
+    ) -> Result<()> {
         let path_remote = self.prepend_base_folder(path_remote);
         debug!(
             "Uploading: '{}' → '{}'",
@@ -500,15 +506,49 @@ impl<'a> SshSession<'a> {
         bar.set_style(crate::cli::style_progress_bar_transfer());
         let mut reader = BufReader::new(local_file);
 
+        let start = Instant::now();
+        let mut written_total = 0;
+
+        let timestep = Duration::from_millis(50);
+
         loop {
+            let now = Instant::now();
             let buf = &reader.fill_buf()?;
-            let to_write = buf.len();
+            let to_write = match limit_speed_bytes_per_second {
+                None => buf.len(),
+                Some(limit_bytes_per_sec) => {
+                    let total_duration = now.duration_since(start);
+                    if total_duration.as_micros() == 0 {
+                        buf.len()
+                    } else {
+                        let current_avg_bytes_per_sec =
+                            written_total * 1_000_000 / total_duration.as_micros();
+
+                        if current_avg_bytes_per_sec > limit_bytes_per_sec as u128 {
+                            // crude limit -> if we exceed speed limit just sleep
+                            std::thread::sleep(timestep);
+                            continue;
+                        }
+                        std::cmp::min(
+                            buf.len(),
+                            timestep.as_millis() as usize * limit_bytes_per_sec / 1_000,
+                        )
+                    }
+                }
+            };
+            log::trace!("Writing {} bytes", to_write);
             if to_write > 0 {
-                remote_file
-                    .write(buf)
+                let written = remote_file
+                    .write(&buf[..to_write])
                     .context("Failed to write chunk to remote file.")?;
-                &reader.consume(to_write);
-                bar.inc(to_write as u64);
+
+                if limit_speed_bytes_per_second.is_some() {
+                    remote_file.flush()?;
+                }
+                &reader.consume(written);
+                log::trace!("Wrote {} bytes", written);
+                written_total += written as u128;
+                bar.inc(written as u64);
             } else {
                 break;
             }
