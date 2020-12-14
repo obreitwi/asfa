@@ -273,6 +273,27 @@ impl<'a> SshSession<'a> {
         }
     }
 
+    pub fn exec_remote(&self, cmd: &str) -> Result<ExecutedRemoteCommand> {
+        let mut channel = self.raw.channel_session()?;
+        channel
+            .exec(cmd)
+            .with_context(|| format!("Could not execute: {}", cmd))?;
+        let mut stdout = String::new();
+        let mut stderr = String::new();
+        channel.read_to_string(&mut stdout)?;
+        channel.stderr().read_to_string(&mut stderr)?;
+        channel.wait_close()?;
+
+        let exit_status = channel.exit_status()?;
+
+        Ok(ExecutedRemoteCommand {
+            cmd: cmd.to_string(),
+            stdout,
+            stderr,
+            exit_status,
+        })
+    }
+
     /// Get listing of files
     pub fn list_files(&self) -> Result<FileListing> {
         FileListing::new(&self)
@@ -566,6 +587,38 @@ impl<'a> SshSession<'a> {
     }
 }
 
+/// Wrapper for executed remote commands
+pub struct ExecutedRemoteCommand {
+    cmd: String,
+    exit_status: i32,
+    stdout: String,
+    stderr: String,
+}
+
+impl ExecutedRemoteCommand {
+    pub fn exit_status(&self) -> i32 {
+        self.exit_status
+    }
+
+    pub fn expect(&self, msg: &str) -> Result<()> {
+        bail!(
+            "{}. Executing '{}' returned {}. Stdout: {} Stderr: {}",
+            msg,
+            self.cmd,
+            self.exit_status,
+            self.stdout,
+            self.stderr
+        );
+    }
+
+    pub fn stdout(&self) -> &str {
+        &self.stdout
+    }
+
+    pub fn stderr(&self) -> &str {
+        &self.stdout
+    }
+}
 struct InteractivePrompt {}
 
 impl Default for InteractivePrompt {
