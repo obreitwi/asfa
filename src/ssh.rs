@@ -311,6 +311,16 @@ impl<'a> SshSession<'a> {
             .with_context(|| format!("Could not create remote folder: {}", path_str))
     }
 
+    /// Make remote file on remote side and return path to it.
+    pub fn mktemp(&self) -> Result<Tempfile> {
+        let tmp = self.exec_remote("mktemp")?;
+        tmp.expect("Could not create temporary remote file.")?;
+        Ok(Tempfile {
+            session: self,
+            path: PathBuf::from(tmp.stdout().trim_end()),
+        })
+    }
+
     /// Get all available authentication methods
     pub fn get_auth_methods(&self) -> Result<HashSet<String>> {
         log::trace!("Getting auth methdos.");
@@ -619,6 +629,46 @@ impl ExecutedRemoteCommand {
         &self.stdout
     }
 }
+
+/// Remote tempfile
+pub struct Tempfile<'a> {
+    path: PathBuf,
+    session: &'a SshSession<'a>,
+}
+
+impl<'a> Tempfile<'a> {
+    fn new(session: &'a SshSession, path: PathBuf) -> Self {
+        Self { session, path }
+    }
+
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    pub fn remove(&self) -> Result<()> {
+        self.session
+            .exec_remote(&format!(
+                "[ -f '{}' ] && rm '{}'",
+                self.path.display(),
+                self.path.display()
+            ))?
+            .expect("Could not remove temporary file.")
+    }
+
+    /// Write string slice directly into temporary file, replacing its contents.
+    pub fn write_str(&self, content: &str) -> Result<()> {
+        let size = content.len() as u64;
+        let mut remote_file = self
+            .session
+            .raw
+            .scp_send(&self.path, 0o755, size, None)
+            .with_context(|| format!("Could not create remote file: {}", self.path.display()))?;
+
+        remote_file.write_all(content.as_bytes())?;
+        Ok(())
+    }
+}
+
 struct InteractivePrompt {}
 
 impl Default for InteractivePrompt {
