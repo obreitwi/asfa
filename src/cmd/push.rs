@@ -25,9 +25,26 @@ pub struct Push {
     #[clap()]
     files: Vec<PathBuf>,
 
-    /// Limit upload speed (in MBit/s).
-    #[clap(short, long)]
+    /// Limit upload speed (in Mbit/s). Please note that the upload speed will be shown in
+    /// {M,K}Bytes/s, but most internet providers specify upload speeds in Mbits/s. This option
+    /// makes it easier to specify what portion of your available upload speed to use.
+    /// See also: --limit-kbytes
+    #[clap(
+        short = 'l',
+        long,
+        conflicts_with = "limit-kbytes",
+        value_name = "Mbit/s"
+    )]
     limit_mbits: Option<f64>,
+
+    /// Limit upload speed (in kByte/s).
+    #[clap(
+        short = 'L',
+        long,
+        conflicts_with = "limit-mbits",
+        value_name = "kByte/s"
+    )]
+    limit_kbytes: Option<f64>,
 }
 
 impl Push {
@@ -53,9 +70,13 @@ impl Push {
         session.upload_file(
             &to_upload,
             &target,
-            self.limit_mbits.map(|f| {
-                (f * 1024.0 /* mega */ * 1024.0/* kilo */ / 8.0/* bit -> bytes */) as usize
-            }),
+            self.limit_mbits
+                .map(|f| {
+                    (f * 1024.0 /* mega */ * 1024.0/* kilo */ / 8.0/* bit -> bytes */) as usize
+                })
+                .or(self.limit_kbytes.map(|f| {
+                    (f * 1024.0/* kilo */) as usize
+                })),
         )?;
 
         if config.verify_via_hash {
@@ -118,7 +139,10 @@ impl Command for Push {
         }
 
         if let Some(limit) = self.limit_mbits {
-            debug!("Limiting upload to {} MBit/s", limit);
+            debug!("Limiting upload to {} Mbit/s", limit);
+        }
+        if let Some(limit) = self.limit_kbytes {
+            debug!("Limiting upload to {} kByte/s", limit);
         }
 
         for (to_upload, alias) in self.files.iter().zip(aliases.iter()) {

@@ -14,7 +14,7 @@
   * Make output in confirmation dialog similar to `list`-command.
   * Add `-d`/`--details` to force displaying of file details in confirmation like `list` command.
 * `push`-command:
-  * Add `--limit-mbits` to allow specifying a speed limit when uploading.
+  * Add `--limit-{mbits,kbytes}` to allow specifying a speed limit when uploading.
 
 ## v0.5.4 (2020-11-15)
 
