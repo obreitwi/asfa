@@ -2,6 +2,7 @@
 #![cfg_attr(feature = "doc", doc(include = "../README.md"))]
 #![forbid(unsafe_code)]
 
+mod at;
 mod cfg;
 mod cli;
 mod cmd;

@@ -15,6 +15,10 @@
   * Add `-d`/`--details` to force displaying of file details in confirmation like `list` command.
 * `push`-command:
   * Add `--limit-{mbits,kbytes}` to allow specifying a speed limit when uploading.
+  * Add `-e`/`--expire` argument
+    * automatically deletes uploaded files after set delay
+    * delay syntax specified in the same manner as `--newer`/`--older` argument
+    * uses `at` at remote site to schedule deletion
 
 ## v0.5.4 (2020-11-15)
 

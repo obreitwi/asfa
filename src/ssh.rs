@@ -275,6 +275,7 @@ impl<'a> SshSession<'a> {
 
     pub fn exec_remote(&self, cmd: &str) -> Result<ExecutedRemoteCommand> {
         let mut channel = self.raw.channel_session()?;
+        log::debug!("Executing remotely: {}", cmd);
         channel
             .exec(cmd)
             .with_context(|| format!("Could not execute: {}", cmd))?;
@@ -315,10 +316,7 @@ impl<'a> SshSession<'a> {
     pub fn mktemp(&self) -> Result<Tempfile> {
         let tmp = self.exec_remote("mktemp")?;
         tmp.expect("Could not create temporary remote file.")?;
-        Ok(Tempfile {
-            session: self,
-            path: PathBuf::from(tmp.stdout().trim_end()),
-        })
+        Ok(Tempfile::new(self, PathBuf::from(tmp.stdout().trim_end())))
     }
 
     /// Get all available authentication methods
@@ -394,7 +392,7 @@ impl<'a> SshSession<'a> {
         Ok(hashes)
     }
 
-    fn prepend_base_folder(&self, path: &Path) -> PathBuf {
+    pub fn prepend_base_folder(&self, path: &Path) -> PathBuf {
         let mut buf = PathBuf::new();
         buf.push(&self.host.folder);
         buf.push(path);
@@ -508,6 +506,13 @@ impl<'a> SshSession<'a> {
         Ok(filestats)
     }
 
+    /// Get stat for a single remote file (relative to base folder).
+    pub fn stat_single(&self, path: &Path) -> Result<FileStat> {
+        let path = self.prepend_base_folder(path);
+        let sftp = self.raw.sftp()?;
+        Ok(sftp.stat(&path)?)
+    }
+
     /// Upload the given local path to the given remote path (relative to the current host's
     /// base-folder)
     pub fn upload_file(
@@ -611,14 +616,18 @@ impl ExecutedRemoteCommand {
     }
 
     pub fn expect(&self, msg: &str) -> Result<()> {
-        bail!(
-            "{}. Executing '{}' returned {}. Stdout: {} Stderr: {}",
-            msg,
-            self.cmd,
-            self.exit_status,
-            self.stdout,
-            self.stderr
-        );
+        if self.exit_status != 0 {
+            bail!(
+                "{}. Executing '{}' returned {}. Stdout: {} Stderr: {}",
+                msg,
+                self.cmd,
+                self.exit_status,
+                self.stdout,
+                self.stderr
+            );
+        } else {
+            Ok(())
+        }
     }
 
     pub fn stdout(&self) -> &str {

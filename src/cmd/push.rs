@@ -5,6 +5,7 @@ use log::debug;
 use std::path::{Path, PathBuf};
 use std::string::String;
 
+use crate::at::At;
 use crate::cfg::Config;
 use crate::cli::WaitingSpinner;
 use crate::cmd::Command;
@@ -20,6 +21,15 @@ pub struct Push {
     /// aliases as there are files to upload.
     #[clap(short, long)]
     alias: Vec<String>,
+
+    /// Expire the uploaded file after the given amount of time via `at`-scheduled remote job.
+    ///
+    /// Select files newer than the given duration. Durations can be: seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    ///
+    /// Mininum time till expiration is a minute.
+    #[clap(short, long)]
+    expire: Option<String>,
 
     /// File(s) to upload.
     #[clap()]
@@ -59,6 +69,14 @@ impl Push {
         let prefix_length = session.host.prefix_length;
         let hash = get_hash(to_upload, prefix_length)
             .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
+
+        let mut expire_addendum = String::new();
+        let expirer = if let Some(delay) = self.expire.as_ref() {
+            expire_addendum = format!(" (expiring after {})", delay);
+            Some(At::new(session, &delay)?)
+        } else {
+            None
+        };
 
         target.push(&hash);
         let folder = target.clone();
@@ -101,12 +119,18 @@ impl Push {
             session.adjust_group(&folder, &group)?;
         };
 
-        println!(
-            "{}",
+        if let Some(expirer) = expirer {
+            expirer.expire(&target)?;
+        }
+        print!(
+            "{}{}",
             session
                 .host
-                .get_url(&format!("{}/{}", &hash, &target_name))?
+                .get_url(&format!("{}/{}", &hash, &target_name))?,
+            expire_addendum
         );
+        println!();
+
         Ok(())
     }
 }
