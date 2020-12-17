@@ -85,6 +85,8 @@ if (( container_set_up == 0 )); then
 FROM linuxserver/openssh-server
 # needed for scp-functionality
 RUN apk add --no-cache openssh-client
+RUN apk add --no-cache at
+RUN echo "asfa-ci-user" >> /etc/at.allow
 EOF
     docker create                                         \
       --name=asfa-ci                                      \
