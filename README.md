@@ -102,6 +102,14 @@ https://my-domain.eu/my-uploads/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specifi
 https://my-domain.eu/my-uploads/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
 ```
 
+#### Automatically expiring uploaded files 
+
+Uploads can be automatically expired after a certain time via `--expire <delay>`.
+`<delay>` can be anything from minutes to hours, days even months.
+It requires [`at`][at] to be installed and running at the remote site.
+
+[at]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html
+
 #### List
 
 List all files currently available online:
