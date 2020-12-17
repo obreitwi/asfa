@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.5.5-pre (under development)
+## v0.6.0 (2020-12-18)
 
 * `clean`/`list`/`verify`-commands: Add `--newer`/`--older`-flags
   * They take a duration (seconds, minutes, hours, weeks, months, years) and filter the otherwise selected files
