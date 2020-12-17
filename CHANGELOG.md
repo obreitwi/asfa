@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.6.1-pre (under development)
+
 ## v0.6.0 (2020-12-18)
 
 * `clean`/`list`/`verify`-commands: Add `--newer`/`--older`-flags
