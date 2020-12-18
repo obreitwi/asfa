@@ -4,7 +4,7 @@ version = "0.6.1-pre"
 authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
 edition = "2018"
 description = "Avoid sending file attachments by uploading to a remote site with non-guessable (hash-based) prefix and print URLs."
-keywords = ["cli", "file", "ssh", "upload"]
+keywords = ["cli", "file", "ssh", "upload", "mail"]
 license = "MIT OR Apache-2.0"
 categories = ["command-line-utilities"]
 readme = "README.md"
@@ -40,7 +40,6 @@ whoami = "0.9.0"
 yaml-rust = "0.4.4"
 
 [dev-dependencies]
-# cmd_lib = { git = "https://github.com/rust-shell-script/rust_cmd_lib" }
 cmd_lib_core = "0.1.0"
 rand = "0.7.3"
 
