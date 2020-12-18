@@ -2,6 +2,7 @@
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
 ## v0.6.1-pre (under development)
+* Changed `from_openssh` (introduced in v0.5.4) to default to `true` (was originally planned for v0.6.0, but forgotten :( ).
 
 ## v0.6.0 (2020-12-18)
 

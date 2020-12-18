@@ -397,7 +397,7 @@ impl Auth {
 impl Default for Auth {
     fn default() -> Self {
         Auth {
-            from_openssh: false,
+            from_openssh: true,
             interactive: true,
             private_key_file: None,
             private_key_file_password: None,
