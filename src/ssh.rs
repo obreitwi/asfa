@@ -599,7 +599,7 @@ pub struct ExecutedRemoteCommand {
 impl ExecutedRemoteCommand {
     fn new(ssh: &SshSession, cmd: &str) -> Result<Self> {
         let mut channel = ssh.raw.channel_session()?;
-        log::debug!("Executing remotely: {}", cmd);
+        log::trace!("Executing remotely: {}", cmd);
         channel
             .exec(cmd)
             .with_context(|| format!("Could not execute: {}", cmd))?;
