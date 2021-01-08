@@ -625,17 +625,33 @@ impl ExecutedRemoteCommand {
 
     pub fn expect(self, msg: &str) -> Result<Self> {
         if self.exit_status != 0 {
-            bail!(
-                "{}. Executing '{}' returned {}. Stdout: {} Stderr: {}",
-                msg,
-                self.cmd,
-                self.exit_status,
-                self.stdout,
-                self.stderr
-            );
+            self.fail(msg)
         } else {
             Ok(self)
         }
+    }
+
+    pub fn expect_with<F>(self, fn_exit_code_to_msg: F) -> Result<Self>
+    where
+        F: Fn(i32) -> String,
+    {
+        if self.exit_status != 0 {
+            let msg = fn_exit_code_to_msg(self.exit_status);
+            self.fail(&msg)
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn fail(self, msg: &str) -> Result<Self> {
+        log::debug!(
+            "While executing '{}' returned {}. Stdout: {} Stderr: {}",
+            self.cmd,
+            self.exit_status,
+            self.stdout,
+            self.stderr
+        );
+        bail!("{}", msg);
     }
 
     pub fn stdout(&self) -> &str {
