@@ -277,25 +277,7 @@ impl<'a> SshSession<'a> {
     }
 
     pub fn exec_remote(&self, cmd: &str) -> Result<ExecutedRemoteCommand> {
-        let mut channel = self.raw.channel_session()?;
-        log::debug!("Executing remotely: {}", cmd);
-        channel
-            .exec(cmd)
-            .with_context(|| format!("Could not execute: {}", cmd))?;
-        let mut stdout = String::new();
-        let mut stderr = String::new();
-        channel.read_to_string(&mut stdout)?;
-        channel.stderr().read_to_string(&mut stderr)?;
-        channel.wait_close()?;
-
-        let exit_status = channel.exit_status()?;
-
-        Ok(ExecutedRemoteCommand {
-            cmd: cmd.to_string(),
-            stdout,
-            stderr,
-            exit_status,
-        })
+        ExecutedRemoteCommand::new(self, cmd)
     }
 
     /// Get listing of files
@@ -615,6 +597,28 @@ pub struct ExecutedRemoteCommand {
 }
 
 impl ExecutedRemoteCommand {
+    fn new(ssh: &SshSession, cmd: &str) -> Result<Self> {
+        let mut channel = ssh.raw.channel_session()?;
+        log::debug!("Executing remotely: {}", cmd);
+        channel
+            .exec(cmd)
+            .with_context(|| format!("Could not execute: {}", cmd))?;
+        let mut stdout = String::new();
+        let mut stderr = String::new();
+        channel.read_to_string(&mut stdout)?;
+        channel.stderr().read_to_string(&mut stderr)?;
+        channel.wait_close()?;
+
+        let exit_status = channel.exit_status()?;
+
+        Ok(Self {
+            cmd: cmd.to_string(),
+            stdout,
+            stderr,
+            exit_status,
+        })
+    }
+
     pub fn exit_status(&self) -> i32 {
         self.exit_status
     }
