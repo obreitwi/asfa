@@ -3,6 +3,7 @@
 
 ## v0.6.1-pre (under development)
 * Changed `from_openssh` (introduced in v0.5.4) to default to `true` (was originally planned for v0.6.0, but forgotten :( ).
+* Fix bug that no files are listed if some folder names begin with a dash.
 
 ## v0.6.0 (2020-12-18)
 

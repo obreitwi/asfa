@@ -45,15 +45,18 @@ impl<'a> SshSession<'a> {
 
     /// List all files present (relative to the current host's base-folder).
     pub fn all_files(&self) -> Result<Vec<PathBuf>> {
-        let cmd = format!("cd {} && ls -1rt */*", self.host.folder.display());
-        let mut channel = self.raw.channel_session()?;
+        let files = self
+            .exec_remote(&format!(
+                "find '{}' -mindepth 2 -maxdepth 2 -type f -print0 | xargs -0 ls -1rt",
+                self.host.folder.display()
+            ))?
+            .expect("Could not list remote files.")?;
 
-        channel
-            .exec(&cmd)
-            .context("Could not execute listing command")?;
-        let mut files = String::new();
-        channel.read_to_string(&mut files)?;
-        Ok(files.lines().map(|s| Path::new(s).to_path_buf()).collect())
+        Ok(files
+            .stdout
+            .lines()
+            .map(|s| Path::new(s).strip_prefix(&self.host.folder).unwrap().to_path_buf())
+            .collect())
     }
 
     /// Try all defined authentication methods in order
@@ -314,8 +317,9 @@ impl<'a> SshSession<'a> {
 
     /// Make remote file on remote side and return path to it.
     pub fn mktemp(&self) -> Result<Tempfile> {
-        let tmp = self.exec_remote("mktemp")?;
-        tmp.expect("Could not create temporary remote file.")?;
+        let tmp = self
+            .exec_remote("mktemp")?
+            .expect("Could not create temporary remote file.")?;
         Ok(Tempfile::new(self, PathBuf::from(tmp.stdout().trim_end())))
     }
 
@@ -615,7 +619,7 @@ impl ExecutedRemoteCommand {
         self.exit_status
     }
 
-    pub fn expect(&self, msg: &str) -> Result<()> {
+    pub fn expect(self, msg: &str) -> Result<Self> {
         if self.exit_status != 0 {
             bail!(
                 "{}. Executing '{}' returned {}. Stdout: {} Stderr: {}",
@@ -626,7 +630,7 @@ impl ExecutedRemoteCommand {
                 self.stderr
             );
         } else {
-            Ok(())
+            Ok(self)
         }
     }
 
@@ -661,7 +665,8 @@ impl<'a> Tempfile<'a> {
                 self.path.display(),
                 self.path.display()
             ))?
-            .expect("Could not remove temporary file.")
+            .expect("Could not remove temporary file.")?;
+        Ok(())
     }
 
     /// Write string slice directly into temporary file, replacing its contents.
