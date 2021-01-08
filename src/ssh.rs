@@ -346,25 +346,13 @@ impl<'a> SshSession<'a> {
         };
         paths.insert(0, hasher.to_string());
 
-        let mut channel = self.raw.channel_session()?;
         let cmd = paths.join(" ");
-        channel.exec(&cmd)?;
-        let mut stdout = String::new();
-        let mut stderr = String::new();
-        channel.read_to_string(&mut stdout)?;
-        channel.stderr().read_to_string(&mut stderr)?;
-        channel.wait_close()?;
-        match channel.exit_status()? {
-            0 => { /* just continue */ }
-            127 => bail!("{} not found on remote site.", hasher),
-            s => bail!(
-                "Computing remote hash exited with {}. Stdout: {} Stderr: {}",
-                s,
-                stdout,
-                stderr
-            ),
-        }
-        let hashes: Vec<_> = stdout
+        let cmd_remote_hashes = self.exec_remote(&cmd)?.expect_with(|rc| match rc {
+            127 => format!("{} not found on remote site.", hasher),
+            _ => String::from("Unexpected remote error."),
+        })?;
+        let hashes: Vec<_> = cmd_remote_hashes
+            .stdout
             .lines()
             .filter_map(|l| l.split_whitespace().next())
             .filter_map(|h| hex::decode(h).ok())
