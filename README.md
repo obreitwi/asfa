@@ -93,6 +93,7 @@ share a logfile or plot with a generic name.
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif)
 
 Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.
+
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif)
 
 Or specify the aliases afterwards.
