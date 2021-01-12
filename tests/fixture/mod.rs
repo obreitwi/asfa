@@ -41,10 +41,11 @@ pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<PathBuf>
 /// Generate random filename of size `len` with specified extension
 pub fn random_filename(len: usize, extension: &str) -> String {
     let mut rng = rand::thread_rng();
-    let chars: String = std::iter::repeat(())
+    let chars: Vec<_> = std::iter::repeat(())
         .map(|()| rng.sample(rand::distributions::Alphanumeric))
         .take(len)
         .collect();
+    let chars = std::str::from_utf8(&chars[..]).unwrap();
     format!("{}.{}", chars, extension)
 }
 
