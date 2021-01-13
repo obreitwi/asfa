@@ -2,6 +2,7 @@
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
 ## v0.6.2-pre (under development)
+* `push`: Add `--prefix`/`--suffix`.
 
 ## v0.6.1 (2021-01-08)
 * Changed `from_openssh` (introduced in v0.5.4) to default to `true` (was originally planned for v0.6.0, but forgotten :( ).

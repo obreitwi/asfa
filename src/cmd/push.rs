@@ -55,6 +55,24 @@ pub struct Push {
         value_name = "kByte/s"
     )]
     limit_kbytes: Option<f64>,
+
+    /// Upload all files with the given prefix prepended.
+    /// This is especially useful to give a bunch of files with generic names (e.g., plots) more
+    /// context.
+    ///
+    /// Example: `--prefix foo_` causes `bar.png` to be uploaded as `foo_bar.png`.
+    #[clap(short, long, conflicts_with = "alias")]
+    prefix: Option<String>,
+
+    /// Upload all files with the given suffix appended while not altering the file extension.
+    /// This is especially useful to give a bunch of files with generic names (e.g., plots) more
+    /// context.
+    ///
+    /// NOTE: Only the last extension is honored.
+    ///
+    /// Example: `--suffix _bar` causes `foo.png` to be uploaded as `foo_bar.png`.
+    #[clap(short, long, conflicts_with = "alias")]
+    suffix: Option<String>,
 }
 
 impl Push {
@@ -133,6 +151,25 @@ impl Push {
 
         Ok(())
     }
+
+    fn transform_filename(&self, file: &Path) -> Result<String> {
+        let stem = file
+            .file_stem()
+            .with_context(|| format!("{} has no filename.", file.display()))?
+            .to_str()
+            .with_context(|| format!("Invalid filename: {}", file.display()))?;
+        let extension = file
+            .extension()
+            .map(|ext| format!(".{}", ext.to_str().unwrap()))
+            .unwrap_or(String::new());
+        Ok(format!(
+            "{prefix}{stem}{suffix}{ext}",
+            prefix = self.prefix.as_ref().unwrap_or(&String::new()),
+            stem = stem,
+            suffix = self.suffix.as_ref().unwrap_or(&String::new()),
+            ext = extension
+        ))
+    }
 }
 
 impl Command for Push {
@@ -150,13 +187,7 @@ impl Command for Push {
             bail!("You need to specify as many aliases as you specify files!");
         } else if self.alias.len() == 0 {
             for file in self.files.iter() {
-                aliases.push(
-                    file.file_name()
-                        .with_context(|| format!("{} has no filename.", file.display()))?
-                        .to_str()
-                        .with_context(|| format!("{} has invalid filename", file.display()))?
-                        .to_string(),
-                );
+                aliases.push(self.transform_filename(file)?);
             }
         } else {
             aliases = self.alias.clone();

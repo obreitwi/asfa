@@ -55,7 +55,12 @@ impl<'a> SshSession<'a> {
         Ok(files
             .stdout
             .lines()
-            .map(|s| Path::new(s).strip_prefix(&self.host.folder).unwrap().to_path_buf())
+            .map(|s| {
+                Path::new(s)
+                    .strip_prefix(&self.host.folder)
+                    .unwrap()
+                    .to_path_buf()
+            })
             .collect())
     }
 
