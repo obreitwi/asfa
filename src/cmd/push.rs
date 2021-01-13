@@ -144,7 +144,7 @@ impl Command for Push {
         } else if self.files.len() == 0 && self.alias.len() > 0 {
             bail!(
                 "No files to upload specified. \
-                  Did you forget to seperate --alias option via double dashes from files to upload?"
+                  Did you forget to separate --alias option via double dashes from files to upload?"
             );
         } else if self.alias.len() > 0 && self.alias.len() != self.files.len() {
             bail!("You need to specify as many aliases as you specify files!");
