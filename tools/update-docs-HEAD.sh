@@ -30,6 +30,8 @@ generate_docs()
 
 upload_docs()
 {
+    git push "${remote}" :gh-pages
+    git fetch "${remote}"
     git branch -D gh-pages
     ghp-import --force                       \
                --push                        \
