@@ -40,13 +40,17 @@ pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<PathBuf>
 
 /// Generate random filename of size `len` with specified extension
 pub fn random_filename(len: usize, extension: &str) -> String {
+    format!("{}.{}", random_string(len), extension)
+}
+
+/// Generate random string of size `len`
+pub fn random_string(len: usize) -> String {
     let mut rng = rand::thread_rng();
     let chars: Vec<_> = std::iter::repeat(())
         .map(|()| rng.sample(rand::distributions::Alphanumeric))
         .take(len)
         .collect();
-    let chars = std::str::from_utf8(&chars[..]).unwrap();
-    format!("{}.{}", chars, extension)
+    std::str::from_utf8(&chars[..]).unwrap().to_string()
 }
 
 /// Get root folder where temporary test files should be placed

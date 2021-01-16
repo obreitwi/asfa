@@ -56,6 +56,62 @@ fn simple_file_upload(host: &str) -> Result<()> {
     Ok(())
 }
 
+fn upload_with_prefix_suffix(host: &str) -> Result<()> {
+    let file_size: usize = 32 * 1024 * 1024;
+    log::info!("Uploading to host: {}", host);
+
+    let len_local = 12;
+    let filename = fixture::random_filename(len_local, "txt");
+    let local = fixture::make_random_file(&filename, file_size)?;
+    let prefix = fixture::random_string(4);
+    let suffix = fixture::random_string(4);
+
+    let hash = run_fun(format!("sha256sum {}", local.display()))?
+        .split_whitespace()
+        .next()
+        .with_context(|| "Could not compute hash")?
+        .to_string();
+
+    let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} push {} --prefix {}_ --suffix _{}",
+        host,
+        local.display(),
+        prefix,
+        suffix
+    ))
+    .with_context(|| "Could not push.")?;
+    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
+        .with_context(|| "Could not verify.")?;
+    let remote = format!(
+        "{}/{}/{}_{}_{}.txt",
+        std::env::var("ASFA_FOLDER_UPLOAD")?,
+        &hash_b64[..32], // TODO: right now prefix length in ci-config is set to 32 -> read from config
+        prefix,
+        filename.chars().take(len_local).collect::<String>(),
+        suffix
+    );
+    if !Path::new(&remote).exists() {
+        bail!("Failed to upload path: {} not found.", remote);
+    }
+    run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))
+        .with_context(|| "Files differ")?;
+    run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
+        .with_context(|| "Could not verify.")?;
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
+        host,
+        local.display()
+    ))
+    .with_context(|| "Could not clean.")?;
+    if Path::new(&remote).exists() {
+        bail!("Remote file not cleaned up!");
+    }
+    fs::remove_file(local)?;
+
+    Ok(())
+}
+
 fn expiring_file_upload_begin(host: &str) -> Result<(PathBuf, Instant)> {
     let file_size: usize = 32 * 1024 * 1024;
     log::info!("Uploading to host: {}", host);
@@ -193,6 +249,7 @@ fn run_tests() -> Result<()> {
     let (upload_to_expire, to_expire_uploaded_at) = expiring_file_upload_begin("asfa-ci-pw")?;
     simple_file_upload("asfa-ci-pw")?;
     simple_file_upload("asfa-ci-key")?;
+    upload_with_prefix_suffix("asfa-ci-key")?;
     simple_file_upload_speed_limited(
         "asfa-ci-pw",
         32 * 1024, /* = 32 Kbyte */
