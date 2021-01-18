@@ -243,11 +243,13 @@ fn simple_file_upload_speed_limited(
 }
 
 fn clean_all(host: &str) -> Result<()> {
-    run_cmd(format!(
-        "cargo run -- --loglevel debug -H {} clean --all --no-confirm",
-        host,
-    ))
-    .with_context(|| "Could not clean.")?;
+    if run_cmd(format!("cargo run -- --loglevel debug -H {} list", host,)).is_ok() {
+        run_cmd(format!(
+            "cargo run -- --loglevel debug -H {} clean --all --no-confirm",
+            host,
+        ))
+        .with_context(|| "Could not clean.")?;
+    }
     Ok(())
 }
 
