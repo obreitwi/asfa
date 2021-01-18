@@ -242,6 +242,15 @@ fn simple_file_upload_speed_limited(
     Ok(())
 }
 
+fn clean_all(host: &str) -> Result<()> {
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} clean --all --no-confirm",
+        host,
+    ))
+    .with_context(|| "Could not clean.")?;
+    Ok(())
+}
+
 #[test]
 fn run_tests() -> Result<()> {
     fixture::ensure_env()?;
@@ -263,5 +272,7 @@ fn run_tests() -> Result<()> {
         Duration::from_secs(9),
     )?;
     expiring_file_upload_verify(&upload_to_expire, &to_expire_uploaded_at)?;
+    clean_all("asfa-ci-key")?;
+
     Ok(())
 }
