@@ -5,7 +5,7 @@
 # `asfa` - avoid sending file attachments
 
 [![Crates.io](https://img.shields.io/crates/v/asfa)](https://crates.io/crates/asfa)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.6.1)](https://www.github.com/obreitwi/asfa)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.7.0)](https://www.github.com/obreitwi/asfa)
 [![Build Status](https://travis-ci.com/obreitwi/asfa.svg?branch=master)](https://travis-ci.com/obreitwi/asfa)
 [![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
