@@ -1,6 +1,8 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.7.1-pre (under development)
+
 ## v0.7.0 (2021-01-25)
 * `push`: Add `--prefix`/`--suffix`.
   * Add a prefix (and/or suffix) to the filename stem (i.e. the part without extension).
