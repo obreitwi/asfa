@@ -3,6 +3,10 @@
 
 ## v0.7.1-pre (under development)
 
+* Fix formatting error when displaying file sizes that are >=999.5 {K,M,G,T,…}, breaking table formatting.
+* `list`-command:
+  * Fix displaying all files if filter does not match anything.
+
 ## v0.7.0 (2021-01-25)
 
 * `push`: Add `--prefix`/`--suffix`.
