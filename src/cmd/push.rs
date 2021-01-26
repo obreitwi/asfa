@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use atty::Stream;
 use clap::Clap;
 use log::debug;
 use std::io::{self, Write};
@@ -147,7 +148,10 @@ impl Push {
                 .get_url(&format!("{}/{}", &hash, &target_name))?,
         );
         io::stdout().flush().unwrap();
-        eprintln!("{}", expire_addendum);
+        if atty::is(Stream::Stdout) {
+            // Only print expiration notification if asfa is used directly via terminal
+            eprintln!("{}", expire_addendum);
+        }
 
         Ok(())
     }
