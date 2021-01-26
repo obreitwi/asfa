@@ -1,6 +1,7 @@
 use crate::ssh::SshSession;
 
 use anyhow::{bail, Context, Result};
+use chrono::prelude::*;
 use humantime::parse_duration;
 use std::path::Path;
 use std::time::Duration;
@@ -42,7 +43,9 @@ impl<'a> At<'a> {
     /// Expire the given path relative to the remote base folder.
     ///
     /// First expires the file the parent folder.
-    pub fn expire(&self, path: &Path) -> Result<()> {
+    ///
+    /// Returns the expected expiration date.
+    pub fn expire(&self, path: &Path) -> Result<DateTime<Local>> {
         let stat = self
             .session
             .stat_single(path)
@@ -51,6 +54,7 @@ impl<'a> At<'a> {
         if !stat.is_file() {
             bail!("Object to expire is no file: {}", path.display());
         }
+        let now = Local::now();
 
         let tempfile = self.session.mktemp()?;
 
@@ -77,7 +81,9 @@ impl<'a> At<'a> {
             .exec_remote(&cmd_at)?
             .expect("Could not set remote expiration.")?;
 
-        tempfile.remove()
+        tempfile.remove()?;
+
+        Ok(now + chrono::Duration::from_std(self.duration)?)
     }
 
     fn num_mins(&self) -> u64 {

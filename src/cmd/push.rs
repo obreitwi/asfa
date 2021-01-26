@@ -89,9 +89,7 @@ impl Push {
         let hash = get_hash(to_upload, prefix_length)
             .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
 
-        let mut expire_addendum = String::new();
         let expirer = if let Some(delay) = self.expire.as_ref() {
-            expire_addendum = format!(" (expiring after {})", delay);
             Some(At::new(session, &delay)?)
         } else {
             None
@@ -138,9 +136,11 @@ impl Push {
             session.adjust_group(&folder, &group)?;
         };
 
-        if let Some(expirer) = expirer {
-            expirer.expire(&target)?;
-        }
+        let expiration_date = if let Some(expirer) = expirer {
+            Some(expirer.expire(&target)?)
+        } else {
+            None
+        };
         print!(
             "{}",
             session
@@ -148,9 +148,12 @@ impl Push {
                 .get_url(&format!("{}/{}", &hash, &target_name))?,
         );
         io::stdout().flush().unwrap();
-        if atty::is(Stream::Stdout) {
-            // Only print expiration notification if asfa is used directly via terminal
-            eprintln!("{}", expire_addendum);
+        // Only print expiration notification if asfa is used directly via terminal
+        if atty::is(Stream::Stdout) && expiration_date.is_some() {
+            let expiration_date = expiration_date.unwrap();
+            eprintln!(" (expiring at: {})", expiration_date.to_rfc2822());
+        } else {
+            println!("");
         }
 
         Ok(())

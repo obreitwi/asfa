@@ -8,6 +8,7 @@
   * Fix displaying all files if filter does not match anything.
 * `push`-command:
   * When specifying `--expire`, the notification about when the link expires is now
+    * an explicit timestamp instead of repeated user input.
     * printed to stderr instead of stdout.
     * only printed if `asfa` is used in a terminal.
     This makes it easier to capture the URL in scripts like `tmp_link=$(asfa push my-file)`.
