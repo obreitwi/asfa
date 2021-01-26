@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.1-pre (under development)
+## v0.7.1 (2021-01-26)
 
 * Fix formatting error when displaying file sizes that are >=999.5 {K,M,G,T,…}, breaking table formatting.
 * `list`-command:
