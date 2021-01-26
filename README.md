@@ -7,7 +7,7 @@
 [![Crates.io](https://img.shields.io/crates/v/asfa)](https://crates.io/crates/asfa)
 [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.7.1)](https://www.github.com/obreitwi/asfa)
 [![Build Status](https://travis-ci.com/obreitwi/asfa.svg?branch=master)](https://travis-ci.com/obreitwi/asfa)
-[![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa)
+[![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa/)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
 
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif)
