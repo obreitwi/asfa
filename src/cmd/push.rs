@@ -9,6 +9,7 @@ use std::string::String;
 use crate::at::At;
 use crate::cfg::Config;
 use crate::cli::WaitingSpinner;
+use crate::cli::color;
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 use crate::util::get_hash;
@@ -141,20 +142,21 @@ impl Push {
         } else {
             None
         };
-        print!(
+        io::stdout().flush().unwrap();
+        // Only print expiration notification if asfa is used directly via terminal
+        if atty::is(Stream::Stdout) && expiration_date.is_some() {
+            let expiration_date = expiration_date.unwrap();
+            eprint!("{bl}expiring: {date}{br} ",
+                bl=color::frame.apply_to("["),
+                br=color::frame.apply_to("]"),
+                date=color::expire.apply_to(expiration_date.to_rfc2822()));
+        }
+        println!(
             "{}",
             session
                 .host
                 .get_url(&format!("{}/{}", &hash, &target_name))?,
         );
-        io::stdout().flush().unwrap();
-        // Only print expiration notification if asfa is used directly via terminal
-        if atty::is(Stream::Stdout) && expiration_date.is_some() {
-            let expiration_date = expiration_date.unwrap();
-            eprintln!(" (expiring at: {})", expiration_date.to_rfc2822());
-        } else {
-            println!("");
-        }
 
         Ok(())
     }

@@ -271,6 +271,7 @@ pub mod color {
     lazy_static::lazy_static! {
         pub static ref dot : Style = Style::new().cyan();
         pub static ref entry : Style = Style::new();
+        pub static ref expire : Style = Style::new().red();
         pub static ref failure : Style = Style::new().red().bright();
         pub static ref filename : Style = Style::new().blue().bright();
         pub static ref frame : Style = Style::new().blue();

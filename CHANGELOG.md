@@ -4,6 +4,8 @@
 ## v0.7.2-pre (under development)
 
 * Switch CI from Travis to Github Actions.
+* `push`-command: When specifying `--expire`, move notification to the beginning of the line.
+  This This allows for easier box copying of links when uploading several files at once.
 
 ## v0.7.1 (2021-01-26)
 
