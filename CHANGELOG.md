@@ -3,6 +3,8 @@
 
 ## v0.7.2-pre (under development)
 
+* Switch CI from Travis to Github Actions.
+
 ## v0.7.1 (2021-01-26)
 
 * Fix formatting error when displaying file sizes that are >=999.5 {K,M,G,T,…}, breaking table formatting.
