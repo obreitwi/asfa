@@ -1,7 +1,7 @@
 use anyhow::{bail, Context, Result};
 use clap::Clap;
-// use log::info;
 use log::debug;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::string::String;
 
@@ -141,13 +141,13 @@ impl Push {
             expirer.expire(&target)?;
         }
         print!(
-            "{}{}",
+            "{}",
             session
                 .host
                 .get_url(&format!("{}/{}", &hash, &target_name))?,
-            expire_addendum
         );
-        println!();
+        io::stdout().flush().unwrap();
+        eprintln!("{}", expire_addendum);
 
         Ok(())
     }

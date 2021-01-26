@@ -6,6 +6,9 @@
 * Fix formatting error when displaying file sizes that are >=999.5 {K,M,G,T,…}, breaking table formatting.
 * `list`-command:
   * Fix displaying all files if filter does not match anything.
+* `push`-command:
+  * When specifying `--expire`, the notification about when the link expires is now printed to stderr instead of stdout.
+    This makes it easier to capture the URL in scripts like `tmp_link=$(asfa push my-file)`.
 
 ## v0.7.0 (2021-01-25)
 
