@@ -51,7 +51,7 @@ impl OpenSshConfig {
 
         let mut raw = HashMap::new();
         for (key, value) in output.lines().filter_map(|l| -> Option<(String, String)> {
-            let mut l = l.split(",");
+            let mut l = l.split(" ");
             Some((String::from(l.next()?), l.collect::<String>()))
         }) {
             let new = if let Some(old) = raw.remove(&key) {
