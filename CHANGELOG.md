@@ -6,6 +6,8 @@
 * Switch CI from Travis to Github Actions.
 * `push`-command: When specifying `--expire`, move notification to the beginning of the line.
   This This allows for easier box copying of links when uploading several files at once.
+* `list`-command: When specifying `--detail`, fix files below one KiB having no unit suffix.
+  Now the suffix is `B`.
 
 ## v0.7.1 (2021-01-26)
 

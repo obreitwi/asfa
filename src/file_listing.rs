@@ -260,7 +260,7 @@ impl<'a> FileListing<'a> {
     }
 
     fn column_size(&self, stat: &FileStat) -> Result<String> {
-        let possible = ["", "K", "M", "G", "T", "P", "E"];
+        let possible = ["B", "K", "M", "G", "T", "P", "E"];
         let mut size: u64 = stat.size.with_context(|| "No file size defined!")?;
         for (i, s) in possible.iter().enumerate() {
             // If size is >= 999.5 (which we cannot detect via integer), the printed representation
