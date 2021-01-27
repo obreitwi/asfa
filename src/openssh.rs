@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use thiserror::Error;
 
+#[derive(Debug)]
 enum OpenSshConfigEntry {
     /// Single value
     Single(String),
@@ -11,6 +12,7 @@ enum OpenSshConfigEntry {
     Multiple(Vec<String>),
 }
 
+#[derive(Debug)]
 pub struct OpenSshConfig {
     raw: HashMap<String, OpenSshConfigEntry>,
 }
@@ -66,6 +68,7 @@ impl OpenSshConfig {
 
             raw.insert(key, new);
         }
+        log::trace!("openSSH config contents:\n{:#?}", raw);
 
         Ok(Self { raw })
     }
