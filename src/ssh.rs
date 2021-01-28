@@ -240,10 +240,10 @@ impl<'a> SshSession<'a> {
         Ok(())
     }
 
-    /// Create a new SSH session from the given host configuration.
+    /// Create a new SSH session by connecting to the given host configuration.
     ///
     /// First try authenticating with all agent identities then use an interactive password, if enabled.
-    pub fn create(host: &'a Host) -> Result<Self> {
+    pub fn connect(host: &'a Host) -> Result<Self> {
         let auth: &Auth = &host.auth;
 
         let cfg_openssh = {
