@@ -3,7 +3,6 @@ verify_via_hash: true
 prefix_length: 32
 hosts:
   asfa-ci-key:
-    hostname: localhost:2222
     folder: /var/www/default/uploads
     url: https://my-domain.eu/my-uploads
     group: "1234"

@@ -65,6 +65,14 @@ if (( container_set_up == 0 )); then
     ssh-keygen -t ed25519 -f "${TEST_SSH_PRIVKEY_FILE}" -m PEM -P "" >&2
     sed -i "s:TEST_SSH_PRIVKEY_FILE:${TEST_SSH_PRIVKEY_FILE}:" \
         "${ASFA_CONFIG}/config.yaml"
+
+    ensure_folder "${HOME}/.ssh"
+
+    cat >>"${HOME}/.ssh/config" <<EOF 
+Host asfa-ci-key
+    Hostname localhost
+    Port 2222
+EOF
 fi
 
 
