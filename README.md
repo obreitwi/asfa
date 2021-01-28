@@ -211,7 +211,7 @@ A fully commented example config can be found
 #### Minimal: `~/.config/asfa/hosts/my-remote-site.yaml`
 
 ```yaml
-hostname: my-hostname.eu
+hostname: my-hostname.eu  # if not specified, will defaulted from ssh or filename
 folder: /var/www/default/my-uploads
 url: https://my-domain.eu/my-uploads
 group: www-data

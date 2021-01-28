@@ -1,4 +1,6 @@
-# note: port is optional and defaults to 22
+# Note: hostname and port are optional
+# * hostname is inferred from openSSH config (or host-entry name)
+# * port defaults to 22
 hostname: my-hostname-2.eu
 folder: /var/www/default/my-uploads
 url: https://my-domain-2.eu/my-uploads
@@ -6,3 +8,4 @@ group: www-data
 auth:  # optional, overwrites global auth-config
   interactive: true
   use_agent: true
+  from_openssh: true
