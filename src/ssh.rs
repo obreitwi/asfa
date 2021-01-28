@@ -256,7 +256,9 @@ impl<'a> SshSession<'a> {
             }
         };
 
-        let tcp = TcpStream::connect(ensure_port(host.get_hostname()))?;
+        let tcp = TcpStream::connect(ensure_port(
+            &host.get_hostname_def(cfg_openssh.as_ref().and_then(|c| c.hostname())),
+        ))?;
 
         let mut sess = RawSession::new()?;
         sess.set_tcp_stream(tcp);

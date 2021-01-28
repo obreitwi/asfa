@@ -81,6 +81,17 @@ impl OpenSshConfig {
         Ok(status.success())
     }
 
+    pub fn hostname(&self) -> Option<String> {
+        if let Some(OpenSshConfigEntry::Single(hostname)) = self.raw.get("hostname")
+        {
+            Some(hostname.to_string())
+        }
+        else
+        {
+            None
+        }
+    }
+
     pub fn private_key_files(&self) -> Vec<&str> {
         match self.raw.get("identityfile") {
             Some(entry) => entry.into(),
