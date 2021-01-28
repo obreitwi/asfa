@@ -7,7 +7,7 @@
 [![Crates.io](https://img.shields.io/crates/v/asfa)](https://crates.io/crates/asfa)
 [![Changelog](https://img.shields.io/badge/changelog-asfa-yellow)](https://github.com/obreitwi/asfa/blob/master/CHANGELOG.md)
 [![dependency status](https://deps.rs/repo/github/obreitwi/asfa/status.svg)](https://deps.rs/repo/github/obreitwi/asfa)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.7.1)](https://www.github.com/obreitwi/asfa)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.7.2)](https://www.github.com/obreitwi/asfa)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/obreitwi/asfa/cargo%20test)](https://github.com/obreitwi/asfa/actions?query=workflow%3A%22cargo+test%22)
 [![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa/)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)

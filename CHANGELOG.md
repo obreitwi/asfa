@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.2-pre (under development)
+## v0.7.2 (2021-01-29)
 
 * Switch CI from Travis to Github Actions.
 * `push`-command: When specifying `--expire`, move notification to the beginning of the line.
