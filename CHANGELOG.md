@@ -9,6 +9,7 @@
 * `list`-command: When specifying `--detail`, fix files below one KiB having no unit suffix.
   Now the suffix is `B`.
 * If not specified explicitly, get hostname for host-entry from openSSH config.
+* Fix connection error when openSSH offers too many pubkeys.
 
 ## v0.7.1 (2021-01-26)
 

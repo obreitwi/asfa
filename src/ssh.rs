@@ -66,6 +66,7 @@ impl<'a> SshSession<'a> {
 
     /// Try all defined authentication methods in order
     fn auth(&self, auth: &Auth) -> Result<()> {
+        log::trace!("Authenticating…");
         let mut methods = self.get_auth_methods()?;
 
         let supports_pubkey = methods.contains("publickey");
@@ -210,20 +211,19 @@ impl<'a> SshSession<'a> {
     }
 
     /// Try to authenticate with private keys defined in openssh
+    ///
+    /// Assumes that auth() already checked for supported pubkey authentication!
     fn auth_private_keys_openssh(&self) -> Result<()> {
-        let should_perform = || -> Result<bool> {
-            Ok(self.get_auth_methods()?.contains("publickey") && !self.raw.authenticated())
-        };
-
         if self.cfg_openssh.is_none() {
             log::trace!("No openSSH config found, skipping private key authentication.");
             return Ok(());
         }
 
+        // Because requesting auth methods too often might lead to connection abort, try
+        // in order until first key matches.
+        // -> Revisit if more sophisticated authenticatoin with several keys in order is actually
+        // needed.
         for private_key in self.cfg_openssh.as_ref().unwrap().private_key_files() {
-            if !should_perform()? {
-                return Ok(());
-            }
             if !Path::new(private_key).exists() {
                 continue;
             }
@@ -235,6 +235,9 @@ impl<'a> SshSession<'a> {
                     private_key,
                     e
                 );
+            }
+            if self.raw.authenticated() {
+                break;
             }
         }
         Ok(())
@@ -256,9 +259,13 @@ impl<'a> SshSession<'a> {
             }
         };
 
-        let tcp = TcpStream::connect(ensure_port(
-            &host.get_hostname_def(cfg_openssh.as_ref().and_then(|c| c.hostname())),
-        ))?;
+        let tcp = {
+            let host = ensure_port(
+                &host.get_hostname_def(cfg_openssh.as_ref().and_then(|c| c.hostname())),
+            );
+            log::debug!("Connecting to: {}", host);
+            TcpStream::connect(host)?
+        };
 
         let mut sess = RawSession::new()?;
         sess.set_tcp_stream(tcp);
@@ -273,6 +280,7 @@ impl<'a> SshSession<'a> {
         ssh_session.auth(auth)?;
 
         if ssh_session.raw.authenticated() {
+            log::trace!("Authenticated.");
             Ok(ssh_session)
         } else {
             error!("Could not authenticate ssh session, check your authentication settings!");
