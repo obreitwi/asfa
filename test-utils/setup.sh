@@ -68,11 +68,13 @@ if (( container_set_up == 0 )); then
 
     ensure_folder "${HOME}/.ssh"
 
-    cat >>"${HOME}/.ssh/config" <<EOF 
+    if ! grep -q asfa-ci-key "${HOME}/.ssh/config"; then
+        cat >>"${HOME}/.ssh/config" <<EOF 
 Host asfa-ci-key
     Hostname localhost
     Port 2222
 EOF
+    fi
 fi
 
 
