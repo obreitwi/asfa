@@ -228,7 +228,7 @@ auth:
   use_agent: true
 hosts:
   my-remote-site:
-    # note: port is optional and defaults to 22
+    # note: port is optional, will be inferred form ssh and defaults to 22
     hostname: my-hostname.eu:22
     folder: /var/www/default/my-uploads
     url: https://my-domain.eu/my-uploads

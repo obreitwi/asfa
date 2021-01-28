@@ -82,12 +82,24 @@ impl OpenSshConfig {
     }
 
     pub fn hostname(&self) -> Option<String> {
-        if let Some(OpenSshConfigEntry::Single(hostname)) = self.raw.get("hostname")
+        let hostname = if let Some(OpenSshConfigEntry::Single(hostname)) = self.raw.get("hostname")
         {
             Some(hostname.to_string())
+        } else {
+            None
+        };
+
+        if let Some(port) = self.port() {
+            hostname.map(|h| format!("{}:{}", h, port))
+        } else {
+            hostname
         }
-        else
-        {
+    }
+
+    pub fn port(&self) -> Option<String> {
+        if let Some(OpenSshConfigEntry::Single(port)) = self.raw.get("port") {
+            Some(port.to_string())
+        } else {
             None
         }
     }

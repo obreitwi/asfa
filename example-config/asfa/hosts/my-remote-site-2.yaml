@@ -1,6 +1,6 @@
 # Note: hostname and port are optional
 # * hostname is inferred from openSSH config (or host-entry name)
-# * port defaults to 22
+# * port will be inferred form openSSH and defaults to 22 otherwise
 hostname: my-hostname-2.eu
 folder: /var/www/default/my-uploads
 url: https://my-domain-2.eu/my-uploads
