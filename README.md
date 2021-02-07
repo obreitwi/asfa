@@ -179,13 +179,25 @@ A remote server that
 
 ## Install
 
-Simply install via cargo
+### `cargo`
 ```text
 $ cargo install asfa
 ```
 
-or build from source
+### AUR
+AUR package [`asfa-git`](https://aur.archlinux.org/packages/asfa-git/) provides the latest commit from `master`.
 
+Either use your favorite AUR helper or install manually:
+```text
+$ cd <temporary folder>
+$ curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=asfa-git
+$ makepkg
+[...]
+==> Finished making: asfa-git 0.7.2.r16.g763f726-1 (Sun 07 Feb 2021 04:18:12 PM CET)
+$ sudo pacman -U asfa-git-0.7.2.r16.g763f726-1-x86_64.pkg.tar.zst
+```
+
+### From source
 ```text
 $ git clone https://github.com/obreitwi/asfa.git
 $ cargo install --path asfa
