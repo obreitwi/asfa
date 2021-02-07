@@ -1,5 +1,5 @@
 /target
 **/*.rs.bk
 Cargo.lock
-aur/*
-!aur/PKGBUILD
+aur/asfa-git/*
+!aur/asfa-git/PKGBUILD
