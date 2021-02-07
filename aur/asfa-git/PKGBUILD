@@ -2,7 +2,7 @@
 
 _pkgname=asfa
 pkgname=${_pkgname}-git
-pkgver=0.7.2.r2.g95e30d5
+pkgver=0.7.2.r7.g69b9ab4
 pkgrel=1
 pkgdesc='avoid sending file attachments - send a link instead'
 arch=('x86_64')
@@ -22,7 +22,7 @@ pkgver() {
 
 build() {
     cd $_pkgname
-    cargo build --locked --release
+    cargo build --locked --release --target-dir=target
     local _folder_man
     _folder_man=target/release/man
     mkdir -p ${_folder_man}/man1
