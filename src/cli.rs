@@ -2,9 +2,10 @@ use anyhow::{bail, Context, Result};
 use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
 use indicatif::ProgressStyle;
 use std::iter::IntoIterator;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc;
 use std::sync::mpsc::channel;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread;
 
 use crate::cmd::{Clean, List, Push, Verify};
@@ -138,10 +139,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
             .max()
             .with_context(|| "Nothing to show.")?;
 
-        *[60, content_max, header_len + 2]
-            .iter()
-            .max()
-            .unwrap()
+        *[60, content_max, header_len + 2].iter().max().unwrap()
     };
 
     let line_horizontal = |len: usize| color_box.apply_to("─".repeat(len));
@@ -203,7 +201,7 @@ fn join_frames(content: &str, raw: &str, joiner: char) -> String {
 /// Spinner that spins until finish() is called.
 pub struct WaitingSpinner {
     handle: thread::JoinHandle<()>,
-    stop_token: Arc<Mutex<bool>>,
+    stop_token: Arc<AtomicBool>,
     tx: mpsc::Sender<SpinnerSetting>,
 }
 
@@ -215,7 +213,7 @@ enum SpinnerSetting {
 impl WaitingSpinner {
     pub fn new(message: String) -> Self {
         let (tx, rx) = channel();
-        let stop_token = Arc::new(Mutex::new(false));
+        let stop_token = Arc::new(AtomicBool::new(false));
         let stop_token_pbar = Arc::clone(&stop_token);
         let handle = thread::spawn(move || {
             let spinner = crate::cli::spinner();
@@ -230,7 +228,7 @@ impl WaitingSpinner {
                 }
             };
 
-            while !*stop_token_pbar.lock().unwrap() {
+            while !stop_token_pbar.load(Ordering::Relaxed) {
                 handle_messages();
                 spinner.inc(1);
                 std::thread::sleep(std::time::Duration::from_millis(25));
@@ -257,7 +255,7 @@ impl WaitingSpinner {
     }
 
     pub fn finish(self) {
-        *self.stop_token.lock().unwrap() = true;
+        self.stop_token.store(true, Ordering::Relaxed);
         self.handle.join().unwrap();
     }
 }
