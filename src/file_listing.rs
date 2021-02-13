@@ -63,7 +63,7 @@ impl<'a> FileListing<'a> {
 
     /// Select all files with corresponding indices
     pub fn by_indices(self, indices: &[i64]) -> Result<Self> {
-        if indices.len() > 0 {
+        if !indices.is_empty() {
             let num_files = self.num_files as i64;
             for idx in indices {
                 if *idx < -num_files || *idx >= num_files {
@@ -90,7 +90,7 @@ impl<'a> FileListing<'a> {
 
     /// Select all files that have the same hash as the names given
     pub fn by_name(self, names: &[&str], prefix_length: u8) -> Result<Self> {
-        if names.len() > 0 {
+        if !names.is_empty() {
             let indices = {
                 let mut indices = self.indices;
 
@@ -245,7 +245,7 @@ impl<'a> FileListing<'a> {
 
     /// Add all if, so far, no files have been selected and the boolean switch is set.
     pub fn with_all_if_none(self, doit: bool) -> Self {
-        if doit && self.indices.len() == 0 {
+        if doit && self.indices.is_empty() {
             self.with_all(true)
         } else {
             self
