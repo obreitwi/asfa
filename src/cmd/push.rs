@@ -146,8 +146,7 @@ impl Push {
         };
         io::stdout().flush().unwrap();
         // Only print expiration notification if asfa is used directly via terminal
-        if atty::is(Stream::Stdout) && expiration_date.is_some() {
-            let expiration_date = expiration_date.unwrap();
+        if let (true, Some(expiration_date)) = (atty::is(Stream::Stdout), expiration_date) {
             eprint!(
                 "{bl}expiring: {date}{br} ",
                 bl = color::frame.apply_to("["),
