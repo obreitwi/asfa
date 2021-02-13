@@ -166,7 +166,7 @@ impl<'a> FileListing<'a> {
         self.iter()?
             .map(|(i, file, stat)| -> Result<String> {
                 Ok(format!(
-                    " {idx:width$} {sep} {rev_idx:rev_width$} {sep} {size}{mtime}{url} ",
+                    " {idx:width$}{sep}{rev_idx:rev_width$}{sep}{size}{mtime}{url} ",
                     idx = i,
                     rev_idx = i as i64 - self.num_files as i64,
                     url = if filename_only {
@@ -270,7 +270,7 @@ impl<'a> FileListing<'a> {
                 continue;
             } else {
                 return Ok(format!(
-                    "{size:>6.2}{suffix} {sep} ",
+                    "{size:>6.2}{suffix}{sep}",
                     size = stat.size.unwrap() as f64 / (1 << (i * 10)) as f64,
                     suffix = s,
                     sep = text::separator()
@@ -283,7 +283,7 @@ impl<'a> FileListing<'a> {
     fn column_time(&self, stat: &FileStat) -> Result<String> {
         let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
         Ok(format!(
-            "{mtime} {sep} ",
+            "{mtime}{sep}",
             mtime = mtime.format("%Y-%m-%d %H:%M:%S").to_string(),
             sep = text::separator()
         ))

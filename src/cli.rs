@@ -284,7 +284,7 @@ pub mod text {
     use std::collections::HashMap;
 
     pub fn separator() -> String {
-        format!("{}", super::color::frame.apply_to("│"))
+        format!(" {} ", super::color::frame.apply_to("│"))
     }
 
     /// Helper to replace text in colored text
