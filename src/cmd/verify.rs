@@ -54,7 +54,7 @@ impl Command for Verify {
         let files_to_verify = session
             .list_files()?
             .by_indices(&self.indices[..])?
-            .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
+            .by_filter(self.filter.as_deref())?
             .with_all_if_none(true)
             .select_newer(self.select_newer.as_deref())?
             .select_older(self.select_older.as_deref())?
