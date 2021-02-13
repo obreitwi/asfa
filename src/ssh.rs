@@ -438,7 +438,7 @@ impl<'a> SshSession<'a> {
         let stats_map: HashMap<_, _> = raw
             .lines()
             .map(|l| {
-                let mut parts = l.split(" ");
+                let mut parts = l.split(' ');
                 let mtime: Option<u64> = parts.next().and_then(|s| s.parse().ok());
                 let size: Option<u64> = parts.next().and_then(|s| s.parse().ok());
                 let name: String = parts.join(" ");
