@@ -279,7 +279,7 @@ impl Config {
         match alias
             .as_ref()
             .map(|a| a.as_ref())
-            .or(self.default_host.as_deref())
+            .or_else(|| self.default_host.as_deref())
         {
             None => match self.hosts.len() {
                 0 => {
