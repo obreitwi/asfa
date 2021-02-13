@@ -92,7 +92,7 @@ impl<'a> SshSession<'a> {
                     );
                 }
             } else if auth.from_openssh {
-                self.auth_private_keys_openssh()?;
+                self.auth_private_keys_openssh();
             }
         }
 
@@ -213,10 +213,10 @@ impl<'a> SshSession<'a> {
     /// Try to authenticate with private keys defined in openssh
     ///
     /// Assumes that auth() already checked for supported pubkey authentication!
-    fn auth_private_keys_openssh(&self) -> Result<()> {
+    fn auth_private_keys_openssh(&self) {
         if self.cfg_openssh.is_none() {
             log::trace!("No openSSH config found, skipping private key authentication.");
-            return Ok(());
+            return;
         }
 
         // Because requesting auth methods too often might lead to connection abort, try
@@ -240,7 +240,6 @@ impl<'a> SshSession<'a> {
                 break;
             }
         }
-        Ok(())
     }
 
     /// Create a new SSH session by connecting to the given host configuration.
