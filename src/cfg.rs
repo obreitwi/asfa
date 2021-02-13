@@ -411,7 +411,7 @@ impl Default for Auth {
 }
 
 fn check_prefix_length(length: i64) -> Result<()> {
-    if length < 8 || 128 < length {
+    if !(8..=128).contains(&length) {
         bail! {"Prefix needs to be between 8 and 128 characters."};
     }
     Ok(())
