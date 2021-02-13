@@ -188,16 +188,16 @@ impl Command for Push {
     fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         let mut aliases: Vec<String> = vec![];
 
-        if self.files.len() == 0 && self.alias.len() == 0 {
+        if self.files.is_empty() && self.alias.is_empty() {
             bail!("No files to upload specified.");
-        } else if self.files.len() == 0 && self.alias.len() > 0 {
+        } else if self.files.is_empty() && !self.alias.is_empty() {
             bail!(
                 "No files to upload specified. \
                   Did you forget to separate --alias option via double dashes from files to upload?"
             );
-        } else if self.alias.len() > 0 && self.alias.len() != self.files.len() {
+        } else if !self.alias.is_empty() && self.alias.len() != self.files.len() {
             bail!("You need to specify as many aliases as you specify files!");
-        } else if self.alias.len() == 0 {
+        } else if self.alias.is_empty() {
             for file in self.files.iter() {
                 aliases.push(self.transform_filename(file)?);
             }
