@@ -120,7 +120,7 @@ impl Command for Verify {
         spinner.set_message("Verifying.. done".to_string())?;
         spinner.finish();
 
-        if failure.len() > 0 {
+        if !failure.is_empty() {
             bail!("{} files failed to verify.", failure.len());
         } else {
             Ok(())
