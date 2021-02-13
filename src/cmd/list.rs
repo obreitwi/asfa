@@ -1,4 +1,5 @@
 use anyhow::Result;
+use atty::Stream;
 use clap::Clap;
 use console::Style;
 
@@ -109,14 +110,22 @@ impl Command for List {
                 self.details || self.with_size,
                 self.details || self.with_time,
             )?;
-            draw_boxed(
-                format!(
-                    "{listing} remote files:",
-                    listing = Style::new().bold().green().bright().apply_to("Listing")
-                ),
-                content.iter().map(|s| s.as_ref()),
-                &color::frame,
-            )?;
+            // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
+            // parseable format
+            if atty::is(Stream::Stdout) {
+                draw_boxed(
+                    format!(
+                        "{listing} remote files:",
+                        listing = Style::new().bold().green().bright().apply_to("Listing")
+                    ),
+                    content.iter().map(|s| s.as_ref()),
+                    &color::frame,
+                )?;
+            } else {
+                for line in content {
+                    println!("{}", line);
+                }
+            }
         }
         Ok(())
     }

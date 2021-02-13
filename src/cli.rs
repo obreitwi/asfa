@@ -278,10 +278,18 @@ pub mod color {
 
 #[allow(non_upper_case_globals)]
 pub mod text {
+    use atty::Stream;
     use std::collections::HashMap;
 
+    /// Return separator for columns in output tables.
+    ///
+    /// Changes behavior if stdout is no tty.
     pub fn separator() -> String {
-        format!(" {} ", super::color::frame.apply_to("│"))
+        if atty::is(Stream::Stdout) {
+            format!(" {} ", super::color::frame.apply_to("│"))
+        } else {
+            String::from('\t')
+        }
     }
 
     /// Helper to replace text in colored text
@@ -321,9 +329,7 @@ pub mod text {
                     match current_nocolor {
                         Some((idx_strip, char_nocolor)) if char_nocolor == char_orig => {
                             iter_nocolor.next();
-                            *self.replacements
-                                .get(&idx_strip)
-                                .unwrap_or(&char_orig)
+                            *self.replacements.get(&idx_strip).unwrap_or(&char_orig)
                         }
                         _ => char_orig,
                     }

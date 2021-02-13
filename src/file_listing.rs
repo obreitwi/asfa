@@ -151,7 +151,9 @@ impl<'a> FileListing<'a> {
         }
     }
 
-    /// Get formatted lines to be printed with draw_boxed()
+    /// Get formatted lines to be printed with draw_boxed() if stdout is a tty.
+    ///
+    /// If stdout is no tty, simply format contents separated by tabs for easy parsing.
     ///
     /// If filename_only is specified, prints url if host is specified, otherwise the relative
     /// path.

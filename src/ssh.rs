@@ -52,8 +52,10 @@ impl<'a> SshSession<'a> {
             ))?
             .expect("Could not list remote files.")?;
 
+        log::trace!("{}", files.stdout());
+
         Ok(files
-            .stdout
+            .stdout()
             .lines()
             .map(|s| {
                 Path::new(s)

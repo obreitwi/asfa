@@ -5,6 +5,10 @@
 
 * Internal:
   * Removed code-smell reported by [clippy](https://github.com/rust-lang/rust-clippy).
+* `list`-command:
+  * Disable framed-box layout if piping to another program.
+    * Separate different fields by tabs.
+    * Allows for easier parsing.
 
 ## v0.7.2 (2021-01-29)
 
