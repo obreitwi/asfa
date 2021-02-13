@@ -722,13 +722,13 @@ impl KeyboardInteractivePrompt for InteractivePrompt {
     ) -> Vec<String> {
         debug!(
             "Performing keyboard-interactive auth{}.",
-            if username.len() > 0 {
+            if !username.is_empty() {
                 format!(" for {}", username)
             } else {
                 "".to_string()
             }
         );
-        if instructions.len() > 0 {
+        if !instructions.is_empty() {
             info!("{}", instructions);
         }
         prompts
