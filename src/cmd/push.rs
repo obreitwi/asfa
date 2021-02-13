@@ -110,9 +110,11 @@ impl Push {
                 .map(|f| {
                     (f * 1024.0 /* mega */ * 1024.0/* kilo */ / 8.0/* bit -> bytes */) as usize
                 })
-                .or(self.limit_kbytes.map(|f| {
-                    (f * 1024.0/* kilo */) as usize
-                })),
+                .or_else(|| {
+                    self.limit_kbytes.map(|f| {
+                        (f * 1024.0/* kilo */) as usize
+                    })
+                }),
         )?;
 
         if config.verify_via_hash {
