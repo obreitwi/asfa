@@ -182,14 +182,14 @@ impl<'a> FileListing<'a> {
                     size = if with_size {
                         stat.as_ref()
                             .map(|s| self.column_size(s))
-                            .unwrap_or(Ok("".to_string()))?
+                            .unwrap_or_else(|| Ok("".to_string()))?
                     } else {
                         "".to_string()
                     },
                     mtime = if with_time {
                         stat.as_ref()
                             .map(|s| self.column_time(s))
-                            .unwrap_or(Ok("".to_string()))?
+                            .unwrap_or_else(|| Ok("".to_string()))?
                     } else {
                         "".to_string()
                     }
