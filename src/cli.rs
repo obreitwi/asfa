@@ -321,10 +321,9 @@ pub mod text {
                     match current_nocolor {
                         Some((idx_strip, char_nocolor)) if char_nocolor == char_orig => {
                             iter_nocolor.next();
-                            self.replacements
+                            *self.replacements
                                 .get(&idx_strip)
                                 .unwrap_or(&char_orig)
-                                .clone()
                         }
                         _ => char_orig,
                     }
