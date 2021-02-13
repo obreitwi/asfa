@@ -173,7 +173,7 @@ impl Push {
         let extension = file
             .extension()
             .map(|ext| format!(".{}", ext.to_str().unwrap()))
-            .unwrap_or(String::new());
+            .unwrap_or_default();
         Ok(format!(
             "{prefix}{stem}{suffix}{ext}",
             prefix = self.prefix.as_ref().unwrap_or(&String::new()),
