@@ -569,7 +569,7 @@ impl<'a> SshSession<'a> {
                 if limit_speed_bytes_per_second.is_some() {
                     remote_file.flush()?;
                 }
-                &reader.consume(written);
+                reader.consume(written);
                 log::trace!("Wrote {} bytes", written);
                 written_total += written as u128;
                 bar.inc(written as u64);
