@@ -3,6 +3,9 @@
 
 ## v0.7.3-pre (under development)
 
+* Internal:
+  * Removed code-smell reported by [clippy](https://github.com/rust-lang/rust-clippy).
+
 ## v0.7.2 (2021-01-29)
 
 * Switch CI from Travis to Github Actions.
