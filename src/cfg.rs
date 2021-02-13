@@ -326,7 +326,7 @@ impl Host {
                     check_prefix_length(*prefix)?;
                     *prefix as u8
                 }
-                None => config.prefix_length.clone(),
+                None => config.prefix_length,
             };
 
             let password = get_optional(dict, "password", get_string_from)?.cloned();
