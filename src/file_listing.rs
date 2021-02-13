@@ -266,7 +266,7 @@ impl<'a> FileListing<'a> {
             // If size is >= 999.5 (which we cannot detect via integer), the printed representation
             // will be rouned to 1000.00 -> move to next higher unit at 999
             if 999 <= size {
-                size = size >> 10;
+                size >>= 10;
                 continue;
             } else {
                 return Ok(format!(
