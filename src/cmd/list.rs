@@ -101,7 +101,7 @@ impl Command for List {
             for idx in to_list.indices {
                 print!("{} ", idx);
             }
-            println!("");
+            println!();
         } else {
             let content = to_list.format_files(
                 Some(&session.host),
