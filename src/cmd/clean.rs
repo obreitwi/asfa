@@ -74,7 +74,7 @@ impl Command for Clean {
             .list_files()?
             .with_all(self.all)
             .by_indices(&self.indices[..])?
-            .by_filter(self.filter.as_ref().map(|s| s.as_str()))?
+            .by_filter(self.filter.as_deref())?
             .with_all_if_none(self.select_newer.is_some() || self.select_older.is_some())
             .select_newer(self.select_newer.as_deref())?
             .select_older(self.select_older.as_deref())?
