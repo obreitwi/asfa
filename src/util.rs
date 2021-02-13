@@ -40,7 +40,7 @@ fn get_explicit_hash<Hasher: sha2::Digest>(path: &Path) -> Result<String> {
         let to_write = buf.len();
         if to_write > 0 {
             hash.update(buf);
-            &reader.consume(to_write);
+            reader.consume(to_write);
         } else {
             break;
         }
