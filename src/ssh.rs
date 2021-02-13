@@ -20,7 +20,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 fn ensure_port(hostname: &str) -> String {
-    if hostname.contains(":") {
+    if hostname.contains(':') {
         hostname.to_string()
     } else {
         format!("{}:22", hostname)
