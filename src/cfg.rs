@@ -158,7 +158,7 @@ impl Config {
         let mut config = Self::from_yaml(&raw)?;
 
         let hosts_dir = {
-            let mut hosts_dir = config_dir.clone();
+            let mut hosts_dir = config_dir;
             hosts_dir.push("hosts");
             hosts_dir
         };
