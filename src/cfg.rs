@@ -352,11 +352,11 @@ impl Host {
         self.hostname
             .clone()
             .or(default)
-            .unwrap_or(self.alias.clone())
+            .unwrap_or_else(|| self.alias.clone())
     }
 
     pub fn get_username(&self) -> String {
-        self.user.clone().unwrap_or(username())
+        self.user.clone().unwrap_or_else(username)
     }
 
     pub fn get_url(&self, file: &str) -> Result<String> {
