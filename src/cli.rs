@@ -138,11 +138,10 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
             .max()
             .with_context(|| "Nothing to show.")?;
 
-        [60, content_max, header_len + 2]
+        *[60, content_max, header_len + 2]
             .iter()
             .max()
             .unwrap()
-            .clone()
     };
 
     let line_horizontal = |len: usize| color_box.apply_to("─".repeat(len));
