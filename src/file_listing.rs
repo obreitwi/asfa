@@ -295,7 +295,7 @@ impl<'a> FileListing<'a> {
                 .indices
                 .iter()
                 .map(|i| self.all_files.get(i).unwrap().as_path());
-            let idx = self.indices.iter().map(|idx| *idx);
+            let idx = self.indices.iter().copied();
             let raw_stats = self.ssh.stat(paths)?;
             self.stats = Some(idx.zip(raw_stats.into_iter()).collect());
         }
