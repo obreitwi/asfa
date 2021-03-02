@@ -2,8 +2,8 @@
 # * hostname is inferred from openSSH config (or host-entry name)
 # * port will be inferred form openSSH and defaults to 22 otherwise
 hostname: my-hostname-2.eu
-folder: /var/www/default/my-uploads
-url: https://my-domain-2.eu/my-uploads
+folder: /var/www/default/asfa
+url: https://my-domain-2.eu/asfa
 group: www-data
 auth:  # optional, overwrites global auth-config
   interactive: true

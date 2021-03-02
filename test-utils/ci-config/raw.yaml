@@ -4,7 +4,7 @@ prefix_length: 32
 hosts:
   asfa-ci-key:
     folder: /var/www/default/uploads
-    url: https://my-domain.eu/my-uploads
+    url: https://my-domain.eu/asfa
     group: "1234"
     user: asfa-ci-user
     auth:

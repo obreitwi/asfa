@@ -26,9 +26,9 @@ hosts:  # dictionary mapping host alias to host settings
                                   # Note: port-suffix will be inferred form
                                   # openSSH and defaults to 22 otherwise
     user: my-remote-user  # defaults to current user if not set
-    folder: /var/www/default/my-uploads  # target folder where to store data,
+    folder: /var/www/default/asfa  # target folder where to store data,
                                          # needs to be writable
-    url: https://my-domain.eu/my-uploads  # URL that is prefixed when URLs are
+    url: https://my-domain.eu/asfa  # URL that is prefixed when URLs are
                                           # printed, this is of no functional
                                           # relevance right now
     group: www-data  # optional, group to assign to files after upload so that

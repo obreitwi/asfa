@@ -85,7 +85,7 @@ Push (upload) a local file to the remote site and print the URL under which it
 is reachable.
 ```text
 $ asfa push my-file.txt
-https://my-domain.eu/my-uploads/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
+https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
 ```
 See example at the top. Because the file is identified by its hash, uploading
 the same file twice will generate the same link.
@@ -104,8 +104,8 @@ Note that if you specify several files to upload with their own aliases, you nee
 Or specify the aliases afterwards.
 ```text
 $ asfa push my-file.txt my-file-2.txt --alias my-very-specific-file.txt my-very-specific-file-2.txt
-https://my-domain.eu/my-uploads/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
-https://my-domain.eu/my-uploads/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
+https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
+https://my-domain.eu/asfa/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
 ```
 
 #### Automatically expiring uploaded files 
@@ -215,8 +215,8 @@ structure.
 
 An example config can be found in `./example-config`.
 Here, we assume that your server can be reached at `https://my-domain.eu` and
-that the folder `/var/wwww/default/my-uploads` will be served at
-`https://my-domain.eu/my-uploads`.
+that the folder `/var/wwww/default/asfa` will be served at
+`https://my-domain.eu/asfa`.
 
 ### `asfa`-side
 
@@ -227,8 +227,8 @@ A fully commented example config can be found
 
 ```yaml
 hostname: my-hostname.eu  # if not specified, will defaulted from ssh or filename
-folder: /var/www/default/my-uploads
-url: https://my-domain.eu/my-uploads
+folder: /var/www/default/asfa
+url: https://my-domain.eu/asfa
 group: www-data
 ```
 
@@ -245,8 +245,8 @@ hosts:
   my-remote-site:
     # note: port is optional, will be inferred form ssh and defaults to 22
     hostname: my-hostname.eu:22
-    folder: /var/www/default/my-uploads
-    url: https://my-domain.eu/my-uploads
+    folder: /var/www/default/asfa
+    url: https://my-domain.eu/asfa
     group: www-data
     auth:
       interactive: false
@@ -270,7 +270,7 @@ requirements are met:
 
 Your apache config can be as simple as:
 ```apache
-<Directory /var/www/default/my-uploads>
+<Directory /var/www/default/asfa>
   Options None
   allow from all
 </Directory>
@@ -281,7 +281,7 @@ _very_ easily access all uploaded files.
 #### nginx
 
 ```nginx
-location /my-uploads {
+location /asfa {
   autoindex off
 }
 ```

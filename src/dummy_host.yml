@@ -3,5 +3,5 @@ hosts:
   hostname: my-dummy-host.dummy-domain.eu
   port: 22
   user: my-dummy-user
-  folder: /var/www/my-uploads
+  folder: /var/www/asfa
   group: www-data
