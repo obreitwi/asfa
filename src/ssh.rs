@@ -47,7 +47,7 @@ impl<'a> SshSession<'a> {
     pub fn all_files(&self) -> Result<Vec<PathBuf>> {
         let files = self
             .exec_remote(&format!(
-                "find '{}' -mindepth 2 -maxdepth 2 -type f -print0 | xargs -0 ls -1rt",
+                "find '{}' -mindepth 2 -maxdepth 2 -type f -print0 | xargs -0r ls -1rt",
                 self.host.folder.display()
             ))?
             .expect("Could not list remote files.")?;

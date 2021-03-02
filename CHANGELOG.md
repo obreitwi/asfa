@@ -9,6 +9,7 @@
   * Disable framed-box layout if piping to another program.
     * Separate different fields by tabs.
     * Allows for easier parsing.
+  * Fix cryptic error message if there are no remote files.
 
 ## v0.7.2 (2021-01-29)
 
