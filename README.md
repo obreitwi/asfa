@@ -186,7 +186,7 @@ $ cargo install asfa
 ```
 
 ### AUR
-AUR package [`asfa-git`](https://aur.archlinux.org/packages/asfa-git/) provides the latest commit from `master`.
+AUR packages [`asfa`](https://aur.archlinux.org/packages/asfa/)/[`asfa-git`](https://aur.archlinux.org/packages/asfa-git/) provide the latest version/commit from `master`.
 
 Either use your favorite AUR helper or install manually:
 ```text
