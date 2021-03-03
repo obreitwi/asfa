@@ -347,14 +347,6 @@ impl Host {
         }
     }
 
-    /// Get hostname as configured or a supplied default or (finally) alias name of the host.
-    pub fn get_hostname_def(&self, default: Option<String>) -> String {
-        self.hostname
-            .clone()
-            .or(default)
-            .unwrap_or_else(|| self.alias.clone())
-    }
-
     pub fn get_username(&self) -> String {
         self.user.clone().unwrap_or_else(username)
     }
