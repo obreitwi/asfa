@@ -10,6 +10,9 @@
     * Separate different fields by tabs.
     * Allows for easier parsing.
   * Fix cryptic error message if there are no remote files.
+* config: If defined, use hostname to query openSSH config.
+  * This allows for several distinct host-entries to be defined for the same physical host.
+
 
 ## v0.7.2 (2021-01-29)
 

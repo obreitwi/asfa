@@ -251,7 +251,12 @@ impl<'a> SshSession<'a> {
         let auth: &Auth = &host.auth;
 
         let cfg_openssh = {
-            match OpenSshConfig::new(&host.alias) {
+            match OpenSshConfig::new(
+                host.hostname
+                    .clone()
+                    .unwrap_or_else(|| host.alias.clone())
+                    .as_str(),
+            ) {
                 Ok(cfg) => Some(cfg),
                 Err(e) => {
                     log::debug!("Could not load openSSH-config for host: {}", e);
@@ -261,11 +266,16 @@ impl<'a> SshSession<'a> {
         };
 
         let tcp = {
-            let host = ensure_port(
-                &host.get_hostname_def(cfg_openssh.as_ref().and_then(|c| c.hostname())),
-            );
-            log::debug!("Connecting to: {}", host);
-            TcpStream::connect(host)?
+            let hostname = {
+                if let Some(hostname) = cfg_openssh.as_ref().and_then(|c| c.hostname()) {
+                    hostname
+                } else {
+                    host.hostname.clone().unwrap_or(host.alias.clone())
+                }
+            };
+            let full_hostname = ensure_port(&hostname);
+            log::debug!("Connecting to: {}", full_hostname);
+            TcpStream::connect(full_hostname)?
         };
 
         let mut sess = RawSession::new()?;
