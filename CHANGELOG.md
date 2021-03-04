@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.3-pre (under development)
+## v0.7.3 (2021-03-04)
 
 * Internal:
   * Removed code-smell reported by [clippy](https://github.com/rust-lang/rust-clippy).
