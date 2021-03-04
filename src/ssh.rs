@@ -20,6 +20,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 fn ensure_port(hostname: &str) -> String {
+    log::debug!("Raw hostname: {}", hostname);
     if hostname.contains(':') {
         hostname.to_string()
     } else {
@@ -254,6 +255,7 @@ impl<'a> SshSession<'a> {
             match OpenSshConfig::new(
                 host.hostname
                     .clone()
+                    .map(|h| h.split(':').next().unwrap().to_string())
                     .unwrap_or_else(|| host.alias.clone())
                     .as_str(),
             ) {
@@ -267,10 +269,16 @@ impl<'a> SshSession<'a> {
 
         let tcp = {
             let hostname = {
-                if let Some(hostname) = cfg_openssh.as_ref().and_then(|c| c.hostname()) {
+                // Priority:
+                // 1. Fully specified hostname with port.
+                // 2. Information from openSSH
+                // 3. Hostname/alias
+                if host.hostname.is_some() && host.hostname.clone().unwrap().contains(":") {
+                    host.hostname.clone().unwrap()
+                } else if let Some(hostname) = cfg_openssh.as_ref().and_then(|c| c.hostname()) {
                     hostname
                 } else {
-                    host.hostname.clone().unwrap_or(host.alias.clone())
+                    host.hostname.clone().unwrap_or_else(|| host.alias.clone())
                 }
             };
             let full_hostname = ensure_port(&hostname);
