@@ -1,6 +1,6 @@
 [package]
 name = "asfa"
-version = "0.7.3"
+version = "0.7.4-pre"
 authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
 edition = "2018"
 description = "Avoid sending file attachments by uploading to a remote site with non-guessable (hash-based) prefix and print URLs."
