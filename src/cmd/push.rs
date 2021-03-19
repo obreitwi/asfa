@@ -186,24 +186,37 @@ impl Push {
 
 impl Command for Push {
     fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
-        let mut aliases: Vec<String> = vec![];
+        let (files, aliases) = {
+            let mut aliases: Vec<String> = vec![];
+            let mut files: Vec<PathBuf> = vec![];
 
-        if self.files.is_empty() && self.alias.is_empty() {
-            bail!("No files to upload specified.");
-        } else if self.files.is_empty() && !self.alias.is_empty() {
-            bail!(
-                "No files to upload specified. \
-                  Did you forget to separate --alias option via double dashes from files to upload?"
-            );
-        } else if !self.alias.is_empty() && self.alias.len() != self.files.len() {
-            bail!("You need to specify as many aliases as you specify files!");
-        } else if self.alias.is_empty() {
-            for file in self.files.iter() {
-                aliases.push(self.transform_filename(file)?);
+            if self.files.is_empty() && self.alias.is_empty() {
+                bail!("No files to upload specified.");
+            } else if self.files.is_empty() && !self.alias.is_empty() {
+                if self.alias.len() == 2 {
+                    // The other specified `asfa push --alias <alias> <file>`, clap is not able to
+                    // parse this, so we fix it manually.
+                    files.push(PathBuf::from(&self.alias[1]));
+                    aliases.push(self.alias[0].clone());
+                } else {
+                    bail!(
+                        "No files to upload specified. \
+                        Did you forget to separate --alias option via double dashes from files to upload?"
+                    );
+                }
+            } else if !self.alias.is_empty() && self.alias.len() != self.files.len() {
+                bail!("You need to specify as many aliases as you specify files!");
+            } else if self.alias.is_empty() {
+                for file in self.files.iter() {
+                    aliases.push(self.transform_filename(file)?);
+                    files.push(file.clone());
+                }
+            } else {
+                aliases = self.alias.clone();
+                files = self.files.clone();
             }
-        } else {
-            aliases = self.alias.clone();
-        }
+            (files, aliases)
+        };
 
         if let Some(limit) = self.limit_mbits {
             debug!("Limiting upload to {} Mbit/s", limit);
@@ -212,7 +225,7 @@ impl Command for Push {
             debug!("Limiting upload to {} kByte/s", limit);
         }
 
-        for (to_upload, alias) in self.files.iter().zip(aliases.iter()) {
+        for (to_upload, alias) in files.iter().zip(aliases.iter()) {
             self.upload(session, config, to_upload, alias)?;
         }
 

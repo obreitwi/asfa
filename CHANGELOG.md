@@ -3,6 +3,12 @@
 
 ## v0.7.4-pre (under development)
 
+* `push`-command:
+  * Remove need to seperate single alias from single file by dashes if alias
+    specified first.
+    Previously: `asfa push --alias my-alias.txt -- my-original-file.txt`
+    Now: `asfa push --alias my-alias.txt my-original-file.txt`
+
 ## v0.7.3 (2021-03-04)
 
 * Internal:

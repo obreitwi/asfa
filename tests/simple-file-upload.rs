@@ -126,11 +126,12 @@ fn expiring_file_upload_begin(host: &str) -> Result<(PathBuf, Instant)> {
         .to_string();
 
     let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
+    // also test specifying alias for single file first
     run_cmd(format!(
-        "cargo run -- --loglevel debug -H {} push {} --alias {} --expire 1min",
+        "cargo run -- --loglevel debug -H {} push --alias {} {} --expire 1min",
         host,
-        local.display(),
-        alias
+        alias,
+        local.display()
     ))
     .with_context(|| "Could not push.")?;
     run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
