@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use log::{error, trace};
+use log::error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -73,6 +73,7 @@ make_yaml_getter! {get_array_from, Array, yaml::Array}
 make_yaml_getter! {get_int_from, Integer, i64}
 make_yaml_getter! {get_real_from, Real, String}
 
+/// Raise an error if the required key does not exist.
 pub fn get_required<
     'a,
     T,
@@ -85,26 +86,6 @@ pub fn get_required<
     match getter(dict, name)? {
         Some(v) => Ok(v),
         None => bail!("Required key '{}' not defined!", name),
-    }
-}
-
-/// Optional value: Outter Option is if there was an error, inner Option is the actual type that
-/// can be None.
-pub fn get_optional<
-    'a,
-    T,
-    F: Fn(&'a yaml::Hash, &str) -> Result<Option<&'a T>, InvalidYamlTypeError>,
->(
-    dict: &'a yaml::Hash,
-    name: &str,
-    getter: F,
-) -> Result<Option<&'a T>> {
-    match getter(dict, name)? {
-        Some(v) => Ok(Some(v)),
-        None => {
-            trace!("Optional key '{}' not defined.", name);
-            Ok(None)
-        }
     }
 }
 

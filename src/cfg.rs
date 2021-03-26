@@ -308,20 +308,20 @@ impl Host {
         if let Yaml::Hash(dict) = input {
             let url = get_required(dict, "url", get_string_from)?.clone();
 
-            let hostname = get_optional(dict, "hostname", get_string_from)?.cloned();
+            let hostname = get_string_from(dict, "hostname")?.cloned();
 
-            let user = get_optional(dict, "user", get_string_from)?.cloned();
+            let user = get_string_from(dict, "user")?.cloned();
 
             let folder = expanduser(get_required(dict, "folder", get_string_from)?)?;
 
-            let group = get_optional(dict, "group", get_string_from)?.cloned();
+            let group = get_string_from(dict, "group")?.cloned();
 
-            let auth = match get_optional(dict, "auth", get_dict_from)? {
+            let auth = match get_dict_from(dict, "auth")? {
                 Some(auth) => Auth::from_yaml(auth, Some(&config.auth))?,
                 None => config.auth.clone(),
             };
 
-            let prefix_length = match get_optional(dict, "prefix_length", get_int_from)? {
+            let prefix_length = match get_int_from(dict, "prefix_length")? {
                 Some(prefix) => {
                     check_prefix_length(*prefix)?;
                     *prefix as u8
@@ -329,7 +329,7 @@ impl Host {
                 None => config.prefix_length,
             };
 
-            let password = get_optional(dict, "password", get_string_from)?.cloned();
+            let password = get_string_from(dict, "password")?.cloned();
 
             Ok(Host {
                 alias,
