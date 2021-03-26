@@ -34,7 +34,7 @@ if docker exec asfa-ci cat /config/test_root 2>/dev/null | read -r test_root; th
     container_set_up=1
 else
     container_set_up=0
-    test_root="$(mktemp -d)"
+    test_root="$(mktemp --tmpdir -d tmp.asfa_ci.XXXXXXXXXX)"
 fi
 
 
