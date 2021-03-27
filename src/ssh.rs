@@ -681,7 +681,7 @@ impl ExecutedRemoteCommand {
     }
 
     pub fn stderr(&self) -> &str {
-        &self.stdout
+        &self.stderr
     }
 }
 
