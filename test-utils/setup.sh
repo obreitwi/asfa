@@ -97,6 +97,7 @@ FROM linuxserver/openssh-server
 RUN apk add --no-cache openssh-client
 RUN apk add --no-cache at
 RUN echo "asfa-ci-user" >> /etc/at.allow
+CMD [ "atd", "-f" ]
 EOF
     docker create                                         \
       --name=asfa-ci                                      \
