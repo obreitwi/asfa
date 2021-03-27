@@ -77,11 +77,27 @@ impl<'a> At<'a> {
             self.num_mins()
         );
 
-        self.session
+        let submission = self
+            .session
             .exec_remote(&cmd_at)?
             .expect("Could not set remote expiration.")?;
 
         tempfile.remove()?;
+
+        let pattern = "No atd running?";
+        if submission.stderr().contains(&pattern) {
+            bail!(
+                "There was a problem setting the remote file to expire: \
+                atd does not appear to be running. Please investigate!\n\
+                Remote returned: {}",
+                submission
+                    .stderr()
+                    .lines()
+                    .filter(|l| l.contains(&pattern))
+                    .collect::<Vec<&str>>()
+                    .join("\n")
+            );
+        }
 
         Ok(now + chrono::Duration::from_std(self.duration)?)
     }
