@@ -17,7 +17,7 @@
       supported.
     * Any set default argument can be disabled per host or command line by
       specifying `none` as argument.
-* `list`:
+* `list`-command:
   * More informative message if no files are present on remote site.
 * tests:
   * Fix `atd` not running in tests, but tests still passing because file got
