@@ -31,7 +31,7 @@ pub struct Push {
     ///
     /// Mininum time till expiration is a minute.
     ///
-    /// Any setting specified via command line overwrites any settings from config files.
+    /// Any setting specified via command line overwrites settings from config files.
     ///
     /// A globally set expiration setting can overwritten by specifying "none".
     #[clap(short, long)]
