@@ -1,6 +1,7 @@
 default_host: my-remote-site  # optional, if only one host is defined, that one
                               # will be used. Can be overwritten by ASFA_HOST
                               # environment variable.
+expire: 3days  # optional, expire all uploads with the given duration by default
 verify_via_hash: true  # defaults to true
 prefix_length: 32  # optional, defaults to 32, how many hex-digits of the hash
                    # to print
@@ -27,7 +28,8 @@ hosts:  # dictionary mapping host alias to host settings
                                   # openSSH and defaults to 22 otherwise
     user: my-remote-user  # defaults to current user if not set
     folder: /var/www/default/asfa  # target folder where to store data,
-                                         # needs to be writable
+                                   # needs to be writable
+    expire: 1day  # host-specific setting for expiring all uploads
     url: https://my-domain.eu/asfa  # URL that is prefixed when URLs are
                                           # printed, this is of no functional
                                           # relevance right now

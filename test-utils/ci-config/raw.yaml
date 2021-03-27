@@ -21,3 +21,14 @@ hosts:
     auth:
       interactive: false
       use_agent: false
+  asfa-ci-pw-expire:
+    hostname: localhost:2222
+    folder: /var/www/default/uploads
+    url: https://my-domain.eu/asfa
+    group: "1234"
+    user: asfa-ci-user
+    password: foobar
+    expire: 1min
+    auth:
+      interactive: false
+      use_agent: false

@@ -128,7 +128,7 @@ fn expiring_file_upload_begin(host: &str) -> Result<(PathBuf, Instant)> {
     let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
     // also test specifying alias for single file first
     run_cmd(format!(
-        "cargo run -- --loglevel debug -H {} push --alias {} {} --expire 1min",
+        "cargo run -- --loglevel debug -H {} push --alias {} {}",
         host,
         alias,
         local.display()
@@ -155,14 +155,18 @@ fn expiring_file_upload_begin(host: &str) -> Result<(PathBuf, Instant)> {
 }
 
 fn expiring_file_upload_verify(path: &Path, uploaded_at: &Instant) -> Result<()> {
-    let need_to_wait = Duration::from_secs(61); // wait two minutes to be sure
-    let already_waited = Instant::now().duration_since(*uploaded_at);
-    if already_waited < need_to_wait {
+    let need_to_wait = Duration::from_secs(121); // wait two minutes to be sure
+    let mut already_waited = Instant::now().duration_since(*uploaded_at);
+    while Path::new(path).exists() && already_waited < need_to_wait {
         println!(
-            "Waiting for {}s to ensure upload expires.",
-            (need_to_wait - already_waited).as_secs()
+            "Waiting {}s for upload to expire.",
+            already_waited.as_secs()
         );
-        std::thread::sleep(need_to_wait - already_waited);
+        std::thread::sleep(std::cmp::min(
+            need_to_wait - already_waited,
+            std::time::Duration::from_secs(10),
+        ));
+        already_waited = Instant::now().duration_since(*uploaded_at);
     }
 
     if Path::new(path).exists() {
@@ -252,7 +256,8 @@ fn clean_all(host: &str) -> Result<()> {
 fn run_tests() -> Result<()> {
     fixture::ensure_env()?;
 
-    let (upload_to_expire, to_expire_uploaded_at) = expiring_file_upload_begin("asfa-ci-pw")?;
+    let (upload_to_expire, to_expire_uploaded_at) =
+        expiring_file_upload_begin("asfa-ci-pw-expire")?;
     simple_file_upload("asfa-ci-pw")?;
     simple_file_upload("asfa-ci-key")?;
     upload_with_prefix_suffix("asfa-ci-key")?;

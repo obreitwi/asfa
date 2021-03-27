@@ -30,6 +30,8 @@ pub struct Push {
     /// (min, m), days (d), weeks (w), months (M) or years (y).
     ///
     /// Mininum time till expiration is a minute.
+    ///
+    /// Any setting specified via command line overwrites any settings from config files.
     #[clap(short, long)]
     expire: Option<String>,
 
@@ -90,7 +92,11 @@ impl Push {
         let hash = get_hash(to_upload, prefix_length)
             .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
 
-        let expirer = if let Some(delay) = self.expire.as_ref() {
+        let expirer = if let Some(delay) = self
+            .expire
+            .as_ref()
+            .or_else(|| session.host.expire.as_ref())
+        {
             Some(At::new(session, &delay)?)
         } else {
             None

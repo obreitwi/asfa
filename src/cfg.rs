@@ -26,6 +26,14 @@ pub struct Config {
     /// List of all configured hosts.
     hosts: HashMap<String, Host>,
 
+    /// Expire the uploaded file after the given amount of time via `at`-scheduled remote job.
+    ///
+    /// Select files newer than the given duration. Durations can be: seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    ///
+    /// Mininum time till expiration is a minute.
+    pub expire: Option<String>,
+
     /// Length of prefix to use unless overwritten in host
     pub prefix_length: u8,
 
@@ -61,6 +69,16 @@ pub struct Host {
 
     /// Overwrite global authentication settings for this host.
     pub auth: Auth,
+
+    /// Expire the uploaded file after the given amount of time via `at`-scheduled remote job.
+    ///
+    /// Select files newer than the given duration. Durations can be: seconds (sec, s), minutes
+    /// (min, m), days (d), weeks (w), months (M) or years (y).
+    ///
+    /// Mininum time till expiration is a minute.
+    ///
+    /// Overrides the global setting.
+    pub expire: Option<String>,
 
     /// In which folder do we store files on the host.
     pub folder: PathBuf,
@@ -123,6 +141,7 @@ impl Default for Config {
         Config {
             auth: Auth::default(),
             default_host: None,
+            expire: None,
             hosts: HashMap::new(),
             prefix_length: 32,
             verify_via_hash: true,
@@ -244,6 +263,9 @@ impl Config {
             std::env::var("ASFA_HOST")
                 .ok()
                 .or(get_string_from(config_yaml, "default_host")?.cloned());
+
+        config.expire = get_string_from(config_yaml, "expire")?.cloned();
+
         config.verify_via_hash = get_bool_from(config_yaml, "verify_via_hash")?
             .cloned()
             .unwrap_or(config.verify_via_hash);
@@ -312,6 +334,10 @@ impl Host {
 
             let user = get_string_from(dict, "user")?.cloned();
 
+            let expire = get_string_from(dict, "expire")?
+                .cloned()
+                .or_else(|| config.expire.clone());
+
             let folder = expanduser(get_required(dict, "folder", get_string_from)?)?;
 
             let group = get_string_from(dict, "group")?.cloned();
@@ -334,6 +360,7 @@ impl Host {
             Ok(Host {
                 alias,
                 auth,
+                expire,
                 folder,
                 group,
                 hostname,
