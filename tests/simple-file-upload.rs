@@ -149,12 +149,6 @@ fn expiring_file_upload_begin(host: &str) -> Result<(PathBuf, Instant)> {
         .with_context(|| "Files differ")?;
     run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
         .with_context(|| "Could not verify.")?;
-    run_cmd(format!(
-        "cargo run -- --loglevel debug -H {} clean --file {} --no-confirm",
-        host,
-        local.display()
-    ))
-    .with_context(|| "Could not clean.")?;
     fs::remove_file(local)?;
 
     Ok((PathBuf::from(remote), Instant::now()))
