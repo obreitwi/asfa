@@ -6,11 +6,15 @@
 * `push`-command:
   * Remove need to seperate single alias from single file by dashes if alias
     specified first.
-    Previously: `asfa push --alias my-alias.txt -- my-original-file.txt`
-    Now: `asfa push --alias my-alias.txt my-original-file.txt`
-  * Check response for errors regaring `atd` not running if `--expire` specified.
-  * Now supports a default setting for `--expire` in the config. Same as auth,
-    both a global setting and host-specific settings are supported.
+    Previously: `asfa push --alias my-alias.txt -- my-original-file.txt` Now:
+    `asfa push --alias my-alias.txt my-original-file.txt`
+  * Check response for errors regaring `atd` not running if `--expire`
+    specified.
+  * Now supports a default setting for `--expire` in the config.
+    * Same as auth, both a global setting and host-specific settings are
+      supported.
+    * Any set default argument can be disabled per host or command line by
+      specifying `none` as argument.
 * `list`:
   * More informative message if no files are present on remote site.
 * tests:

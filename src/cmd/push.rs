@@ -32,6 +32,8 @@ pub struct Push {
     /// Mininum time till expiration is a minute.
     ///
     /// Any setting specified via command line overwrites any settings from config files.
+    ///
+    /// A globally set expiration setting can overwritten by specifying "none".
     #[clap(short, long)]
     expire: Option<String>,
 
@@ -97,7 +99,12 @@ impl Push {
             .as_ref()
             .or_else(|| session.host.expire.as_ref())
         {
-            Some(At::new(session, &delay)?)
+            // Allow for explicit disabling term that overwrites a possibly set default
+            if ["no", "none", "disabled", "false"].contains(&delay.as_str()) {
+                None
+            } else {
+                Some(At::new(session, &delay)?)
+            }
         } else {
             None
         };

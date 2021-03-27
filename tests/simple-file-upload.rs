@@ -21,7 +21,7 @@ fn simple_file_upload(host: &str) -> Result<()> {
 
     let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
     run_cmd(format!(
-        "cargo run -- --loglevel debug -H {} push {} --alias {}",
+        "cargo run -- --loglevel debug -H {} push {} --alias {} --expire none",
         host,
         local.display(),
         alias

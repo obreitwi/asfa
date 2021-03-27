@@ -3,6 +3,7 @@
 # * port will be inferred form openSSH and defaults to 22 otherwise
 hostname: my-hostname-2.eu
 folder: /var/www/default/asfa
+expire: none  # Disable a potentially set default setting
 url: https://my-domain-2.eu/asfa
 group: www-data
 auth:  # optional, overwrites global auth-config
