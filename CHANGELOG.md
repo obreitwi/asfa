@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.4-pre (under development)
+## v0.7.4 (2021-03-27)
 
 * `push`-command:
   * Remove need to seperate single alias from single file by dashes if alias
