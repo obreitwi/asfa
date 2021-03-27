@@ -110,6 +110,16 @@ impl Command for List {
                 self.details || self.with_size,
                 self.details || self.with_time,
             )?;
+
+            let content = if content.is_empty() {
+                vec![format!(
+                    "{}(There are no remote files to show.)",
+                    if atty::is(Stream::Stdout) { " " } else { "" }
+                )]
+            } else {
+                content
+            };
+
             // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
             // parseable format
             if atty::is(Stream::Stdout) {
