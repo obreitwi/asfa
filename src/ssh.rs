@@ -166,7 +166,7 @@ impl<'a> SshSession<'a> {
     }
 
     fn auth_interactive(&self) -> Result<()> {
-        info!(
+        debug!(
             "Interactive authentication enabled for host {}",
             self.host.alias
         );
@@ -752,7 +752,7 @@ impl KeyboardInteractivePrompt for InteractivePrompt {
             }
         );
         if !instructions.is_empty() {
-            info!("{}", instructions);
+            debug!("{}", instructions);
         }
         prompts
             .iter()
