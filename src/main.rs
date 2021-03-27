@@ -20,7 +20,14 @@ use simple_logger::SimpleLogger;
 
 use clap::Clap;
 
-fn main() -> Result<()> {
+fn main() {
+    if let Err(err) = try_main() {
+        log::error!("{}", err);
+        std::process::exit(1);
+    }
+}
+
+fn try_main() -> Result<()> {
     let opts = cli::Opts::parse();
 
     opts.verify()?;
