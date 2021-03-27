@@ -8,6 +8,12 @@
     specified first.
     Previously: `asfa push --alias my-alias.txt -- my-original-file.txt`
     Now: `asfa push --alias my-alias.txt my-original-file.txt`
+  * Check response for errors regaring `atd` not running if `--expire` specified.
+* `list`:
+  * More informative message if no files are present on remote site.
+* tests:
+  * Fix `atd` not running in tests, but tests still passing because file got
+    deleted differently.
 
 ## v0.7.3 (2021-03-04)
 
