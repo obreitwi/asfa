@@ -611,6 +611,7 @@ impl<'a> SshSession<'a> {
 }
 
 /// Wrapper for executed remote commands
+#[derive(Debug)]
 pub struct ExecutedRemoteCommand {
     cmd: String,
     exit_status: i32,
@@ -633,12 +634,14 @@ impl ExecutedRemoteCommand {
 
         let exit_status = channel.exit_status()?;
 
-        Ok(Self {
+        let cmd = Self {
             cmd: cmd.to_string(),
             stdout,
             stderr,
             exit_status,
-        })
+        };
+        log::trace!("{:#?}", cmd);
+        Ok(cmd)
     }
 
     pub fn exit_status(&self) -> i32 {
