@@ -376,7 +376,7 @@
       </g>
       <text
          xml:space="preserve"
-         style="font-size:12px;line-height:1.25;font-family:Inconsolata,'DejaVu Sans Mono',monospace;-inkscape-font-specification:Inconsolata;stroke-width:0.264583"
+         style="font-size:12px;line-height:1.25;font-family:Inconsolata,Consolas,'DejaVu Sans Mono',monospace;-inkscape-font-specification:Inconsolata;stroke-width:0.264583"
          x="354.14972"
          y="333.55225"
          id="text922"><tspan
@@ -384,7 +384,7 @@
            id="tspan920"
            x="354.14972"
            y="333.55225"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Inconsolata,'DejaVu Sans Mono',monospace;-inkscape-font-specification:Inconsolata;stroke-width:0.264583">https://…</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Inconsolata,Consolas,'DejaVu Sans Mono',monospace;-inkscape-font-specification:Inconsolata;stroke-width:0.264583">https://…</tspan></text>
       <path
          id="path1402"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
