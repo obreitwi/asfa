@@ -177,6 +177,7 @@ A remote server that
 * has a webserver running
 * has writable folder served by your webserver
 * _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
+* _(optional)_ has [`at`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html) installed to support expiring links.
 
 ## Install
 
