@@ -15,36 +15,27 @@
 [![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa/)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif)
+![][gif-send]
 
-Since I handle my emails mostly via ssh on a remote server (shoutout to
-[neomutt](https://neomutt.org/), [OfflineIMAP](http://www.offlineimap.org/) and
-[msmtp](https://marlam.de/msmtp/)), I needed a quick and easy possibility to
-attach files to emails. As email attachments are rightfully frowned upon, I did
-not want to simply copy files over to the remote site to attach them.
-Furthermore, I often need to share generated files (such as plots or logfiles)
-on our group-internal [mattermost](https://www.mattermost.org) or any other
-form of text-based communication. Ideally, I want to do this from the folder I
-am already in on the terminal - and not by to navigating back to it from the
-browser's "file open" menu…
+Transfer files from the command line by uploading them to your webserver and send the link instead.
+The link prefix of variable length is then generated from the checksum of the uploaded file.
+Hence, it is non-guessable (only people with the correct link can access it) and does not change if the same file gets uploaded twice.
 
-Therefore, I needed a quick tool that let's me
+Comes with a few convenience features/requirements:
 
-* [send][gif-send] a link instead of the file.
-* support [aliases][gif-aliases] because sometimes
+* Has support to expire links after a set amount of time.
+* Does not require any binary to be deployed on the webserver.
+  Apart from a way to serve files and ssh-access, any other dependencies are optional, despite being readily available.
+* Supports [aliases][gif-aliases] at upload because sometimes
   `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`,
   especially a few weeks later.
-* have the link "just work" for non-tech-savvy people, i.e. not have the file
-  be password-protected, but still only accessible for people who possess the
-  link. Here it is helpful to own a domain somewhat resembling your last name.
-* [keep][gif-list-details] track of which files I shared.
-* easily clean files by [signed][gif-clean-signed] [index][gif-clean], regex or
-  [checksum][gif-clean-checksum].
-* verify that all files uploaded correctly.
-* do everything from the command line.
-* have an excuse to to use [Rust](https://www.rust-lang.org/) for something
-  other than [Advent of Code](https://adventofcode.com/).
-* (have a name that can only be typed with the left hand without moving.)
+* The link "just works" for non-tech-savvy people, i.e. not have the file be password-protected, but still only accessible for people who possess the link.
+  Here it is helpful to own a domain somewhat resembling your last name.
+  Files can always be encrypted prior to uploading.
+* Easily [keep track][gif-list-details] of which files are currently shared.
+* Clean files by [signed][gif-clean-signed] [index][gif-clean], regex or [checksum][gif-clean-checksum].
+* Verify afterwards that all files uploaded correctly.
+* And most importantly, of course: Have a name that be typed with the left hand on home row.
 
 [gif-send]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif
 [gif-aliases]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
@@ -54,22 +45,20 @@ Therefore, I needed a quick tool that let's me
 [gif-clean]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif
 [gif-clean-checksum]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif
 
-`asfa` works by uploading the given file to a publicly reachable location on
-the remote server via SSH. The link prefix of variable length is then generated
-from the checksum of the uploaded file. Hence, it is non-guessable (only people
-with the correct link can access it) and can be used to verify the file
-uploaded correctly.
-
-The emitted link can then be copied and pasted.
-
-`asfa` uses a single `ssh`-connection for each invocation which is convenient
-if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage
-(see [details](#background)). Alternatively, private key files in [PEM
-format][pem] or openssh-format (i.e., private key starts with
-`-----BEGIN OPENSSH PRIVATE KEY-----`) can be used directly.
+`asfa` uses a single `ssh`-connection for each invocation which is convenient if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage (see [details](#background)).
+Alternatively, private key files in [PEM format][pem] or openssh-format (i.e., private key starts with `-----BEGIN OPENSSH PRIVATE KEY-----`) can be used directly.
 
 [gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
 [pem]: https://serverfault.com/a/706342
+
+## Requirements
+
+A remote server that
+* is accessible via ssh
+* has a webserver running
+* has writable folder served by your webserver
+* _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
+* _(optional)_ has [`at`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html) installed to support expiring links.
 
 ## Usage
 
@@ -81,19 +70,16 @@ Note: All commands can actually be abbreviated:
 
 #### Push
 
-Push (upload) a local file to the remote site and print the URL under which it
-is reachable.
+Push (upload) a local file to the remote site and print the URL under which it is reachable.
 ```text
 $ asfa push my-file.txt
 https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
 ```
-See example at the top. Because the file is identified by its hash, uploading
-the same file twice will generate the same link.
+See example at the top. Because the file is identified by its hash, uploading the same file twice will generate the same link.
 
 #### Push with alias
 
-Push a file to the server under a different name. This is useful if you want to
-share a logfile or plot with a generic name.
+Push a file to the server under a different name. This is useful if you want to share a logfile or plot with a generic name.
 
 ![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif)
 
@@ -170,15 +156,6 @@ $ asfa list --newer 5min
 $ asfa list --newer 5m
 ```
 
-## Requirements
-
-A remote server that
-* is accessible via ssh
-* has a webserver running
-* has writable folder served by your webserver
-* _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
-* _(optional)_ has [`at`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html) installed to support expiring links.
-
 ## Install
 
 ### `cargo`
@@ -207,22 +184,17 @@ $ cargo install --path asfa
 
 ## Configuration
 
-Configuration resides in `~/.config/asfa/config.yaml`. Host-specific
-configuration can also be split into single files residing under
-`~/.config/asfa/hosts/<alias>.yaml`.
+Configuration resides in `~/.config/asfa/config.yaml`.
+Host-specific configuration can also be split into single files residing under `~/.config/asfa/hosts/<alias>.yaml`.
 
-System-wide configuration can be placed in `/etc/asfa` with the same folder
-structure.
+System-wide configuration can be placed in `/etc/asfa` with the same folder structure.
 
 An example config can be found in `./example-config`.
-Here, we assume that your server can be reached at `https://my-domain.eu` and
-that the folder `/var/wwww/default/asfa` will be served at
-`https://my-domain.eu/asfa`.
+Here, we assume that your server can be reached at `https://my-domain.eu` and that the folder `/var/wwww/default/asfa` will be served at `https://my-domain.eu/asfa`.
 
 ### `asfa`-side
 
-A fully commented example config can be found
-[here](example-config/asfa).
+A fully commented example config can be found [here](example-config/asfa).
 
 #### Minimal: `~/.config/asfa/hosts/my-remote-site.yaml`
 
@@ -257,15 +229,11 @@ hosts:
 
 ### Webserver
 
-Whatever webserver you are using, you have to make sure the following
-requirements are met:
-* The user as which you upload needs to have write access to your configured
-  `folder`.
+Whatever webserver you are using, you have to make sure the following requirements are met:
+* The user as which you upload needs to have write access to your configured `folder`.
 * Your webserver needs to serve `folder` at `url`.
-* In case you do not want your uploaded data to be world-readable, set `group`
-  to the group of your webserver.
-* Make sure your webserver does not serve indexes of `folder`, otherwise any
-  visitor can see all uploaded files rather easily.
+* In case you do not want your uploaded data to be world-readable, set `group` to the group of your webserver.
+* Make sure your webserver does not serve indexes of `folder`, otherwise any visitor can see all uploaded files rather easily.
 
 #### Apache
 
@@ -276,8 +244,7 @@ Your apache config can be as simple as:
   allow from all
 </Directory>
 ```
-Make sure that Options does not contain `Indexes`, otherwise any visitor could
-_very_ easily access all uploaded files.
+Make sure that Options does not contain `Indexes`, otherwise any visitor could _very_ easily access all uploaded files!
 
 #### nginx
 
@@ -289,13 +256,15 @@ location /asfa {
 
 ## Background
 
-As a small exercise for writing rust, I ported a small [python
-script][py-rpush] I had been using for a couple of years.
+Since I handle my emails mostly via ssh on a remote server (shoutout to [neomutt](https://neomutt.org/), [OfflineIMAP](http://www.offlineimap.org/) and [msmtp](https://marlam.de/msmtp/)), I needed a quick and easy possibility to attach files to emails.
+As email attachments are rightfully frowned upon, I did not want to simply copy files over to the remote site to attach them.
+Furthermore, I often need to share generated files (such as plots or logfiles) on our group-internal [mattermost](https://www.mattermost.org) or any other form of text-based communication.
+Ideally, I want to do this from the folder I am already in on the terminal - and not by to navigating back to it from the browser's "file open" menu…
 
-For [security reasons][ssh-agent-hijacking] I have my `gpg-agent` (acting as `ssh-agent`) set up to
-[confirm][gpg-agent-confirm] each usage upon connecting to remote servers and
-the previous hack required three connections (and confirmations) to perform its
-task. `asfa` is set up to only use one ssh-connection per invocation.
+As a small exercise for writing rust (other than [Advent of Code](https://adventofcode.com/)), I ported a small [python script][py-rpush] I had been using for a couple of years.
+
+For [security reasons][ssh-agent-hijacking] I have my `gpg-agent` (acting as `ssh-agent`) set up to [confirm][gpg-agent-confirm] each usage upon connecting to remote servers and the previous hack required three connections (and confirmations) to perform its task.
+`asfa` is set up to only use one ssh-connection per invocation.
 
 [py-rpush]: https://github.com/obreitwi/py-rpush
 [ssh-agent-hijacking]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
