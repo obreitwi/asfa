@@ -48,7 +48,7 @@ A remote server that
 
 ## Usage
 
-Note: All commands can actually be abbreviated:
+Note: All commands can be abbreviated:
 * `p` for `push`
 * `l` for `list`
 * `c` for `clean`
