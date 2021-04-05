@@ -337,7 +337,7 @@ impl<'a> SshSession<'a> {
 
     /// Get all available authentication methods
     pub fn get_auth_methods(&self) -> Result<HashSet<String>> {
-        log::trace!("Getting auth methdos.");
+        log::trace!("Getting auth methods.");
         let methods = self
             .raw
             .auth_methods(&self.get_username())?
