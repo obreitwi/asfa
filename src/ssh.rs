@@ -18,6 +18,7 @@ use std::iter::{IntoIterator, Iterator};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
+use whoami::username;
 
 fn ensure_port(hostname: &str) -> String {
     log::debug!("Raw hostname: {}", hostname);
@@ -85,7 +86,7 @@ impl<'a> SshSession<'a> {
                 if let Err(e) = self.auth_private_key(
                     private_key_file,
                     auth.private_key_file_password.as_deref(),
-                    &self.host.get_username(),
+                    &self.get_username(),
                     auth.interactive,
                 ) {
                     log::debug!(
@@ -102,10 +103,7 @@ impl<'a> SshSession<'a> {
         if !self.raw.authenticated() && methods.contains("password") {
             if let Some(password) = self.host.password.as_ref() {
                 debug!("Authenticating with plaintext password.");
-                if let Err(e) = self
-                    .raw
-                    .userauth_password(&self.host.get_username(), &password)
-                {
+                if let Err(e) = self.raw.userauth_password(&self.get_username(), &password) {
                     log::debug!("Password authenication failed: {}", e);
                 }
             }
@@ -151,7 +149,7 @@ impl<'a> SshSession<'a> {
         agent.connect().unwrap();
         agent.list_identities().unwrap();
 
-        let username = &self.host.get_username();
+        let username = &self.get_username();
 
         for identity in agent.identities().unwrap() {
             debug!("Trying {}", identity.comment());
@@ -175,13 +173,13 @@ impl<'a> SshSession<'a> {
             self.host.alias
         ))?;
         self.raw
-            .userauth_password(&self.host.get_username(), &password)?;
+            .userauth_password(&self.get_username(), &password)?;
         Ok(())
     }
 
     fn auth_keyboard_interactive(&self) -> Result<()> {
         Ok(self.raw.userauth_keyboard_interactive(
-            &self.host.get_username(),
+            &self.get_username(),
             &mut InteractivePrompt::default(),
         )?)
     }
@@ -230,9 +228,7 @@ impl<'a> SshSession<'a> {
             if !Path::new(private_key).exists() {
                 continue;
             }
-            if let Err(e) =
-                self.auth_private_key(private_key, None, &self.host.get_username(), false)
-            {
+            if let Err(e) = self.auth_private_key(private_key, None, &self.get_username(), false) {
                 log::debug!(
                     "Private key authenication for '{}' (seemingly) failed: {}",
                     private_key,
@@ -344,7 +340,7 @@ impl<'a> SshSession<'a> {
         log::trace!("Getting auth methdos.");
         let methods = self
             .raw
-            .auth_methods(&self.host.get_username())?
+            .auth_methods(&self.get_username())?
             .split(',')
             .map(String::from)
             .collect();
@@ -352,6 +348,15 @@ impl<'a> SshSession<'a> {
         log::trace!("Advertised auth methods: {:?}", methods);
 
         Ok(methods)
+    }
+
+    /// Get username either from host, openSSH config or host system.
+    pub fn get_username(&self) -> String {
+        self.host
+            .user
+            .clone()
+            .or_else(|| self.cfg_openssh.as_ref().and_then(|c| c.user()))
+            .unwrap_or_else(username)
     }
 
     /// Get hash of the remote file (relative to the current host's base-folder).

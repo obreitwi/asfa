@@ -3,6 +3,8 @@
 
 ## v0.7.5-pre (under development)
 
+* Attempt to retrieve username from openSSH-config prior to falling back on system.
+
 ## v0.7.4 (2021-03-27)
 
 * `push`-command:

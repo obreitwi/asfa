@@ -6,7 +6,6 @@ use std::default::Default;
 use std::fmt::Display;
 use std::fs::{read_dir, read_to_string};
 use std::path::PathBuf;
-use whoami::username;
 use yaml_rust::{yaml::Hash, Yaml, YamlLoader};
 
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
@@ -372,10 +371,6 @@ impl Host {
         } else {
             bail!("Invalid yaml data for Host-alias '{}'", alias);
         }
-    }
-
-    pub fn get_username(&self) -> String {
-        self.user.clone().unwrap_or_else(username)
     }
 
     pub fn get_url(&self, file: &str) -> Result<String> {

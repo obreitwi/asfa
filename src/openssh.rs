@@ -110,4 +110,12 @@ impl OpenSshConfig {
             None => Vec::new(),
         }
     }
+
+    pub fn user(&self) -> Option<String> {
+        if let Some(OpenSshConfigEntry::Single(user)) = self.raw.get("user") {
+            Some(user.to_string())
+        } else {
+            None
+        }
+    }
 }
