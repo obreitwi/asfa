@@ -17,7 +17,7 @@
 
 ![][gif-send]
 
-Instead of email attachments or direct file transfers, upload files from the command line to your web server and send the link instead.
+Instead of email attachments or direct file transfers, upload files from the command line to your web server via `ssh` and send the link instead.
 The link prefix is generated from the uploaded file's checksum.
 Hence, only people with the correct link can access it.
 
