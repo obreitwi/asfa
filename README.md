@@ -17,7 +17,7 @@
 
 ![][gif-send]
 
-Instead of email attachments or direct file transfers, upload files from the command line to your webserver and send the link instead.
+Instead of email attachments or direct file transfers, upload files from the command line to your web server and send the link instead.
 The link prefix is generated from the uploaded file's checksum.
 Hence, only people with the correct link can access it.
 
@@ -25,7 +25,7 @@ Comes with a few convenience features:
 
 * Has support to expire links after a set amount of time.
 * The link "just works" for non-tech-savvy people, but still only accessible for people who possess the link.
-* Does not require any custom binary to be executed to the webserver.
+* Does not require any custom binary to be executed to the web server.
 * Optional server-side dependencies are readily available ([`at`][at], [`sha2`][sha2]).
 * Easily [keep track](#list) of which files are shared currently.
 * [Clean](#clean) files by index, checksum or [age](#filtering-by-upload-date).
@@ -41,8 +41,8 @@ Even though they should not, plain passwords are accepted as well.
 
 A remote server that
 * is accessible via ssh
-* has a webserver running
-* has a folder by your user that is served by your webserver
+* has a web server running
+* has a folder by your user that is served by your web server
 * _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
 * _(optional)_ has [`at`][at] installed to support expiring links.
 
@@ -211,13 +211,13 @@ hosts:
       private_key_file: /path/to/private/key/in/pem/format #optional
 ```
 
-### Webserver
+### Web Server
 
-Whatever webserver you are using, you have to make sure the following requirements are met:
+Whatever web server you are using, you have to make sure the following requirements are met:
 * The user as which you upload needs to have write access to your configured `folder`.
-* Your webserver needs to serve `folder` at `url`.
-* In case you do not want your uploaded data to be world-readable, set `group` to the group of your webserver.
-* Make sure your webserver does not serve indexes of `folder`, otherwise any visitor can see all uploaded files rather easily.
+* Your web server needs to serve `folder` at `url`.
+* In case you do not want your uploaded data to be world-readable, set `group` to the group of your web server.
+* Make sure your web server does not serve indexes of `folder`, otherwise any visitor can see all uploaded files rather easily.
 
 #### Apache
 
