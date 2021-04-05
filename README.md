@@ -17,9 +17,9 @@
 
 ![][gif-send]
 
-Transfer files from the command line by uploading them to your webserver and send the link instead.
-The link prefix of variable length is then generated from the checksum of the uploaded file.
-Hence, it is non-guessable (only people with the correct link can access it) and does not change if the same file gets uploaded twice.
+Instead of email attachments or direct file transfers, upload files from the command line to your webserver and send the link instead.
+The link prefix is generated from the uploaded file's checksum.
+Hence, only people with the correct link can access it.
 
 Comes with a few convenience features:
 
@@ -31,7 +31,7 @@ Comes with a few convenience features:
 * [Clean](#clean) files by index, checksum or [age](#filtering-by-upload-date).
 * After upload files are [verified](#verify) (optionally).
 * Supports [aliases](#push-with-alias) at upload because sometimes `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`, especially a few weeks later.
-* And most importantly, of course: Have a name that be typed with the left hand on home row.
+* And _most importantly_, of course: Have a name that can be typed with the left hand on home row only.
 
 `asfa` uses a single `ssh`-connection for each invocation which is convenient if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage (see [details](#background)).
 Alternatively, private key files in OpenSSH or [PEM-format][pem] can be used directly.
