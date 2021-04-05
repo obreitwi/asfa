@@ -42,7 +42,7 @@ Even though they should not, plain passwords are accepted as well.
 A remote server that
 * is accessible via ssh
 * has a webserver running
-* has writable folder served by your webserver
+* has a folder by your user that is served by your webserver
 * _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
 * _(optional)_ has [`at`][at] installed to support expiring links.
 
