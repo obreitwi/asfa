@@ -29,7 +29,7 @@ Comes with a few convenience features:
 * Optional server-side dependencies are readily available ([`at`][at], [`sha2`][sha2]).
 * Easily [keep track](#list) of which files are shared currently.
 * [Clean](#clean) files by index, checksum or [age](#filtering-by-upload-date).
-* After upload files are verified (optionally).
+* After upload files are [verified](#verify) (optionally).
 * Supports [aliases](#push-with-alias) at upload because sometimes `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`, especially a few weeks later.
 * And most importantly, of course: Have a name that be typed with the left hand on home row.
 
