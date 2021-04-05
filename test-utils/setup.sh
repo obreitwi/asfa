@@ -71,6 +71,7 @@ if (( container_set_up == 0 )); then
     if ! grep -q asfa-ci-key "${HOME}/.ssh/config"; then
         cat >>"${HOME}/.ssh/config" <<EOF 
 Host asfa-ci-key
+    User asfa-ci-user
     Hostname localhost
     Port 2222
 EOF
