@@ -24,32 +24,18 @@ Hence, it is non-guessable (only people with the correct link can access it) and
 Comes with a few convenience features:
 
 * Has support to expire links after a set amount of time.
-* Does not require any binary to be deployed on the webserver.
-  Apart from a way to serve files and ssh-access, any other dependencies are optional, despite being readily available.
-* Supports [aliases][gif-aliases] at upload because sometimes
-  `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`,
-  especially a few weeks later.
-* The link "just works" for non-tech-savvy people, i.e. not have the file be password-protected, but still only accessible for people who possess the link.
-  Here it is helpful to own a domain somewhat resembling your last name.
-  Files can always be encrypted prior to uploading.
-* Easily [keep track][gif-list-details] of which files are currently shared.
-* Clean files by [signed][gif-clean-signed] [index][gif-clean], regex or [checksum][gif-clean-checksum].
-* Verify afterwards that all files uploaded correctly.
+* The link "just works" for non-tech-savvy people, but still only accessible for people who possess the link.
+* Does not require any custom binary to be executed to the webserver.
+* Optional server-side dependencies are readily available ([`at`][at], [`sha2`][]).
+* Easily [keep track](#list) of which files are shared currently.
+* [Clean](#clean) files by index, checksum or [age](#filtering-by-upload-date).
+* After upload files are verified (optionally).
+* Supports [aliases](#push-with-alias) at upload because sometimes `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`, especially a few weeks later.
 * And most importantly, of course: Have a name that be typed with the left hand on home row.
 
-[gif-send]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif
-[gif-aliases]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
-[gif-list]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif
-[gif-list-details]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif
-[gif-clean-signed]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif
-[gif-clean]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif
-[gif-clean-checksum]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif
-
 `asfa` uses a single `ssh`-connection for each invocation which is convenient if you have [confirmations enabled][gpg-agent-confirm] for each ssh-agent usage (see [details](#background)).
-Alternatively, private key files in [PEM format][pem] or openssh-format (i.e., private key starts with `-----BEGIN OPENSSH PRIVATE KEY-----`) can be used directly.
-
-[gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
-[pem]: https://serverfault.com/a/706342
+Alternatively, private key files in OpenSSH or [PEM-format][pem] can be used directly.
+Even though they should not, plain passwords are accepted as well.
 
 ## Requirements
 
@@ -58,7 +44,7 @@ A remote server that
 * has a webserver running
 * has writable folder served by your webserver
 * _(optional)_ has `sha2`-related hashing tools installed (`sha256sum`/`sha512sum`)
-* _(optional)_ has [`at`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html) installed to support expiring links.
+* _(optional)_ has [`at`][at] installed to support expiring links.
 
 ## Usage
 
@@ -81,11 +67,11 @@ See example at the top. Because the file is identified by its hash, uploading th
 
 Push a file to the server under a different name. This is useful if you want to share a logfile or plot with a generic name.
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif)
+![][gif-alias-01]
 
 Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.
 
-![](https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif)
+![][gif-alias-02]
 
 Or specify the aliases afterwards.
 ```text
@@ -94,13 +80,11 @@ https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file
 https://my-domain.eu/asfa/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
 ```
 
-#### Automatically expiring uploaded files 
+#### Automatic Expire
 
 Uploads can be automatically expired after a certain time via `--expire <delay>`.
 `<delay>` can be anything from minutes to hours, days even months.
 It requires [`at`][at] to be installed and running at the remote site.
-
-[at]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html
 
 #### List
 
@@ -164,7 +148,7 @@ $ cargo install asfa
 ```
 
 ### AUR
-AUR packages [`asfa`](https://aur.archlinux.org/packages/asfa/)/[`asfa-git`](https://aur.archlinux.org/packages/asfa-git/) provide the latest version/commit from `master`.
+AUR packages [`asfa`][aur-asfa]/[`asfa-git`][aur-asfa-git] provide the latest version/commit from `master`.
 
 Either use your favorite AUR helper or install manually:
 ```text
@@ -256,7 +240,7 @@ location /asfa {
 
 ## Background
 
-Since I handle my emails mostly via ssh on a remote server (shoutout to [neomutt](https://neomutt.org/), [OfflineIMAP](http://www.offlineimap.org/) and [msmtp](https://marlam.de/msmtp/)), I needed a quick and easy possibility to attach files to emails.
+Since I handle my emails mostly via ssh on a remote server (shoutout to [neomutt][], [OfflineIMAP][offlineimap] and [msmtp][]), I needed a quick and easy possibility to attach files to emails.
 As email attachments are rightfully frowned upon, I did not want to simply copy files over to the remote site to attach them.
 Furthermore, I often need to share generated files (such as plots or logfiles) on our group-internal [mattermost](https://www.mattermost.org) or any other form of text-based communication.
 Ideally, I want to do this from the folder I am already in on the terminal - and not by to navigating back to it from the browser's "file open" menu…
@@ -266,16 +250,32 @@ As a small exercise for writing rust (other than [Advent of Code](https://advent
 For [security reasons][ssh-agent-hijacking] I have my `gpg-agent` (acting as `ssh-agent`) set up to [confirm][gpg-agent-confirm] each usage upon connecting to remote servers and the previous hack required three connections (and confirmations) to perform its task.
 `asfa` is set up to only use one ssh-connection per invocation.
 
-[py-rpush]: https://github.com/obreitwi/py-rpush
-[ssh-agent-hijacking]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
-
 ## License
 
 Licensed under either of
-
  * Apache License, Version 2.0
    ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
  * MIT license
    ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
+
+[at]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html
+[aur-asfa-git]: https://aur.archlinux.org/packages/asfa/
+[aur-asfa]: https://aur.archlinux.org/packages/asfa/
+[gif-alias-01]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif
+[gif-alias-02]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
+[gif-aliases]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
+[gif-clean-checksum]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif
+[gif-clean-signed]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif
+[gif-clean]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif
+[gif-list-details]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif
+[gif-list]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif
+[gif-send]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif
+[gpg-agent-confirm]: https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol
+[msmtp]: https://marlam.de/msmtp/
+[neomutt]: https://neomutt.org/
+[offlineimap]: http://www.offlineimap.org/
+[pem]: https://serverfault.com/a/706342
+[py-rpush]: https://github.com/obreitwi/py-rpush
+[ssh-agent-hijacking]: https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/
