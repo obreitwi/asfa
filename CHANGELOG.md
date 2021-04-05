@@ -8,10 +8,9 @@
 ## v0.7.4 (2021-03-27)
 
 * `push`-command:
-  * Remove need to seperate single alias from single file by dashes if alias
-    specified first.
-    Previously: `asfa push --alias my-alias.txt -- my-original-file.txt`
-    Now: `asfa push --alias my-alias.txt my-original-file.txt`
+  * Remove need to seperate single alias from single file by dashes if alias specified first.
+    * Previously: `asfa push --alias my-alias.txt -- my-original-file.txt`
+    * Now: `asfa push --alias my-alias.txt my-original-file.txt`
   * Check response for errors regaring `atd` not running if `--expire`
     specified.
   * Now supports a default setting for `--expire` in the config.
