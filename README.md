@@ -21,7 +21,7 @@ Transfer files from the command line by uploading them to your webserver and sen
 The link prefix of variable length is then generated from the checksum of the uploaded file.
 Hence, it is non-guessable (only people with the correct link can access it) and does not change if the same file gets uploaded twice.
 
-Comes with a few convenience features/requirements:
+Comes with a few convenience features:
 
 * Has support to expire links after a set amount of time.
 * Does not require any binary to be deployed on the webserver.
