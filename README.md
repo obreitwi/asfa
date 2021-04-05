@@ -83,7 +83,7 @@ https://my-domain.eu/asfa/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file
 #### Automatic Expire
 
 Uploads can be automatically expired after a certain time via `--expire <delay>`.
-`<delay>` can be anything from minutes to hours, days even months.
+`<delay>` can be anything from minutes to hours, days or even months.
 It requires [`at`][at] to be installed and running at the remote site.
 
 #### List
