@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FileListing","Helper structure to avoid re-implementing file listing capabilities for all commands."],["FileListingIter",""]]});

@@ -1,0 +1,196 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`asfa` - avoid sending file attachments"><meta name="keywords" content="rust, rustlang, rust-lang, asfa"><title>asfa - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../asfa/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate asfa</p><div class="block version"><p>Version 0.7.5</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all asfa's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="asfa" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">asfa</a><button id="copy-path" onclick="copy_path(this)"><img src="../clipboard.svg" width="19" height="18" alt="Copy item import"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/asfa/main.rs.html#1-74" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p align="center">
+<img src="https://raw.github.com/obreitwi/asfa/master/img/logo.svg" height="96">
+</p>
+<h1 id="asfa---avoid-sending-file-attachments" class="section-header"><a href="#asfa---avoid-sending-file-attachments"><code>asfa</code> - avoid sending file attachments</a></h1>
+<p><a href="https://crates.io/crates/asfa"><img src="https://img.shields.io/crates/v/asfa" alt="Crates.io" /></a>
+<a href="https://aur.archlinux.org/packages/asfa/"><img src="https://img.shields.io/aur/version/asfa" alt="AUR version" /></a>
+<a href="https://aur.archlinux.org/packages/asfa-git/"><img src="https://img.shields.io/aur/version/asfa-git" alt="AUR version" /></a>
+<a href="https://github.com/obreitwi/asfa/blob/master/CHANGELOG.md"><img src="https://img.shields.io/badge/changelog-asfa-yellow" alt="Changelog" /></a>
+<a href="https://www.github.com/obreitwi/asfa"><img src="https://img.shields.io/github/commits-since/obreitwi/asfa/v0.7.5" alt="GitHub commits since tagged version" /></a>
+<br />
+<a href="https://github.com/obreitwi/asfa/actions?query=workflow%3A%22cargo+test%22"><img src="https://img.shields.io/github/workflow/status/obreitwi/asfa/cargo%20test" alt="GitHub Workflow Status" /></a>
+<a href="https://deps.rs/repo/github/obreitwi/asfa"><img src="https://deps.rs/repo/github/obreitwi/asfa/status.svg" alt="dependency status" /></a>
+<a href="https://obreitwi.github.io/asfa/"><img src="https://img.shields.io/badge/docs-rustdoc-blue" alt="Rustdoc" /></a>
+<a href="#license"><img src="https://img.shields.io/crates/l/asfa" alt="Crates.io" /></a></p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_single_01.gif" alt="" /></p>
+<p>Instead of email attachments or direct file transfers, upload files from the command line to your web server via <code>ssh</code> and send the link instead.
+The link prefix is generated from the uploaded file’s checksum.
+Hence, only people with the correct link can access it.</p>
+<p>Comes with a few convenience features:</p>
+<ul>
+<li>Has support to expire links after a set amount of time.</li>
+<li>The link “just works” for non-tech-savvy people, but still only accessible for people who possess the link.</li>
+<li>Does not require any custom binary to be executed to the web server.</li>
+<li>Optional server-side dependencies are readily available (<a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html"><code>at</code></a>, <a href="https://linux.die.net/man/1/sha256sum"><code>sha2</code></a>).</li>
+<li>Easily <a href="#list">keep track</a> of which files are shared currently.</li>
+<li><a href="#clean">Clean</a> files by index, checksum or <a href="#filtering-by-upload-date">age</a>.</li>
+<li>After upload files are <a href="#verify">verified</a> (optionally).</li>
+<li>Supports <a href="#push-with-alias">aliases</a> at upload because sometimes <code>plot_with_specific_parameters.svg</code> is more descriptive than <code>plot.svg</code>, especially a few weeks later.</li>
+<li>And <em>most importantly</em>, of course: Have a name that can be typed with the left hand on home row only.</li>
+</ul>
+<p><code>asfa</code> uses a single <code>ssh</code>-connection for each invocation which is convenient if you have <a href="https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol">confirmations enabled</a> for each ssh-agent usage (see <a href="#background">details</a>).
+Alternatively, private key files in OpenSSH or <a href="https://serverfault.com/a/706342">PEM-format</a> can be used directly.
+Even though they should not, plain passwords are accepted as well.</p>
+<h2 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h2>
+<p>A remote server that</p>
+<ul>
+<li>is accessible via ssh</li>
+<li>has a web server running</li>
+<li>has a folder by your user that is served by your web server</li>
+<li><em>(optional)</em> has <code>sha2</code>-related hashing tools installed (<code>sha256sum</code>/<code>sha512sum</code>)</li>
+<li><em>(optional)</em> has <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html"><code>at</code></a> installed to support expiring links.</li>
+</ul>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<p>Note: All commands can be abbreviated:</p>
+<ul>
+<li><code>p</code> → <code>push</code></li>
+<li><code>l</code> → <code>list</code></li>
+<li><code>c</code> → <code>clean</code></li>
+<li><code>v</code> → <code>verify</code></li>
+</ul>
+<h4 id="push" class="section-header"><a href="#push">Push</a></h4>
+<p>Push (upload) a local file to the remote site and print the URL under which it is reachable.</p>
+<pre><code class="language-text">$ asfa push my-file.txt
+https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
+</code></pre>
+<p>See example at the top. Because the file is identified by its hash, uploading the same file twice will generate the same link.</p>
+<h4 id="push-with-alias" class="section-header"><a href="#push-with-alias">Push with alias</a></h4>
+<p>Push a file to the server under a different name. This is useful if you want to share a logfile or plot with a generic name.</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif" alt="" /></p>
+<p>Note that if you specify several files to upload with their own aliases, you need to explicity assign the arguments.</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif" alt="" /></p>
+<p>Or specify the aliases afterwards.</p>
+<pre><code class="language-text">$ asfa push my-file.txt my-file-2.txt --alias my-very-specific-file.txt my-very-specific-file-2.txt
+https://my-domain.eu/asfa/V66lLtli0Ei4hw3tNkCTXOcweBrneNjt/my-very-specific-file.txt
+https://my-domain.eu/asfa/HiGdwtoXcXotyhDxQxydu4zqKwFQ-9pY/my-very-specific-file-2.txt
+</code></pre>
+<h4 id="automatic-expire" class="section-header"><a href="#automatic-expire">Automatic Expire</a></h4>
+<p>Uploads can be automatically expired after a certain time via <code>--expire &lt;delay&gt;</code>.
+<code>&lt;delay&gt;</code> can be anything from minutes to hours, days or even months.
+It requires <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html"><code>at</code></a> to be installed and running at the remote site.</p>
+<h4 id="list" class="section-header"><a href="#list">List</a></h4>
+<p>List all files currently available online:</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_01.gif" alt="" /></p>
+<h4 id="detailed-list" class="section-header"><a href="#detailed-list">Detailed list</a></h4>
+<p>List all files with meta data via <code>--details</code>:</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/list_details_01.gif" alt="" /></p>
+<h4 id="clean" class="section-header"><a href="#clean">Clean</a></h4>
+<p>Remove the file from remote site via index (negative indices need to be sepearated by <code>--</code>):</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_01.gif" alt="" />
+<img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_03.gif" alt="" /></p>
+<p>You can also ensure that a specific file is deleted by specifying <code>--file</code>:</p>
+<p><img src="https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/clean_02.gif" alt="" /></p>
+<p>Note that the file is deleted even though it was uploaded with an alias.</p>
+<h3 id="verify" class="section-header"><a href="#verify">Verify</a></h3>
+<p>In case an upload gets canceled early, all files can be checked for validity via <code>verify</code>:</p>
+<pre><code class="language-text">$ asfa verify
+✓ my-very-specific-file.txt ... Verified.
+✓ my-very-specific-file-2.txt . Verified.
+</code></pre>
+<p>Since the prefix is the checksum, the check can be performed whether the file exists locally or not.</p>
+<h3 id="filtering-by-upload-date" class="section-header"><a href="#filtering-by-upload-date">Filtering by upload date</a></h3>
+<p>All commands accept a <code>--newer</code>/<code>--older</code> <code>&lt;n&gt;{min,hour,day,week,month}</code>
+argument that can be used to narrow down the number of files.</p>
+<p>Cleaning all files older than a month can, for example, be achieved via</p>
+<pre><code class="language-text">$ asfa clean --older 1month
+$ asfa clean --older 1M
+</code></pre>
+<p>All files uploaded within the last five minutes can be listed via</p>
+<pre><code class="language-text">$ asfa list --newer 5min
+$ asfa list --newer 5m
+</code></pre>
+<h2 id="install" class="section-header"><a href="#install">Install</a></h2><h3 id="cargo" class="section-header"><a href="#cargo"><code>cargo</code></a></h3>
+<pre><code class="language-text">$ cargo install asfa
+</code></pre>
+<h3 id="aur" class="section-header"><a href="#aur">AUR</a></h3>
+<p>AUR packages <a href="https://aur.archlinux.org/packages/asfa/"><code>asfa</code></a>/<a href="https://aur.archlinux.org/packages/asfa/"><code>asfa-git</code></a> provide the latest version/commit from <code>master</code>.</p>
+<p>Either use your favorite AUR helper or install manually:</p>
+<pre><code class="language-text">$ cd &lt;temporary folder&gt;
+$ curl -o PKGBUILD https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=asfa-git
+$ makepkg
+[...]
+==&gt; Finished making: asfa-git 0.7.2.r16.g763f726-1 (Sun 07 Feb 2021 04:18:12 PM CET)
+$ sudo pacman -U asfa-git-0.7.2.r16.g763f726-1-x86_64.pkg.tar.zst
+</code></pre>
+<h3 id="from-source" class="section-header"><a href="#from-source">From source</a></h3>
+<pre><code class="language-text">$ git clone https://github.com/obreitwi/asfa.git
+$ cargo install --path asfa
+</code></pre>
+<h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
+<p>Configuration resides in <code>~/.config/asfa/config.yaml</code>.
+Host-specific configuration can also be split into single files residing under <code>~/.config/asfa/hosts/&lt;alias&gt;.yaml</code>.</p>
+<p>System-wide configuration can be placed in <code>/etc/asfa</code> with the same folder structure.</p>
+<p>An example config can be found in <code>./example-config</code>.
+Here, we assume that your server can be reached at <code>https://my-domain.eu</code> and that the folder <code>/var/wwww/default/asfa</code> will be served at <code>https://my-domain.eu/asfa</code>.</p>
+<h3 id="asfa-side" class="section-header"><a href="#asfa-side"><code>asfa</code>-side</a></h3>
+<p>A fully commented example config can be found <a href="example-config/asfa">here</a>.</p>
+<h4 id="minimal-configasfahostsmy-remote-siteyaml" class="section-header"><a href="#minimal-configasfahostsmy-remote-siteyaml">Minimal: <code>~/.config/asfa/hosts/my-remote-site.yaml</code></a></h4>
+<pre><code class="language-yaml">hostname: my-hostname.eu  # if not specified, will defaulted from ssh or filename
+folder: /var/www/default/asfa
+url: https://my-domain.eu/asfa
+group: www-data
+</code></pre>
+<h4 id="full-single-file-configasfaconfigyaml" class="section-header"><a href="#full-single-file-configasfaconfigyaml">Full (single-file): <code>~/.config/asfa/config.yaml</code></a></h4>
+<pre><code class="language-yaml">default_host: my-remote-site
+prefix_length: 32
+verify_via_hash: true
+auth:
+  interactive: true
+  use_agent: true
+hosts:
+  my-remote-site:
+    # note: port is optional, will be inferred form ssh and defaults to 22
+    hostname: my-hostname.eu:22
+    folder: /var/www/default/asfa
+    url: https://my-domain.eu/asfa
+    group: www-data
+    auth:
+      interactive: false
+      use_agent: true
+      private_key_file: /path/to/private/key/in/pem/format #optional
+</code></pre>
+<h3 id="web-server" class="section-header"><a href="#web-server">Web Server</a></h3>
+<p>Whatever web server you are using, you have to make sure the following requirements are met:</p>
+<ul>
+<li>The user as which you upload needs to have write access to your configured <code>folder</code>.</li>
+<li>Your web server needs to serve <code>folder</code> at <code>url</code>.</li>
+<li>In case you do not want your uploaded data to be world-readable, set <code>group</code> to the group of your web server.</li>
+<li>Make sure your web server does not serve indexes of <code>folder</code>, otherwise any visitor can see all uploaded files rather easily.</li>
+</ul>
+<h4 id="apache" class="section-header"><a href="#apache">Apache</a></h4>
+<p>Your apache config can be as simple as:</p>
+<pre><code class="language-apache">&lt;Directory /var/www/default/asfa&gt;
+  Options None
+  allow from all
+&lt;/Directory&gt;
+</code></pre>
+<p>Make sure that Options does not contain <code>Indexes</code>, otherwise any visitor could <em>very</em> easily access all uploaded files!</p>
+<h4 id="nginx" class="section-header"><a href="#nginx">nginx</a></h4>
+<pre><code class="language-nginx">location /asfa {
+  autoindex off
+}
+</code></pre>
+<h2 id="background" class="section-header"><a href="#background">Background</a></h2>
+<p>Since I handle my emails mostly via ssh on a remote server (shoutout to <a href="https://neomutt.org/">neomutt</a>, <a href="http://www.offlineimap.org/">OfflineIMAP</a> and <a href="https://marlam.de/msmtp/">msmtp</a>), I needed a quick and easy possibility to attach files to emails.
+As email attachments are rightfully frowned upon, I did not want to simply copy files over to the remote site to attach them.
+Furthermore, I often need to share generated files (such as plots or logfiles) on our group-internal <a href="https://www.mattermost.org">mattermost</a> or any other form of text-based communication.
+Ideally, I want to do this from the folder I am already in on the terminal - and not by to navigating back to it from the browser’s “file open” menu…</p>
+<p>As a small exercise for writing rust (other than <a href="https://adventofcode.com/">Advent of Code</a>), I ported a small <a href="https://github.com/obreitwi/py-rpush">python script</a> I had been using for a couple of years.</p>
+<p>For <a href="https://www.clockwork.com/news/2012/09/28/602/ssh_agent_hijacking/">security reasons</a> I have my <code>gpg-agent</code> (acting as <code>ssh-agent</code>) set up to <a href="https://www.gnupg.org/documentation/manuals/gnupg/Agent-Configuration.html#index-sshcontrol">confirm</a> each usage upon connecting to remote servers and the previous hack required three connections (and confirmations) to perform its task.
+<code>asfa</code> is set up to only use one ssh-connection per invocation.</p>
+<h2 id="license" class="section-header"><a href="#license">License</a></h2>
+<p>Licensed under either of</p>
+<ul>
+<li>Apache License, Version 2.0
+(<a href="LICENSE-APACHE">LICENSE-APACHE</a> or http://www.apache.org/licenses/LICENSE-2.0)</li>
+<li>MIT license
+(<a href="LICENSE-MIT">LICENSE-MIT</a> or http://opensource.org/licenses/MIT)</li>
+</ul>
+<p>at your option.</p>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="at/index.html" title="asfa::at mod">at</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="cfg/index.html" title="asfa::cfg mod">cfg</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="cli/index.html" title="asfa::cli mod">cli</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="cmd/index.html" title="asfa::cmd mod">cmd</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="file_listing/index.html" title="asfa::file_listing mod">file_listing</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="openssh/index.html" title="asfa::openssh mod">openssh</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="ssh/index.html" title="asfa::ssh mod">ssh</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="util/index.html" title="asfa::util mod">util</a></td><td class="docblock-short"></td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.main.html" title="asfa::main fn">main</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="fn" href="fn.try_main.html" title="asfa::try_main fn">try_main</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="asfa" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>
