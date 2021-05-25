@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.5-pre (under development)
+## v0.7.5 (2021-05-25)
 
 * Attempt to retrieve username from openSSH-config prior to falling back on system.
 * Update dependencies
