@@ -217,12 +217,12 @@ impl WaitingSpinner {
         let stop_token_pbar = Arc::clone(&stop_token);
         let handle = thread::spawn(move || {
             let spinner = crate::cli::spinner();
-            spinner.set_message(&message);
+            spinner.set_message(message.clone());
 
             let handle_messages = || {
                 while let Ok(msg) = rx.try_recv() {
                     match msg {
-                        SpinnerSetting::Message(msg) => spinner.set_message(&msg),
+                        SpinnerSetting::Message(msg) => spinner.set_message(msg.clone()),
                         SpinnerSetting::Println(msg) => spinner.println(&msg),
                     }
                 }
