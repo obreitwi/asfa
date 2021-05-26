@@ -269,7 +269,7 @@ impl<'a> SshSession<'a> {
                 // 1. Fully specified hostname with port.
                 // 2. Information from openSSH
                 // 3. Hostname/alias
-                if host.hostname.is_some() && host.hostname.clone().unwrap().contains(":") {
+                if host.hostname.is_some() && host.hostname.clone().unwrap().contains(':') {
                     host.hostname.clone().unwrap()
                 } else if let Some(hostname) = cfg_openssh.as_ref().and_then(|c| c.hostname()) {
                     hostname
