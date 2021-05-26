@@ -324,8 +324,14 @@ impl<'a> SshSession<'a> {
             "[ ! -d \"{}\" ] && mkdir \"{}\"",
             path_str, path_str
         ))?;
-        cmd.expect_with(|_| format!("Could not create remote folder: {}", path_str))
-            .map(|_| ())
+        match cmd.exit_status() {
+            0 => Ok(()),
+            1 => {
+                log::debug!("Folder already exists.");
+                Ok(())
+            }
+            _ => bail!("Could not create remote folder: {}", path_str),
+        }
     }
 
     /// Make remote file on remote side and return path to it.
