@@ -708,7 +708,7 @@ pub struct Tempfile<'a> {
 
 impl<'a> Tempfile<'a> {
     fn new(session: &'a SshSession, path: PathBuf) -> Self {
-        Self { session, path }
+        Self { path, session }
     }
 
     pub fn path(&self) -> &Path {
