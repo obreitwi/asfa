@@ -27,6 +27,13 @@ fn simple_file_upload(host: &str) -> Result<()> {
         alias
     ))
     .with_context(|| "Could not push.")?;
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} push {} --alias {} --expire none",
+        host,
+        local.display(),
+        alias
+    ))
+    .with_context(|| "Second push of identical file failed.")?;
     run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
         .with_context(|| "Could not verify.")?;
     let remote = format!(
