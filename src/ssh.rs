@@ -320,11 +320,8 @@ impl<'a> SshSession<'a> {
     pub fn make_folder(&self, path: &Path) -> Result<()> {
         let path = self.prepend_base_folder(path);
         let path_str = path.display();
-        let cmd = format!("[ ! -d \"{}\" ] && mkdir \"{}\"", path_str, path_str);
-        let mut channel = self.raw.channel_session()?;
-        channel
-            .exec(&cmd)
-            .with_context(|| format!("Could not create remote folder: {}", path_str))
+        let cmd = self.exec_remote(&format!("[ ! -d \"{}\" ] && mkdir \"{}\"", path_str, path_str))?;
+        cmd.expect_with(|_| format!("Could not create remote folder: {}", path_str)).map(|_| ())
     }
 
     /// Make remote file on remote side and return path to it.
