@@ -320,8 +320,12 @@ impl<'a> SshSession<'a> {
     pub fn make_folder(&self, path: &Path) -> Result<()> {
         let path = self.prepend_base_folder(path);
         let path_str = path.display();
-        let cmd = self.exec_remote(&format!("[ ! -d \"{}\" ] && mkdir \"{}\"", path_str, path_str))?;
-        cmd.expect_with(|_| format!("Could not create remote folder: {}", path_str)).map(|_| ())
+        let cmd = self.exec_remote(&format!(
+            "[ ! -d \"{}\" ] && mkdir \"{}\"",
+            path_str, path_str
+        ))?;
+        cmd.expect_with(|_| format!("Could not create remote folder: {}", path_str))
+            .map(|_| ())
     }
 
     /// Make remote file on remote side and return path to it.
@@ -543,10 +547,16 @@ impl<'a> SshSession<'a> {
             .context("Could not get metadata of local file.")?
             .len();
 
-        let mut remote_file = self
-            .raw
-            .scp_send(&path_remote, 0o644, size, None)
-            .with_context(|| format!("Could not create remote file: {}", path_remote.display()))?;
+        let mut remote_file = {
+            match self.raw.scp_send(&path_remote, 0o644, size, None) {
+                Ok(file) => file,
+                Err(error) => bail!(format!(
+                    "Could not create remote file: {} Error: {}",
+                    path_remote.display(),
+                    error
+                )),
+            }
+        };
 
         let bar = ProgressBar::new(local_file.metadata()?.len());
         bar.set_style(crate::cli::style_progress_bar_transfer());

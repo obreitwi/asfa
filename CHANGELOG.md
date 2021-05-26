@@ -3,6 +3,9 @@
 
 ## v0.7.6-pre (under development)
 
+* `push`-command:
+  * Provide more detailed error message if creation of remote file fails.
+
 ## v0.7.5 (2021-05-25)
 
 * Attempt to retrieve username from openSSH-config prior to falling back on system.
