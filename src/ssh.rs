@@ -320,18 +320,23 @@ impl<'a> SshSession<'a> {
     pub fn make_folder(&self, path: &Path) -> Result<()> {
         let path = self.prepend_base_folder(path);
         let path_str = path.display();
-        let cmd = self.exec_remote(&format!(
-            "[ ! -d \"{}\" ] && mkdir \"{}\"",
-            path_str, path_str
-        ))?;
-        match cmd.exit_status() {
-            0 => Ok(()),
-            1 => {
-                log::debug!("Folder already exists.");
-                Ok(())
+        let folder_exists = {
+            let cmd = self.exec_remote(&format!("[ -d \"{}\" ]", path_str))?;
+
+            cmd.exit_status() == 0
+        };
+
+        if !folder_exists {
+            let cmd = self.exec_remote(&format!("mkdir \"{}\"", path_str))?;
+            if cmd.exit_status() != 0 {
+                bail!(
+                    "Could not create remote folder: {} Error: {}",
+                    path_str,
+                    cmd.stderr()
+                )
             }
-            _ => bail!("Could not create remote folder: {}", path_str),
         }
+        Ok(())
     }
 
     /// Make remote file on remote side and return path to it.
