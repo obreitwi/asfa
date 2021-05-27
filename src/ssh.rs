@@ -561,17 +561,11 @@ impl<'a> SshSession<'a> {
         let mut remote_file = {
             match self.raw.scp_send(&path_remote, 0o644, size, None) {
                 Ok(file) => file,
-                Err(error) => {
-                    let last_error: String = ssh2::Error::last_session_error(&self.raw)
-                        .map(|e| e.message().into())
-                        .unwrap_or_else(|| "(no error provided by libssh2)".into());
-                    bail!(format!(
-                        "Could not create remote file: {} Error: {} Last Error: {}",
-                        path_remote.display(),
-                        error,
-                        last_error
-                    ))
-                }
+                Err(error) => bail!(format!(
+                    "Could not create remote file: {} Error: {}",
+                    path_remote.display(),
+                    error
+                )),
             }
         };
 
