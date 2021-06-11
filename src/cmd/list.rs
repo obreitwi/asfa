@@ -34,6 +34,10 @@ pub struct List {
     #[clap(short = 'n', long)]
     last: Option<usize>,
 
+    /// If `details` is set to true in config, --no-details can be specified to suppress output.
+    #[clap(long, short = 'D')]
+    no_details: bool,
+
     /// Only print indices of files.
     /// This is useful to supply as input to the clean command for instance:
     /// Example: `asfa clean $(asfa list -iF "\.png$")` deletes all png.
@@ -79,7 +83,7 @@ impl Command for List {
     fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         let host = &session.host;
 
-        let show_details = self.details || config.details;
+        let show_details = (self.details || config.details) && !self.no_details;
 
         let to_list = session
             .list_files()?

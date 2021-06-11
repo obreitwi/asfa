@@ -41,6 +41,10 @@ pub struct Clean {
     #[clap(long = "no-confirm")]
     no_confirm: bool,
 
+    /// If `details` is set to true in config, --no-details can be specified to suppress output.
+    #[clap(long, short = 'D')]
+    no_details: bool,
+
     /// Select files newer than the given duration. Durations can be:seconds (sec, s), minutes
     /// (min, m), days (d), weeks (w), months (M) or years (y).
     #[clap(long = "newer")]
@@ -70,6 +74,8 @@ impl Command for Clean {
 
         let files: Vec<&str> = self.files.iter().map(|s| s.as_str()).collect();
 
+        let show_details = (self.details || config.details) && !self.no_details;
+
         let files_to_delete = session
             .list_files()?
             .with_all(self.all)
@@ -83,7 +89,7 @@ impl Command for Clean {
             .revert(self.reverse)
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?
-            .with_stats((self.details || config.details) && !self.no_confirm)?;
+            .with_stats(show_details && !self.no_confirm)?;
 
         let do_delete = self.no_confirm || self.user_confirm_deletion(&files_to_delete)?;
 

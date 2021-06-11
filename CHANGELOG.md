@@ -7,6 +7,7 @@
   * Provide more detailed error message if creation of remote file fails.
 * Add `details` config option.
   * If true, act as if `--details` is given on command line.
+  * If set, `-D`/`--no-details` can be used to overwrite yet again.
 
 ## v0.7.5 (2021-05-25)
 
