@@ -17,7 +17,7 @@ pub struct Clean {
     #[clap(long)]
     all: bool,
 
-    /// Show all details in confirmation
+    /// Show all details in confirmation, can be set globally in config file.
     #[clap(long, short)]
     details: bool,
 
@@ -65,7 +65,7 @@ pub struct Clean {
 }
 
 impl Command for Clean {
-    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         debug!("Cleaning remote files..");
 
         let files: Vec<&str> = self.files.iter().map(|s| s.as_str()).collect();
@@ -83,7 +83,7 @@ impl Command for Clean {
             .revert(self.reverse)
             .last(self.last)
             .by_name(&files[..], session.host.prefix_length)?
-            .with_stats(self.details && !self.no_confirm)?;
+            .with_stats((self.details || config.details) && !self.no_confirm)?;
 
         let do_delete = self.no_confirm || self.user_confirm_deletion(&files_to_delete)?;
 

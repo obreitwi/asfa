@@ -12,7 +12,7 @@ use crate::ssh::SshSession;
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
 pub struct List {
-    /// Show all details
+    /// Show all details, can be set globally in config file.
     #[clap(long, short)]
     details: bool,
 
@@ -76,8 +76,10 @@ pub struct List {
 }
 
 impl Command for List {
-    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         let host = &session.host;
+
+        let show_details = self.details || config.details;
 
         let to_list = session
             .list_files()?
@@ -90,7 +92,7 @@ impl Command for List {
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)
             .last(self.last)
-            .with_stats(self.details || self.with_time || self.with_size)?;
+            .with_stats(show_details || self.with_time || self.with_size)?;
 
         // reverse digits
 
@@ -107,8 +109,8 @@ impl Command for List {
             let content = to_list.format_files(
                 Some(&session.host),
                 self.filenames,
-                self.details || self.with_size,
-                self.details || self.with_time,
+                show_details || self.with_size,
+                show_details || self.with_time,
             )?;
 
             let content = if content.is_empty() {

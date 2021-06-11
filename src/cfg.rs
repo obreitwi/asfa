@@ -22,6 +22,10 @@ pub struct Config {
     /// Default host to upload to.
     default_host: Option<String>,
 
+    /// Decide if detailed information should be displayed where applicable.
+    /// Defaults to false.
+    pub details: bool,
+
     /// Expire the uploaded file after the given amount of time via `at`-scheduled remote job.
     ///
     /// Select files newer than the given duration. Durations can be: seconds (sec, s), minutes
@@ -140,6 +144,7 @@ impl Default for Config {
         Config {
             auth: Auth::default(),
             default_host: None,
+            details: false,
             expire: None,
             hosts: HashMap::new(),
             prefix_length: 32,
@@ -262,6 +267,10 @@ impl Config {
             std::env::var("ASFA_HOST")
                 .ok()
                 .or(get_string_from(config_yaml, "default_host")?.cloned());
+
+        if let Some(details) = get_bool_from(config_yaml, "details")?.cloned() {
+            config.details = details;
+        }
 
         config.expire = get_string_from(config_yaml, "expire")?.cloned();
 

@@ -193,6 +193,7 @@ group: www-data
 
 ```yaml
 default_host: my-remote-site
+details: true  # optional, acts as if --details is given
 prefix_length: 32
 verify_via_hash: true
 auth:
