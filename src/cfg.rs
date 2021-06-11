@@ -22,9 +22,6 @@ pub struct Config {
     /// Default host to upload to.
     default_host: Option<String>,
 
-    /// List of all configured hosts.
-    hosts: HashMap<String, Host>,
-
     /// Expire the uploaded file after the given amount of time via `at`-scheduled remote job.
     ///
     /// Select files newer than the given duration. Durations can be: seconds (sec, s), minutes
@@ -32,6 +29,9 @@ pub struct Config {
     ///
     /// Mininum time till expiration is a minute.
     pub expire: Option<String>,
+
+    /// List of all configured hosts.
+    hosts: HashMap<String, Host>,
 
     /// Length of prefix to use unless overwritten in host
     pub prefix_length: u8,
