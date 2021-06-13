@@ -101,7 +101,7 @@ impl Command for List {
         // reverse digits
 
         if self.url_only {
-            for (_, file, _) in to_list.iter()? {
+            for (_, file, _) in to_list.iter() {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
             }
         } else if self.print_indices {

@@ -64,7 +64,7 @@ impl Command for Verify {
             .by_name(files.iter(), session.host.prefix_length)?;
 
         let message = "Verifying...";
-        let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();
+        let files: Vec<_> = files_to_verify.iter().map(|e| e.1).collect();
 
         let num_files = files.len();
         if num_files == 0 {

@@ -106,7 +106,7 @@ impl Command for Clean {
             };
 
         if do_delete {
-            for (_, file, _) in files_to_delete.iter()? {
+            for (_, file, _) in files_to_delete.iter() {
                 remove_file(&file)?
             }
         }

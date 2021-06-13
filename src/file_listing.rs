@@ -134,10 +134,10 @@ impl<'a> FileListing<'a> {
         self.stats.is_some()
     }
 
-    pub fn iter(&'a self) -> Result<FileListingIter<'a>> {
+    pub fn iter(&'a self) -> FileListingIter<'a> {
         let stats = self.stats.as_ref();
         let paths = &self.all_files;
-        Ok(FileListingIter::new(&self.indices[..], paths, stats))
+        FileListingIter::new(&self.indices[..], paths, stats)
     }
 
     /// Only use last `n` files
@@ -170,7 +170,7 @@ impl<'a> FileListing<'a> {
         with_time: bool,
     ) -> Result<Vec<String>> {
         let (num_digits, num_digits_rev) = (self.get_num_digits(), self.get_num_digits_rev()?);
-        self.iter()?
+        self.iter()
             .map(|(i, file, stat)| -> Result<String> {
                 Ok(format!(
                     " {idx:width$}{sep}{rev_idx:rev_width$}{sep}{size}{mtime}{url} ",
@@ -329,7 +329,7 @@ impl<'a> FileListing<'a> {
         let mut num_digits = 0;
         let mut num = self.num_files
             - self
-                .iter()?
+                .iter()
                 .map(|f| f.0)
                 .min()
                 .with_context(|| "No files to list.")
