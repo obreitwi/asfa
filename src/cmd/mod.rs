@@ -3,11 +3,13 @@ use crate::ssh::SshSession;
 
 use anyhow::Result;
 
+mod check;
 mod clean;
 mod list;
 mod push;
 mod verify;
 
+pub use check::Check;
 pub use clean::Clean;
 pub use list::List;
 pub use push::Push;

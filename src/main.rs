@@ -69,6 +69,7 @@ fn try_main() -> Result<()> {
     use cli::UserCommand::*;
     match opts.cmd {
         // there is no dispatch over all enum variants? Boo!
+        Check(cmd) => cmd.run(&session, &cfg),
         Clean(cmd) => cmd.run(&session, &cfg),
         List(cmd) => cmd.run(&session, &cfg),
         Push(cmd) => cmd.run(&session, &cfg),

@@ -8,7 +8,7 @@ use std::sync::mpsc::channel;
 use std::sync::Arc;
 use std::thread;
 
-use crate::cmd::{Clean, List, Push, Verify};
+use crate::cmd::{Check, Clean, List, Push, Verify};
 
 #[derive(Clap, Debug)]
 #[clap(
@@ -73,6 +73,9 @@ impl Opts {
 
 #[derive(Clap, Debug)]
 pub enum UserCommand {
+    #[clap(name = "check")]
+    Check(Check),
+
     #[clap(name = "clean")]
     Clean(Clean),
 
