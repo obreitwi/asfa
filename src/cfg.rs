@@ -330,6 +330,10 @@ impl Config {
                 .with_context(|| format!("Did not find alias: {}", alias))?),
         }
     }
+
+    pub fn is_silent(&self) -> bool {
+        matches!(self.loglevel, log::LevelFilter::Off)
+    }
 }
 
 impl Host {
