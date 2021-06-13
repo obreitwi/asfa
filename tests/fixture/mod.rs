@@ -35,7 +35,7 @@ pub fn make_random_file<P: AsRef<Path>>(path: P, size: usize) -> Result<PathBuf>
         path.display(),
         size
     ))?;
-    Ok(path.to_owned())
+    Ok(path)
 }
 
 /// Generate random filename of size `len` with specified extension
