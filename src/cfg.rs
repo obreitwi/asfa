@@ -37,6 +37,9 @@ pub struct Config {
     /// List of all configured hosts.
     hosts: HashMap<String, Host>,
 
+    /// Explicit loglevel set because simple logger has no easy way to retrieve it.
+    pub loglevel: log::LevelFilter,
+
     /// Length of prefix to use unless overwritten in host
     pub prefix_length: u8,
 
@@ -147,6 +150,7 @@ impl Default for Config {
             details: false,
             expire: None,
             hosts: HashMap::new(),
+            loglevel: log::LevelFilter::Info,
             prefix_length: 32,
             verify_via_hash: true,
         }

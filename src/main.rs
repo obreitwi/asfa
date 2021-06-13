@@ -55,7 +55,10 @@ fn try_main() -> Result<()> {
 
     let env_cfg_path = std::env::var("ASFA_CONFIG").ok();
 
-    let cfg = cfg::load(&opts.config.or(env_cfg_path))?;
+    let cfg = {let mut cfg = cfg::load(&opts.config.or(env_cfg_path))?; 
+        cfg.loglevel = level;
+        cfg
+    };
     let host = cfg.get_host(opts.host)?;
 
     trace!("Config file: {:#?}", cfg);
