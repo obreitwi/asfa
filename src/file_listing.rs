@@ -93,6 +93,7 @@ impl<'a> FileListing<'a> {
         self,
         names: impl IntoIterator<Item = T>,
         prefix_length: u8,
+        bail_when_missing: bool,
     ) -> Result<Self> {
         let mut names = names.into_iter().peekable();
         if names.peek().is_none() {
@@ -120,7 +121,17 @@ impl<'a> FileListing<'a> {
                     let hash = util::get_hash(Path::new(file.as_ref()), prefix_length)?;
                     match hash_to_file.get(&hash) {
                         Some(idx) => indices.push(*idx),
-                        None => bail!("No file with same hash found on server: {}", file.as_ref()),
+                        None => {
+                            let msg = format!(
+                                "No file with same hash found on server: {}",
+                                file.as_ref()
+                            );
+                            if bail_when_missing {
+                                bail!("{}", msg);
+                            } else {
+                                log::warn!("{}", msg);
+                            }
+                        }
                     }
                 }
                 Self::make_unique(indices)
