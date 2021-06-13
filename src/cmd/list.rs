@@ -98,46 +98,48 @@ impl Command for List {
             .last(self.last)
             .with_stats(show_details || self.with_time || self.with_size)?;
 
-        if self.url_only {
-            for (_, file, _) in to_list.iter() {
-                println!("{}", host.get_url(&format!("{}", file.display()))?);
-            }
-        } else if self.print_indices {
-            for idx in to_list.indices {
-                print!("{} ", idx);
-            }
-            println!();
-        } else {
-            let content = to_list.format_files(
-                Some(&session.host),
-                self.filenames,
-                show_details || self.with_size,
-                show_details || self.with_time,
-            )?;
-
-            let content = if content.is_empty() {
-                vec![format!(
-                    "{}(There are no remote files to show.)",
-                    if atty::is(Stream::Stdout) { " " } else { "" }
-                )]
+        if !config.is_silent() {
+            if self.url_only {
+                for (_, file, _) in to_list.iter() {
+                    println!("{}", host.get_url(&format!("{}", file.display()))?);
+                }
+            } else if self.print_indices {
+                for idx in to_list.indices {
+                    print!("{} ", idx);
+                }
+                println!();
             } else {
-                content
-            };
-
-            // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
-            // parseable format
-            if atty::is(Stream::Stdout) {
-                draw_boxed(
-                    format!(
-                        "{listing} remote files:",
-                        listing = Style::new().bold().green().bright().apply_to("Listing")
-                    ),
-                    content.iter().map(|s| s.as_ref()),
-                    &color::frame,
+                let content = to_list.format_files(
+                    Some(&session.host),
+                    self.filenames,
+                    show_details || self.with_size,
+                    show_details || self.with_time,
                 )?;
-            } else {
-                for line in content {
-                    println!("{}", line);
+
+                let content = if content.is_empty() {
+                    vec![format!(
+                        "{}(There are no remote files to show.)",
+                        if atty::is(Stream::Stdout) { " " } else { "" }
+                    )]
+                } else {
+                    content
+                };
+
+                // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
+                // parseable format
+                if atty::is(Stream::Stdout) {
+                    draw_boxed(
+                        format!(
+                            "{listing} remote files:",
+                            listing = Style::new().bold().green().bright().apply_to("Listing")
+                        ),
+                        content.iter().map(|s| s.as_ref()),
+                        &color::frame,
+                    )?;
+                } else {
+                    for line in content {
+                        println!("{}", line);
+                    }
                 }
             }
         }
