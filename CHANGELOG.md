@@ -9,6 +9,10 @@
   * If true, act as if `--details` is given on command line.
   * If set, `-D`/`--no-details` can be used to overwrite yet again.
 * Have `-qqq` disable all logging and output messages.
+* Add new command: `check`
+  * Same as list, it can be used to check if a given set of local files have already been uploaded.
+  * If so, check prints similar information as list.
+  * In case at least one file is not found, exit with return code 1 (i.e. for scripts when invoked with `-qqq`).
 
 ## v0.7.5 (2021-05-25)
 
