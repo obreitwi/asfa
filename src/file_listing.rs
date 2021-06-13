@@ -89,8 +89,15 @@ impl<'a> FileListing<'a> {
     }
 
     /// Select all files that have the same hash as the names given
-    pub fn by_name(self, names: &[&str], prefix_length: u8) -> Result<Self> {
-        if !names.is_empty() {
+    pub fn by_name<T: AsRef<str>>(
+        self,
+        names: impl IntoIterator<Item = T>,
+        prefix_length: u8,
+    ) -> Result<Self> {
+        let mut names = names.into_iter().peekable();
+        if names.peek().is_none() {
+            Ok(self)
+        } else {
             let indices = {
                 let mut indices = self.indices;
 
@@ -110,17 +117,15 @@ impl<'a> FileListing<'a> {
                     .collect();
 
                 for file in names {
-                    let hash = util::get_hash(Path::new(file), prefix_length)?;
+                    let hash = util::get_hash(Path::new(file.as_ref()), prefix_length)?;
                     match hash_to_file.get(&hash) {
                         Some(idx) => indices.push(*idx),
-                        None => bail!("No file with same hash found on server: {}", file),
+                        None => bail!("No file with same hash found on server: {}", file.as_ref()),
                     }
                 }
                 Self::make_unique(indices)
             };
             Ok(Self { indices, ..self })
-        } else {
-            Ok(self)
         }
     }
 

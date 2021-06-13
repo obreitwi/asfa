@@ -61,7 +61,7 @@ impl Command for Verify {
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(&files[..], session.host.prefix_length)?;
+            .by_name(files.iter(), session.host.prefix_length)?;
 
         let message = "Verifying...";
         let files: Vec<_> = files_to_verify.iter()?.map(|e| e.1).collect();

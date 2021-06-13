@@ -88,7 +88,7 @@ impl Command for Clean {
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(&files[..], session.host.prefix_length)?
+            .by_name(files.iter(), session.host.prefix_length)?
             .with_stats(show_details && !self.no_confirm)?;
 
         let do_delete = self.no_confirm || self.user_confirm_deletion(&files_to_delete)?;
