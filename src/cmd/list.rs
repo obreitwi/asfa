@@ -98,8 +98,6 @@ impl Command for List {
             .last(self.last)
             .with_stats(show_details || self.with_time || self.with_size)?;
 
-        // reverse digits
-
         if self.url_only {
             for (_, file, _) in to_list.iter() {
                 println!("{}", host.get_url(&format!("{}", file.display()))?);
