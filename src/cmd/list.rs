@@ -146,5 +146,3 @@ impl Command for List {
         Ok(())
     }
 }
-
-impl List {}
