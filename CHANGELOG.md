@@ -13,6 +13,7 @@
   * Same as list, it can be used to check if a given set of local files have already been uploaded.
   * If so, check prints similar information as list.
   * In case at least one file is not found, exit with return code 1 (i.e. for scripts when invoked with `-qqq`).
+  * Since both `check` and `clean` command begin with `c`, another letter is needed to differentiate their short forms.
 
 ## v0.7.5 (2021-05-25)
 

@@ -51,7 +51,8 @@ A remote server that
 Note: All commands can be abbreviated:
 * `p` → `push`
 * `l` → `list`
-* `c` → `clean`
+* `ch` → `check`
+* `cl` → `clean`
 * `v` → `verify`
 
 #### Push
@@ -97,6 +98,10 @@ List all files currently available online:
 List all files with meta data via `--details`:
 
 ![][gif-list-details]
+
+#### Check
+
+Check if files have already been uploaded (via hash) and print them.
 
 #### Clean
 
