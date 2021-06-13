@@ -116,7 +116,7 @@ You can also ensure that a specific file is deleted by specifying `--file`:
 
 Note that the file is deleted even though it was uploaded with an alias.
 
-### Verify
+#### Verify
 
 In case an upload gets canceled early, all files can be checked for validity via `verify`:
 
@@ -128,7 +128,7 @@ $ asfa verify
 
 Since the prefix is the checksum, the check can be performed whether the file exists locally or not.
 
-### Filtering by upload date
+#### Filtering by upload date
 
 All commands accept a `--newer`/`--older` `<n>{min,hour,day,week,month}`
 argument that can be used to narrow down the number of files.
