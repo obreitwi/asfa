@@ -46,7 +46,7 @@ pub struct Verify {
 }
 
 impl Command for Verify {
-    fn run(&self, session: &SshSession, _config: &Config) -> Result<()> {
+    fn run(&self, session: &SshSession, config: &Config) -> Result<()> {
         debug!("Verifying remote files..");
 
         let files: Vec<&str> = self.files.iter().map(|s| s.as_str()).collect();
@@ -61,7 +61,11 @@ impl Command for Verify {
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(files.iter(), session.host.prefix_length, /* bail_when_missing = */ true)?;
+            .by_name(
+                files.iter(),
+                session.host.prefix_length,
+                /* bail_when_missing = */ true,
+            )?;
 
         let message = "Verifying...";
         let files: Vec<_> = files_to_verify.iter().map(|e| e.1).collect();
@@ -71,7 +75,15 @@ impl Command for Verify {
             bail!("No files to verify..");
         }
 
-        let spinner = WaitingSpinner::new(format!("{} 0/{}", message, &num_files));
+        let spinner = {
+            if !config.is_silent() {
+                Some(WaitingSpinner::new(format!("{} 0/{}", message, &num_files)))
+            } else {
+                // Do not print anything if asfa is set to very quiet)
+                None
+            }
+        };
+
         let filename_max = files
             .iter()
             .map(|f| f.file_name().unwrap().to_string_lossy().chars().count())
@@ -88,7 +100,9 @@ impl Command for Verify {
         for (idx, (files, hashes_actual)) in
             files[..].chunks(chunk_size).zip(hashes_actual).enumerate()
         {
-            spinner.set_message(format!("{} {}/{}", message, idx * chunk_size, &num_files))?;
+            if let Some(spinner) = spinner.as_ref() {
+                spinner.set_message(format!("{} {}/{}", message, idx * chunk_size, &num_files))?;
+            }
             let hashes_actual = hashes_actual?;
             for (file, hash_actual) in files.iter().zip(hashes_actual) {
                 let hash_expected = file.parent().unwrap().to_string_lossy();
@@ -96,17 +110,19 @@ impl Command for Verify {
                 let filename_len = filename.chars().count();
                 let separator_len = filename_max - filename_len;
                 if hash_actual != hash_expected {
-                    let msg = format!(
-                        "{} {} {} Expected: {} Found: {}",
-                        color::failure.apply_to("✗"),
-                        color::filename.apply_to(&filename),
-                        ".".repeat(separator_len),
-                        color::success.apply_to(hash_expected),
-                        color::failure.apply_to(hash_actual),
-                    );
-                    spinner.println(msg)?;
+                    if let Some(spinner) = spinner.as_ref() {
+                        let msg = format!(
+                            "{} {} {} Expected: {} Found: {}",
+                            color::failure.apply_to("✗"),
+                            color::filename.apply_to(&filename),
+                            ".".repeat(separator_len),
+                            color::success.apply_to(hash_expected),
+                            color::failure.apply_to(hash_actual),
+                        );
+                        spinner.println(msg)?;
+                    }
                     failure.push(file);
-                } else {
+                } else if let Some(spinner) = spinner.as_ref() {
                     spinner.println(format!(
                         "{} {} {} {}.",
                         color::success.apply_to("✓"),
@@ -117,8 +133,10 @@ impl Command for Verify {
                 }
             }
         }
-        spinner.set_message("Verifying.. done".to_string())?;
-        spinner.finish();
+        if let Some(spinner) = spinner {
+            spinner.set_message("Verifying.. done".to_string())?;
+            spinner.finish();
+        }
 
         if !failure.is_empty() {
             bail!("{} files failed to verify.", failure.len());
