@@ -8,6 +8,7 @@
 * Add `details` config option.
   * If true, act as if `--details` is given on command line.
   * If set, `-D`/`--no-details` can be used to overwrite yet again.
+* Have `-qqq` disable all logging and output messages.
 
 ## v0.7.5 (2021-05-25)
 

@@ -30,7 +30,7 @@ pub struct Opts {
     pub verbose: i32,
 
     /// Make output more quiet.
-    /// Equivalent to loglevels 'warn' and 'error' if (specified multiple times).
+    /// Equivalent to loglevels 'warn', 'error' and 'off' if (specified multiple times).
     /// Should not be specified with `--loglevel`.
     #[clap(short, long, parse(from_occurrences))]
     pub quiet: i32,

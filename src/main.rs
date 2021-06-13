@@ -42,7 +42,8 @@ fn try_main() -> Result<()> {
         (None, 1, 0) => log::LevelFilter::Debug,
         (None, 0, 0) => log::LevelFilter::Info,
         (None, 0, 1) => log::LevelFilter::Warn,
-        (None, 0, q) if q > 1 => log::LevelFilter::Error,
+        (None, 0, 2) => log::LevelFilter::Error,
+        (None, 0, _) => log::LevelFilter::Off,
         _ => {
             bail!("Restriction of loglevel in clap failed!");
         }
