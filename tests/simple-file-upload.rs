@@ -36,6 +36,12 @@ fn simple_file_upload(host: &str) -> Result<()> {
     .with_context(|| "Second push of identical file failed.")?;
     run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
         .with_context(|| "Could not verify.")?;
+    run_cmd(format!(
+        "cargo run -- --loglevel debug -H {} check {}",
+        host,
+        local.display()
+    ))
+    .with_context(|| "Could not check.")?;
     let remote = format!(
         "{}/{}/{}",
         std::env::var("ASFA_FOLDER_UPLOAD")?,
@@ -260,7 +266,7 @@ fn clean_all(host: &str) -> Result<()> {
 }
 
 #[test]
-fn run_tests() -> Result<()> {
+fn run_simple_uploads() -> Result<()> {
     fixture::ensure_env()?;
 
     let (upload_to_expire, to_expire_uploaded_at) =
