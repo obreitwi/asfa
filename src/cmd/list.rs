@@ -28,10 +28,8 @@ pub struct List {
     #[clap()]
     indices: Vec<i64>,
 
-    /// Only list newest `n` entries. Note that entries are selected prior to sorting. That means
-    /// that if you want to get the largest files by size you should not specify `--last`.
-    /// Otherwise, only the last `<n>` files will be sorted by size.
-    #[clap(short = 'n', long)]
+    /// Only list last `n` entries.
+    #[clap(short = 'n', long, conflicts_with="first")]
     last: Option<usize>,
 
     /// If `details` is set to true in config, --no-details can be specified to suppress output.
