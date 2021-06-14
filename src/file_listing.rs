@@ -145,6 +145,17 @@ impl<'a> FileListing<'a> {
         self.stats.is_some()
     }
 
+    /// Only use first `n` files
+    pub fn first(self, n: Option<usize>) -> Self {
+        match n {
+            Some(n) => {
+                let indices = self.indices.into_iter().take(n).collect();
+                Self { indices, ..self }
+            }
+            None => self,
+        }
+    }
+
     pub fn iter(&'a self) -> FileListingIter<'a> {
         let stats = self.stats.as_ref();
         let paths = &self.all_files;

@@ -24,6 +24,10 @@ pub struct List {
     #[clap(long, short = 'F', value_name = "regex")]
     filter: Option<String>,
 
+    /// Only list first `N` entries.
+    #[clap(short = 'N', long, conflicts_with="last")]
+    first: Option<usize>,
+
     /// Specify indices of files to list (if none given, list all).
     #[clap()]
     indices: Vec<i64>,
@@ -92,6 +96,7 @@ impl Command for List {
             .select_older(self.select_older.as_deref())?
             .sort_by_size(self.sort_size)?
             .sort_by_time(self.sort_time)?
+            .first(self.first)
             .last(self.last)
             .revert(self.reverse)
             .with_stats(show_details || self.with_time || self.with_size)?;

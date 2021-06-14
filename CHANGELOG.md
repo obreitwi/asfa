@@ -16,6 +16,7 @@
   * Since both `check` and `clean` command begin with `c`, another letter is needed to differentiate their short forms.
 * `list`-command:
   * Fix interaction between `--reverse` and `--last`.
+  * Add `--first`-argument that works opposite of last.
 
 ## v0.7.5 (2021-05-25)
 
