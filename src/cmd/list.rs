@@ -94,8 +94,8 @@ impl Command for List {
             .select_older(self.select_older.as_deref())?
             .sort_by_size(self.sort_size)?
             .sort_by_time(self.sort_time)?
-            .revert(self.reverse)
             .last(self.last)
+            .revert(self.reverse)
             .with_stats(show_details || self.with_time || self.with_size)?;
 
         if !config.is_silent() {

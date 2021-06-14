@@ -14,6 +14,8 @@
   * If so, check prints similar information as list.
   * In case at least one file is not found, exit with return code 1 (i.e. for scripts when invoked with `-qqq`).
   * Since both `check` and `clean` command begin with `c`, another letter is needed to differentiate their short forms.
+* `list`-command:
+  * Fix interaction between `--reverse` and `--last`.
 
 ## v0.7.5 (2021-05-25)
 
