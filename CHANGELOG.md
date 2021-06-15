@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.7.6-pre (under development)
+## v0.8.0 (2021-06-15)
 
 * `push`-command:
   * Provide more detailed error message if creation of remote file fails.
