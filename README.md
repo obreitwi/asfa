@@ -27,7 +27,7 @@ Comes with a few convenience features:
 * The link "just works" for non-tech-savvy people, but still only accessible for people who possess the link.
 * Does not require any custom binary to be executed to the web server.
 * Optional server-side dependencies are readily available ([`at`][at], [`sha2`][sha2]).
-* Easily [keep track](#list) of which files are shared currently.
+* Easily [keep track](#list) of which files are currently shared.
 * [Clean](#clean) files by index, checksum or [age](#filtering-by-upload-date).
 * After upload files are [verified](#verify) (optionally).
 * Supports [aliases](#push-with-alias) at upload because sometimes `plot_with_specific_parameters.svg` is more descriptive than `plot.svg`, especially a few weeks later.
