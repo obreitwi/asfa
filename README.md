@@ -24,7 +24,7 @@ Hence, only people with the correct link can access it.
 Comes with a few convenience features:
 
 * Has support to expire links after a set amount of time.
-* The link "just works" for non-tech-savvy people, but still only accessible for people who possess the link.
+* The link "just works" for non-tech-savvy people, but is still only accessible for people who possess the link.
 * Does not require any custom binary to be executed to the web server.
 * Optional server-side dependencies are readily available ([`at`][at], [`sha2`][sha2]).
 * Easily [keep track](#list) of which files are currently shared.
