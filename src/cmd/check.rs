@@ -9,7 +9,7 @@ use crate::cli::{color, draw_boxed};
 use crate::cmd::Command;
 use crate::ssh::SshSession;
 
-/// Upload new files.
+/// Check if a given local file is already present on the remote site.
 #[derive(Clap, Debug)]
 pub struct Check {
     /// File(s) to check for.
