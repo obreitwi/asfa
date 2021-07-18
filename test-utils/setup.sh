@@ -100,7 +100,7 @@ RUN apk add --no-cache at
 RUN echo "asfa-ci-user" >> /etc/at.allow
 CMD [ "atd", "-f" ]
 EOF
-    docker create                                         \
+    docker run --rm                                       \
       --name=asfa-ci                                      \
       -e "PUID=$(id -u)"                                  \
       -e "PGID=$(id -g)"                                  \
@@ -112,10 +112,11 @@ EOF
       -p 2222:2222                                        \
       -v "${ASFA_FOLDER_UPLOAD}:/var/www/default/uploads" \
       -v "${folder_docker_config}":/config                \
-      --restart unless-stopped                            \
-      asfa-ci-image >&2
+      asfa-ci-image > "${test_root}/docker-asfa-ci.log"   \
+      2>&1 &
+    disown
 
-    docker start asfa-ci >&2
+    # docker start asfa-ci >&2
 
     ensure_folder "${folder_docker_config}/.ssh"
     cat "${TEST_SSH_PUBKEY_FILE}" >> "${folder_docker_config}/.ssh/authorized_keys"
