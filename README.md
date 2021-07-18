@@ -105,7 +105,7 @@ Check if files have already been uploaded (via hash) and print them.
 
 #### Clean
 
-Remove the file from remote site via index (negative indices need to be sepearated by `--`):
+Remove the file from remote site via index (negative indices _no longer_ need to be sepearated by `--`):
 
 ![][gif-clean]
 ![][gif-clean-signed]

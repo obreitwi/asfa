@@ -1,6 +1,6 @@
 use anyhow::Result;
 use atty::Stream;
-use clap::Clap;
+use clap::{Clap,AppSettings};
 use console::Style;
 
 use crate::cfg::Config;
@@ -11,6 +11,7 @@ use crate::ssh::SshSession;
 
 /// List uploaded files and their URLs.
 #[derive(Clap, Debug)]
+#[clap(global_setting=AppSettings::AllowNegativeNumbers)]
 pub struct List {
     /// Show all details, can be set globally in config file.
     #[clap(long, short)]

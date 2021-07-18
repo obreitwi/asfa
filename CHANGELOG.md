@@ -3,6 +3,9 @@
 
 ## v0.8.1-pre (under development)
 
+* `clean`/`list`
+  * Fix having to supply negative indices after double dash.
+
 ## v0.8.0 (2021-06-15)
 
 * `push`-command:
