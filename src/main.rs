@@ -55,7 +55,8 @@ fn try_main() -> Result<()> {
 
     let env_cfg_path = std::env::var("ASFA_CONFIG").ok();
 
-    let cfg = {let mut cfg = cfg::load(&opts.config.or(env_cfg_path))?; 
+    let cfg = {
+        let mut cfg = cfg::load(&opts.config.or(env_cfg_path))?;
         cfg.loglevel = level;
         cfg
     };
@@ -72,7 +73,9 @@ fn try_main() -> Result<()> {
         Check(cmd) => cmd.run(&session, &cfg),
         Clean(cmd) => cmd.run(&session, &cfg),
         List(cmd) => cmd.run(&session, &cfg),
+        Mv(cmd) => cmd.run(&session, &cfg),
         Push(cmd) => cmd.run(&session, &cfg),
+        Rename(cmd) => cmd.run(&session, &cfg),
         Verify(cmd) => cmd.run(&session, &cfg),
     }?;
     Ok(())
