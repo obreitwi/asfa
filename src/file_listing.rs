@@ -140,6 +140,11 @@ impl<'a> FileListing<'a> {
         }
     }
 
+    /// Return count of currently selected files
+    pub fn count(&self) -> usize {
+        self.indices.len()
+    }
+
     /// Check if file listing has stats
     pub fn has_stats(&self) -> bool {
         self.stats.is_some()
