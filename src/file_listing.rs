@@ -89,7 +89,7 @@ impl<'a> FileListing<'a> {
     }
 
     /// Select all files that have the same hash as the names given
-    pub fn by_name<T: AsRef<str>>(
+    pub fn by_hash<T: AsRef<str>>(
         self,
         names: impl IntoIterator<Item = T>,
         prefix_length: u8,

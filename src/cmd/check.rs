@@ -47,7 +47,7 @@ impl Command for Check {
 
         let found = session
             .list_files()?
-            .by_name(
+            .by_hash(
                 self.files.iter().map(|pb| pb.to_string_lossy()),
                 session.host.prefix_length,
                 /* bail_when_missing = */ false,

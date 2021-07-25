@@ -89,7 +89,7 @@ impl Command for Clean {
             .sort_by_time(self.sort_time)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(
+            .by_hash(
                 files.iter(),
                 session.host.prefix_length,
                 /* bail_when_missing = */ true,

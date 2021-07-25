@@ -61,7 +61,7 @@ impl Command for Verify {
             .sort_by_size(self.sort_size)?
             .revert(self.reverse)
             .last(self.last)
-            .by_name(
+            .by_hash(
                 files.iter(),
                 session.host.prefix_length,
                 /* bail_when_missing = */ true,
