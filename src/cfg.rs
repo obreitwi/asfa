@@ -390,6 +390,9 @@ impl Host {
         }
     }
 
+    /// Get URL to given destination for this host.
+    ///
+    /// Prepends url and performs character escapes.
     pub fn get_url(&self, file: &str) -> Result<String> {
         Ok(format!(
             "{}/{}",
