@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Result, Context};
 use lazy_static::lazy_static;
 use rand::prelude::*;
 use std::path::{Path, PathBuf};
@@ -83,4 +83,21 @@ pub fn random_string(len: usize) -> String {
 /// Get root folder where temporary test files should be placed
 pub fn test_root() -> &'static Path {
     &TEST_ROOT
+}
+
+/// Get the expected remote path of a given local file.
+pub fn get_remote_path(local: &Path) -> Result<PathBuf>
+{
+    let hash = run_fun(format!("sha256sum {}", local.display()))?
+        .split_whitespace()
+        .next()
+        .with_context(|| "Could not compute hash")?
+        .to_string();
+
+    let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
+    let mut pb = PathBuf::new();
+    pb.push(std::env::var("ASFA_FOLDER_UPLOAD").with_context(|| "Could not get remote upload folder from env.")?);
+    pb.push(&hash_b64[..32]); // TODO: right now prefix length in ci-config is set to 32 -> read from config
+    pb.push(local.file_name().with_context(|| "Supplied file has no file name.")?);
+    Ok(pb)
 }
