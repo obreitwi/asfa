@@ -1,8 +1,11 @@
+#![allow(dead_code)]
+
 use anyhow::{bail, Result};
-use cmd_lib_core::run_cmd;
 use lazy_static::lazy_static;
 use rand::prelude::*;
 use std::path::{Path, PathBuf};
+use std::process::Command;
+use cmd_lib_core::{run_cmd, run_fun};
 
 lazy_static! {
     static ref IS_SET_UP: bool = run_cmd("docker container exec asfa-ci hostname").is_ok();
@@ -14,6 +17,30 @@ pub fn ensure_env() -> Result<()> {
         bail!("CI environment is not set up!");
     }
     Ok(())
+}
+
+/// Prepare asfa command execution
+pub fn prepare_cmd(host: &str) -> Command
+{
+    let mut cmd = Command::new("cargo");
+    cmd.args(&["run", "--", "--loglevel", "debug", "-H", host]);
+    cmd
+}
+
+fn get_prefix(host: &str) -> String {
+    format!("cargo run -- --loglevel debug -H {}", host)
+}
+
+/// Wrapper around run_cmd from cmd_lib_core
+pub fn cargo_run(host: &str, args: &str) -> std::io::Result<()>
+{
+    run_cmd(format!("{} {}", get_prefix(host), args))
+}
+
+/// Wrapper around run_fun from cmd_lib_core
+pub fn cargo_run_fun(host: &str, args: &str) -> std::io::Result<String>
+{
+    run_fun(format!("{} {}", get_prefix(host), args))
 }
 
 /// Generate file with random data - if path is not absolute, file will be created in
