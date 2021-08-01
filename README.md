@@ -145,6 +145,18 @@ $ asfa list --newer 5min
 $ asfa list --newer 5m
 ```
 
+#### Rename Uploaded files
+
+Uploaded files can be renamed after the fact via the `rename` command (shorthand `mv`).
+The remtoe file is specified either by index (returned from `list`) or by specifying the local file to be renamed.
+
+```text
+$ asfa rename -1 foobar
+┌┤Renaming:├────────────────────────────────────────────────────────────────────────┐
+│ my-very-specific-file-2.txt → https://breitwieser.eu/asfa/6x-SVlgRJn39wpsV/foobar │
+└───────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Install
 
 ### `cargo`
