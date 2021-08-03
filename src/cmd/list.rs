@@ -21,7 +21,7 @@ pub struct List {
     #[clap(long, short)]
     filenames: bool,
 
-    /// Filter filenames by regex. See https://docs.rs/regex/latest/regex/#syntax
+    /// Filter filenames by regex. See <https://docs.rs/regex/latest/regex/#syntax>
     #[clap(long, short = 'F', value_name = "regex")]
     filter: Option<String>,
 

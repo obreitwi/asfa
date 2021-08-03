@@ -26,7 +26,7 @@ pub struct Clean {
     #[clap(short, long = "file")]
     files: Vec<String>,
 
-    /// Filter filenames by regex. See https://docs.rs/regex/latest/regex/#syntax
+    /// Filter filenames by regex. See <https://docs.rs/regex/latest/regex/#syntax>
     #[clap(long, short = 'F', value_name = "regex")]
     filter: Option<String>,
 

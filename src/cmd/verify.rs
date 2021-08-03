@@ -14,7 +14,7 @@ pub struct Verify {
     #[clap(short, long = "file")]
     files: Vec<String>,
 
-    /// Verify all filenames matching regex. See https://docs.rs/regex/latest/regex/#syntax
+    /// Verify all filenames matching regex. See <https://docs.rs/regex/latest/regex/#syntax>
     #[clap(long, short = 'F', value_name = "regex")]
     filter: Option<String>,
 
