@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Use `cargo release` to publish a new version and update documentation. 
+# Use `cargo release` to publish a new version and update documentation.
+# Also use `make-binary-release.sh` to push binary release.
 
 set -euo pipefail
 
@@ -10,3 +11,4 @@ cd "${toplevel}"
 
 cargo release "${@}"
 "${toplevel}/tools/update-docs-latest-release.sh"
+"${toplevel}/tools/make-binary-release.sh"
