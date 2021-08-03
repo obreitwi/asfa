@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["separator","Return separator for columns in output tables."]],"struct":[["ColoredTextReplacer","Helper to replace text in colored text"]]});

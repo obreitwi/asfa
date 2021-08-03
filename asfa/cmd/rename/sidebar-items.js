@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["IndexOrFile",""]],"struct":[["Rename","Rename an already uploaded file"]]});
