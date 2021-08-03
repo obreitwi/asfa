@@ -6,6 +6,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/asfa)](https://crates.io/crates/asfa)
 [![AUR version](https://img.shields.io/aur/version/asfa)](https://aur.archlinux.org/packages/asfa/)
+[![AUR version](https://img.shields.io/aur/version/asfa-bin)](https://aur.archlinux.org/packages/asfa-bin/)
 [![AUR version](https://img.shields.io/aur/version/asfa-git)](https://aur.archlinux.org/packages/asfa-git/)
 [![Changelog](https://img.shields.io/badge/changelog-asfa-yellow)](https://github.com/obreitwi/asfa/blob/master/CHANGELOG.md)
 [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.9.0)](https://www.github.com/obreitwi/asfa)
@@ -165,7 +166,10 @@ $ cargo install asfa
 ```
 
 ### AUR
-AUR packages [`asfa`][aur-asfa]/[`asfa-git`][aur-asfa-git] provide the latest version/commit from `master`.
+The following AUR packages are provided:
+* [`asfa`][aur-asfa]: Latest stable release built from source.
+* [`asfa-bin`][aur-asfa-bin] Pre-built binaries for target `x86_64-unknown-linux-gnu`.
+* [`asfa-git`][aur-asfa-git] Current development snapshot built from source.
 
 Either use your favorite AUR helper or install manually:
 ```text
@@ -279,7 +283,8 @@ Licensed under either of
 at your option.
 
 [at]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html
-[aur-asfa-git]: https://aur.archlinux.org/packages/asfa/
+[aur-asfa-bin]: https://aur.archlinux.org/packages/asfa-bin/
+[aur-asfa-git]: https://aur.archlinux.org/packages/asfa-git/
 [aur-asfa]: https://aur.archlinux.org/packages/asfa/
 [gif-alias-01]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_01.gif
 [gif-alias-02]: https://raw.githubusercontent.com/obreitwi/asfa/17b954a6f4aafa03e8f6ef8fcd49f8619c4af7dc/img/push_alias_02.gif
