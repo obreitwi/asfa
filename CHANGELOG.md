@@ -3,10 +3,11 @@
 
 ## v0.8.1-pre (under development)
 
-* `clean`/`list`
+* `clean`/`list`-command:
   * Fix having to supply negative indices after double dash.
 * Add `rename`/`mv` command.
-  * Rename a remote file after uploading either by index or by specifying a local file with the same hash.
+  * Rename a remote file after uploading.
+  * Files can be selected by index or via local file with the same hash.
 
 ## v0.8.0 (2021-06-15)
 
