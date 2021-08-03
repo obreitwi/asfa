@@ -59,7 +59,7 @@ help2man "${path_bin}" > "${folder_man}/asfa.1"
 # Generate info about all subcommands except for 'help' (which leads to error)
 "${path_bin}" --help | awk 'enabled && $1 != "help" { print $1 } /^SUBCOMMANDS:$/ { enabled=1 }' \
     | while read -r cmd; do
-    help2man "'${path_bin}' $cmd" > "${folder_man}/asfa-${cmd}.1"
+    help2man "${path_bin} $cmd" > "${folder_man}/asfa-${cmd}.1"
 done
 find "${folder_man}" -type f -print0 | xargs -0 gzip
 
