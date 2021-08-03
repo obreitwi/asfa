@@ -8,7 +8,7 @@
 [![AUR version](https://img.shields.io/aur/version/asfa)](https://aur.archlinux.org/packages/asfa/)
 [![AUR version](https://img.shields.io/aur/version/asfa-git)](https://aur.archlinux.org/packages/asfa-git/)
 [![Changelog](https://img.shields.io/badge/changelog-asfa-yellow)](https://github.com/obreitwi/asfa/blob/master/CHANGELOG.md)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.8.0)](https://www.github.com/obreitwi/asfa)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.9.0)](https://www.github.com/obreitwi/asfa)
 <br />
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/obreitwi/asfa/cargo%20test)](https://github.com/obreitwi/asfa/actions?query=workflow%3A%22cargo+test%22)
 [![dependency status](https://deps.rs/repo/github/obreitwi/asfa/status.svg)](https://deps.rs/repo/github/obreitwi/asfa)

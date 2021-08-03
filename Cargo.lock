@@ -46,7 +46,7 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "asfa"
-version = "0.8.1-pre"
+version = "0.9.0"
 dependencies = [
  "anyhow",
  "atty",
