@@ -39,7 +39,7 @@ fn ensure_renaming() -> Result<()> {
 
     let rename_to = "barfoo";
     let rename = prepare_cmd(host)
-        .args(&["rename", "-1", rename_to])
+        .args(&["mv", "-1", rename_to])
         .spawn()?
         .wait()?;
     if !rename.success() {
