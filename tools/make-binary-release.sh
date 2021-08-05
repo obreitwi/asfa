@@ -47,7 +47,7 @@ path_bin="${toplevel}/target/${target}/release/asfa"
 
 cd "${toplevel}"
 
-cargo build --release --frozen --target=${target}
+RUSTFLAGS=-Ctarget-cpu=x86-64 cargo build --release --frozen --target=${target}
 
 mkdir -p "${folder_release}"
 mkdir -p "${folder_man}"
