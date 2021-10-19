@@ -3,6 +3,8 @@
 
 ## v0.9.1-pre (under development)
 
+* Updated dependencies
+
 ## v0.9.0 (2021-08-03)
 
 * `clean`/`list`-command:

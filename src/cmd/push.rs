@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use atty::Stream;
-use clap::Clap;
+use clap::Parser;
 use log::debug;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -15,7 +15,7 @@ use crate::ssh::SshSession;
 use crate::util::get_hash;
 
 /// Upload new files.
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub struct Push {
     /// Alias/file name on the remote site.
     ///

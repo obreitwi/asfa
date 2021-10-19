@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 use atty::Stream;
-use clap::Clap;
+use clap::Parser;
 use console::Style;
 use std::path::PathBuf;
 
@@ -10,7 +10,7 @@ use crate::cmd::Command;
 use crate::ssh::SshSession;
 
 /// Check if a given local file is already present on the remote site.
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub struct Check {
     /// File(s) to check for.
     #[clap()]

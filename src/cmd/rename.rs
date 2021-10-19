@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, bail};
 use atty::Stream;
-use clap::{AppSettings, Clap};
+use clap::{AppSettings, Parser};
 use console::Style;
 use std::path::PathBuf;
 
@@ -11,7 +11,7 @@ use crate::cmd::Command;
 use crate::ssh::SshSession;
 
 /// Rename an already uploaded file
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 #[clap(global_setting=AppSettings::AllowNegativeNumbers)]
 pub struct Rename {
     /// Show all details, can be set globally in config file.

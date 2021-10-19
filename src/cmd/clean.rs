@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use clap::{Clap,AppSettings};
+use clap::{Parser,AppSettings};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use log::debug;
 use std::path::Path;
@@ -11,7 +11,7 @@ use crate::file_listing::FileListing;
 use crate::ssh::SshSession;
 
 /// Clear already uploaded files.
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 #[clap(global_setting=AppSettings::AllowNegativeNumbers)]
 pub struct Clean {
     /// Clean all remote files (dangerous!)

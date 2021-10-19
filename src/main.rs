@@ -17,7 +17,7 @@ use ssh::SshSession;
 
 use simple_logger::SimpleLogger;
 
-use clap::Clap;
+use clap::Parser;
 
 fn main() {
     if let Err(err) = try_main() {

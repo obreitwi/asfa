@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use clap::{crate_authors, crate_description, crate_version, AppSettings, Clap};
+use clap::{crate_authors, crate_description, crate_version, AppSettings, Parser};
 use indicatif::ProgressStyle;
 use std::iter::IntoIterator;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -10,12 +10,11 @@ use std::thread;
 
 use crate::cmd::{Check, Clean, List, Push, Rename, Verify};
 
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 #[clap(
     version=crate_version!(),
     author=crate_authors!(),
     about=crate_description!(),
-    global_setting=AppSettings::ColoredHelp,
     global_setting=AppSettings::InferSubcommands)]
 pub struct Opts {
     /// Path to configuration folder. Alternatively, ASFA_CONFIG can be set.
@@ -71,7 +70,7 @@ impl Opts {
     }
 }
 
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub enum UserCommand {
     #[clap(name = "check")]
     Check(Check),

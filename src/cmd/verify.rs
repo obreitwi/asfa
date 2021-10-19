@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use clap::Clap;
+use clap::Parser;
 use log::debug;
 
 use crate::cfg::Config;
@@ -8,7 +8,7 @@ use crate::cmd::Command;
 use crate::ssh::SshSession;
 
 /// Verify already uploaded files.
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub struct Verify {
     /// Explicit file to verify
     #[clap(short, long = "file")]
