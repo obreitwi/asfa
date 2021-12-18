@@ -4,6 +4,7 @@
 ## v0.9.1-pre (under development)
 
 * Updated dependencies
+* Fix: Added missing feature flags for clap3 release candidates
 
 ## v0.9.0 (2021-08-03)
 

@@ -2,7 +2,7 @@
 name = "asfa"
 version = "0.9.1-pre"
 authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
-edition = "2018"
+edition = "2021"
 description = "Avoid sending file attachments by uploading via SSH to a remote site with non-guessable (hash-based) prefix and print URLs."
 keywords = ["cli", "file", "ssh", "upload", "mail"]
 license = "MIT OR Apache-2.0"
@@ -16,28 +16,28 @@ documentation = "https://obreitwi.github.io/asfa"
 doc = []
 
 [dependencies]
-anyhow = "1.0.44"
+anyhow = "1.0.51"
 atty = "0.2.14"
 base64 = "0.13.0"
 chrono = "0.4.19"
-clap = "3.0.0-beta.5"
+clap = {version = "3.0.0-rc.7", features = ["derive", "cargo"]}
 console = "0.15.0"
 dialoguer = "0.9.0"
 expanduser = "1.2.2"
 hex = "0.4.3"
 humantime = "2.1.0"
 indicatif = "0.16.2"
-itertools = "0.10.1"
+itertools = "0.10.3"
 lazy_static = "1.4.0"
 log = "0.4.14"
 percent-encoding = "2.1.0"
 regex = "1.5.4"
 rpassword = "5.0.1"
-sha2= "0.9.8"
-simple_logger = "1.13.0"
+sha2= "0.10.0"
+simple_logger = "1.16.0"
 ssh2 = "0.9.3"
 thiserror = "1.0.30"
-whoami = "1.1.5"
+whoami = "1.2.1"
 yaml-rust = "0.4.5"
 
 [dev-dependencies]
