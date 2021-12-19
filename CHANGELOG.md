@@ -5,6 +5,7 @@
 
 * Updated dependencies
 * Fix: Added missing feature flags for clap3 release candidates
+* Fix: Tests not running by disabling timestamps in `simple_logger`
 
 ## v0.9.0 (2021-08-03)
 

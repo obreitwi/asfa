@@ -245,7 +245,7 @@ fn clean_all(host: &str) -> Result<()> {
 
 #[test]
 fn run_simple_uploads() -> Result<()> {
-    fixture::ensure_env()?;
+    fixture::testing_prelude()?;
 
     let (upload_to_expire, to_expire_uploaded_at) =
         expiring_file_upload_begin("asfa-ci-pw-expire")?;

@@ -34,7 +34,7 @@ percent-encoding = "2.1.0"
 regex = "1.5.4"
 rpassword = "5.0.1"
 sha2= "0.10.0"
-simple_logger = "1.16.0"
+simple_logger = { version = "1.16.0", default-features = false, features = ["threads", "colors"]}
 ssh2 = "0.9.3"
 thiserror = "1.0.30"
 whoami = "1.2.1"

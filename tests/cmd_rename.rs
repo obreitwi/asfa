@@ -6,7 +6,7 @@ use fixture::prepare_cmd;
 
 #[test]
 fn ensure_renaming() -> Result<()> {
-    fixture::ensure_env()?;
+    fixture::testing_prelude()?;
 
     let host = "asfa-ci-pw";
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), 256)?;
