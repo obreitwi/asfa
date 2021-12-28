@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## v0.9.1-pre (under development)
+## v0.9.1 (2021-12-28)
 
 * Updated dependencies
 * Fix: Added missing feature flags for clap3 release candidates
