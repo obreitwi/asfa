@@ -50,6 +50,7 @@ cd "${toplevel}"
 RUSTFLAGS=-Ctarget-cpu=x86-64 cargo build --release --frozen --target=${target}
 
 mkdir -p "${folder_release}"
+mkdir -p "${folder_target}"
 mkdir -p "${folder_man}"
 
 install -Dm755 "${path_bin}" "${folder_release}"
