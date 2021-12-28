@@ -54,12 +54,15 @@ mkdir -p "${folder_man}"
 
 install -Dm755 "${path_bin}" "${folder_release}"
 
-help2man "${path_bin}" > "${folder_man}/asfa.1"
+help2man -o "${folder_man}/asfa.1" "${path_bin}"
 
 # Generate info about all subcommands except for 'help' (which leads to error)
 "${path_bin}" --help | awk 'enabled && $1 != "help" { print $1 } /^SUBCOMMANDS:$/ { enabled=1 }' \
     | while read -r cmd; do
-    help2man "${path_bin} $cmd" > "${folder_man}/asfa-${cmd}.1"
+    help2man \
+        "--version-string=${version}" \
+        -o "${folder_man}/asfa-${cmd}.1" \
+        "${path_bin} $cmd"
 done
 find "${folder_man}" -type f -print0 | xargs -0 gzip
 
