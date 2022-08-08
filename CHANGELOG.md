@@ -1,6 +1,10 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
+## v0.9.2-pre (under development)
+
+* Disable unnecessary regex features to reduce binary size by ~20% (by @jirutka)
+
 ## v0.9.1 (2021-12-28)
 
 * Updated dependencies
