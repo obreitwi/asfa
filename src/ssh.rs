@@ -7,7 +7,7 @@ use expanduser::expanduser;
 use indicatif::{ProgressBar, ProgressIterator};
 use itertools::Itertools;
 use log::{debug, error, info};
-use rpassword::prompt_password_stderr;
+use rpassword::prompt_password;
 use ssh2::Session as RawSession;
 use ssh2::{FileStat, KeyboardInteractivePrompt, Prompt};
 use std::collections::{HashMap, HashSet};
@@ -168,7 +168,7 @@ impl<'a> SshSession<'a> {
             "Interactive authentication enabled for host {}",
             self.host.alias
         );
-        let password = prompt_password_stderr(&format!(
+        let password = prompt_password(&format!(
             "Interactive authentication enabled. Enter password for {}:",
             self.host.alias
         ))?;
@@ -197,7 +197,7 @@ impl<'a> SshSession<'a> {
         );
         let password = match private_key_file_password {
             Some(pw) => Some(pw.to_owned()),
-            None if interactive => Some(prompt_password_stderr(&format!(
+            None if interactive => Some(prompt_password(&format!(
                 "Interactive authentication enabled. Enter password for {}:",
                 private_key_file
             ))?),
@@ -519,7 +519,7 @@ impl<'a> SshSession<'a> {
         let paths: Vec<_> = paths.into_iter().collect();
 
         let bar = ProgressBar::new(paths.len() as u64);
-        bar.set_style(crate::cli::style_progress_bar_count());
+        bar.set_style(crate::cli::style_progress_bar_count().expect("couldn't create progress bar"));
         bar.set_message("Getting file stats (fallback): ");
 
         let sftp = self.raw.sftp()?;
@@ -570,7 +570,7 @@ impl<'a> SshSession<'a> {
         };
 
         let bar = ProgressBar::new(local_file.metadata()?.len());
-        bar.set_style(crate::cli::style_progress_bar_transfer());
+        bar.set_style(crate::cli::style_progress_bar_transfer().expect("couldn't create progress bar"));
         let mut reader = BufReader::new(local_file);
 
         let start = Instant::now();
@@ -787,7 +787,7 @@ impl KeyboardInteractivePrompt for InteractivePrompt {
                         .interact_text()
                         .unwrap_or_default()
                 } else {
-                    prompt_password_stderr(&p.text).unwrap_or_default()
+                    prompt_password(&p.text).unwrap_or_default()
                 }
             })
             .collect()
