@@ -95,33 +95,33 @@ pub enum UserCommand {
 }
 
 /// Progress bar style for file transfers
-pub fn style_progress_bar_transfer() -> indicatif::ProgressStyle {
-    ProgressStyle::default_bar()
+pub fn style_progress_bar_transfer() -> Result<indicatif::ProgressStyle> {
+    Ok(ProgressStyle::default_bar()
         .template(
             "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes} / {total_bytes} \
                    @ {bytes_per_sec} ({eta})",
-        )
-        .progress_chars("#>-")
+        )?
+        .progress_chars("#>-"))
 }
 
 /// Progress bar style for counts
-pub fn style_progress_bar_count() -> indicatif::ProgressStyle {
-    ProgressStyle::default_bar()
+pub fn style_progress_bar_count() -> Result<indicatif::ProgressStyle> {
+    Ok(ProgressStyle::default_bar()
         .template(
             "{spinner:.green} [{elapsed_precise}] {msg}[{bar:40.cyan/blue}] {pos} / {len} \
                    @ {per_sec} ({eta})",
-        )
-        .progress_chars("#>-")
+        )?
+        .progress_chars("#>-"))
 }
 
-pub fn spinner() -> indicatif::ProgressBar {
+pub fn spinner() -> Result<indicatif::ProgressBar> {
     let bar = indicatif::ProgressBar::new(!0);
-    bar.set_style(style_spinner());
-    bar
+    bar.set_style(style_spinner()?);
+    Ok(bar)
 }
 
-pub fn style_spinner() -> indicatif::ProgressStyle {
-    ProgressStyle::default_spinner().template("{spinner:.green} {msg}")
+pub fn style_spinner() -> Result<indicatif::ProgressStyle> {
+    Ok(ProgressStyle::default_spinner().template("{spinner:.green} {msg}")?)
 }
 
 pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
@@ -224,7 +224,7 @@ impl WaitingSpinner {
         let stop_token = Arc::new(AtomicBool::new(false));
         let stop_token_pbar = Arc::clone(&stop_token);
         let handle = thread::spawn(move || {
-            let spinner = crate::cli::spinner();
+            let spinner = crate::cli::spinner().expect("couldn't create spinner");
             spinner.set_message(message.clone());
 
             let handle_messages = || {
