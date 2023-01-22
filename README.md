@@ -11,7 +11,7 @@
 [![Changelog](https://img.shields.io/badge/changelog-asfa-yellow)](https://github.com/obreitwi/asfa/blob/master/CHANGELOG.md)
 [![GitHub commits since tagged version](https://img.shields.io/github/commits-since/obreitwi/asfa/v0.9.1)](https://www.github.com/obreitwi/asfa)
 <br />
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/obreitwi/asfa/cargo%20test)](https://github.com/obreitwi/asfa/actions?query=workflow%3A%22cargo+test%22)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/obreitwi/asfa/rust.yml?branch=master)](https://github.com/obreitwi/asfa/actions?query=workflow%3A%22cargo+test%22)
 [![dependency status](https://deps.rs/repo/github/obreitwi/asfa/status.svg)](https://deps.rs/repo/github/obreitwi/asfa)
 [![Rustdoc](https://img.shields.io/badge/docs-rustdoc-blue)](https://obreitwi.github.io/asfa/)
 [![Crates.io](https://img.shields.io/crates/l/asfa)](#license)
