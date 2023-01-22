@@ -162,7 +162,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         hdr = header.as_ref(),
         fl = line_horizontal(line_len - 2 /* header left/right */ - header_len)
     );
-    println!("{}", join_frames(&content[0], &header_raw, '┬'));
+    println!("{}", join_frames(content[0], &header_raw, '┬'));
     for line in content.iter() {
         let pad_width = line_len - console::strip_ansi_codes(line).chars().count();
         println!(
@@ -178,7 +178,7 @@ pub fn draw_boxed<'a, H: AsRef<str>, I: IntoIterator<Item = &'a str>>(
         cr = corner_bottom_right,
         l = line_horizontal(line_len)
     );
-    let last_line = join_frames(&content[content.len() - 1], &last_line_raw, '┴');
+    let last_line = join_frames(content[content.len() - 1], &last_line_raw, '┴');
 
     println!("{}", last_line);
 

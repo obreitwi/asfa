@@ -4,7 +4,7 @@ use crate::ssh::SshSession;
 use crate::util;
 
 use anyhow::{bail, Context, Result};
-use chrono::{Local, TimeZone};
+use chrono::{Local, LocalResult, TimeZone};
 use itertools::Itertools;
 use regex::Regex;
 use ssh2::FileStat;
@@ -315,12 +315,17 @@ impl<'a> FileListing<'a> {
     }
 
     fn column_time(&self, stat: &FileStat) -> Result<String> {
-        let mtime = Local.timestamp(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0);
-        Ok(format!(
-            "{mtime}{sep}",
-            mtime = mtime.format("%Y-%m-%d %H:%M:%S").to_string(),
-            sep = text::separator()
-        ))
+        if let LocalResult::Single(mtime) =
+            Local.timestamp_opt(stat.mtime.with_context(|| "File has no mtime.")? as i64, 0)
+        {
+            Ok(format!(
+                "{mtime}{sep}",
+                mtime = mtime.format("%Y-%m-%d %H:%M:%S"),
+                sep = text::separator()
+            ))
+        } else {
+            bail!("failed to convert time");
+        }
     }
 
     fn ensure_stats(&mut self) -> Result<()> {
