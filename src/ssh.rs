@@ -519,7 +519,9 @@ impl<'a> SshSession<'a> {
         let paths: Vec<_> = paths.into_iter().collect();
 
         let bar = ProgressBar::new(paths.len() as u64);
-        bar.set_style(crate::cli::style_progress_bar_count().expect("couldn't create progress bar"));
+        bar.set_style(
+            crate::cli::style_progress_bar_count().expect("couldn't create progress bar"),
+        );
         bar.set_message("Getting file stats (fallback): ");
 
         let sftp = self.raw.sftp()?;
@@ -570,11 +572,16 @@ impl<'a> SshSession<'a> {
         };
 
         let bar = ProgressBar::new(local_file.metadata()?.len());
-        bar.set_style(crate::cli::style_progress_bar_transfer().expect("couldn't create progress bar"));
+        bar.set_style(
+            crate::cli::style_progress_bar_transfer().expect("couldn't create progress bar"),
+        );
         let mut reader = BufReader::new(local_file);
 
         let start = Instant::now();
         let mut written_total = 0;
+        let mut ui_update_last = Instant::now();
+        let mut ui_update_written: u128 = 0;
+        let ui_update_every = Duration::from_millis(250);
 
         let timestep = Duration::from_millis(50);
 
@@ -615,7 +622,12 @@ impl<'a> SshSession<'a> {
                 reader.consume(written);
                 log::trace!("Wrote {} bytes", written);
                 written_total += written as u128;
-                bar.inc(written as u64);
+
+                if now.duration_since(ui_update_last) > ui_update_every {
+                    bar.inc((written_total - ui_update_written) as u64);
+                    ui_update_written = written_total;
+                    ui_update_last = Instant::now();
+                }
             } else {
                 break;
             }
