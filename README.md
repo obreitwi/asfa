@@ -123,8 +123,8 @@ In case an upload gets canceled early, all files can be checked for validity via
 
 ```text
 $ asfa verify
-✓ my-very-specific-file.txt ... Verified.
-✓ my-very-specific-file-2.txt . Verified.
+✓ my-very-specific-file.txt ..... Verified.
+✓ my-very-specific-file-2.txt ... Verified.
 ```
 
 Since the prefix is the checksum, the check can be performed whether the file exists locally or not.

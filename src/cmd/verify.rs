@@ -108,7 +108,7 @@ impl Command for Verify {
                 let hash_expected = file.parent().unwrap().to_string_lossy();
                 let filename = file.file_name().unwrap().to_string_lossy();
                 let filename_len = filename.chars().count();
-                let separator_len = filename_max - filename_len;
+                let separator_len = filename_max - filename_len + 2; // enusre at least ellipsis
                 if hash_actual != hash_expected {
                     if let Some(spinner) = spinner.as_ref() {
                         let msg = format!(
