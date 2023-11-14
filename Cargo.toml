@@ -16,27 +16,27 @@ documentation = "https://obreitwi.github.io/asfa"
 doc = []
 
 [dependencies]
-anyhow = "1.0.72"
+anyhow = "1.0.75"
 atty = "0.2.14"
 base64 = "0.13.1"
-chrono = "0.4.26"
+chrono = "0.4.31"
 clap = {version = "3.2.25", features = ["derive", "cargo"]}
 console = "0.15.7"
 dialoguer = "0.10.4"
 expanduser = "1.2.2"
 hex = "0.4.3"
 humantime = "2.1.0"
-indicatif = "0.17.5"
+indicatif = "0.17.7"
 itertools = "0.10.5"
 lazy_static = "1.4.0"
-log = "0.4.19"
+log = "0.4.20"
 percent-encoding = "2.3.0"
-regex = { version = "1.9.1", default-features = false, features = ["std", "unicode-bool", "unicode-perl"] }
-rpassword = "7.2.0"
-sha2= "0.10.7"
+regex = { version = "1.10.2", default-features = false, features = ["std", "unicode-bool", "unicode-perl"] }
+rpassword = "7.3.1"
+sha2= "0.10.8"
 simple_logger = { version = "2.3.0", default-features = false, features = ["threads", "colors"]}
 ssh2 = "0.9.4"
-thiserror = "1.0.43"
+thiserror = "1.0.50"
 whoami = "1.4.1"
 yaml-rust = "0.4.5"
 
