@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, bail};
-use atty::Stream;
+use std::io::IsTerminal;
 use clap::{AppSettings, Parser};
 use console::Style;
 use std::path::PathBuf;
@@ -120,7 +120,7 @@ impl Command for Rename {
         if !config.is_silent() {
             // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
             // parseable format
-            if atty::is(Stream::Stdout) {
+            if std::io::stdout().is_terminal() {
                 let content = vec![format!(
                     " {old} → {new} ",
                     old = Style::new().red().bright().apply_to(

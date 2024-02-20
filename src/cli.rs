@@ -286,14 +286,14 @@ pub mod color {
 
 #[allow(non_upper_case_globals)]
 pub mod text {
-    use atty::Stream;
+    use std::io::IsTerminal;
     use std::collections::HashMap;
 
     /// Return separator for columns in output tables.
     ///
     /// Changes behavior if stdout is no tty.
     pub fn separator() -> String {
-        if atty::is(Stream::Stdout) {
+        if std::io::stdout().is_terminal() {
             format!(" {} ", super::color::frame.apply_to("│"))
         } else {
             String::from('\t')

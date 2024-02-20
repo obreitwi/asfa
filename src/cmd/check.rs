@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use atty::Stream;
+use std::io::IsTerminal;
 use clap::Parser;
 use console::Style;
 use std::path::PathBuf;
@@ -68,7 +68,7 @@ impl Command for Check {
 
             // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
             // parseable format
-            if atty::is(Stream::Stdout) {
+            if std::io::stdout().is_terminal() {
                 draw_boxed(
                     format!(
                         "{} remote files:",

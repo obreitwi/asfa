@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use atty::Stream;
+use std::io::IsTerminal;
 use clap::Parser;
 use log::debug;
 use std::io::{self, Write};
@@ -159,7 +159,7 @@ impl Push {
         };
         io::stdout().flush().unwrap();
         // Only print expiration notification if asfa is used directly via terminal
-        if let (true, Some(expiration_date)) = (atty::is(Stream::Stdout), expiration_date) {
+        if let (true, Some(expiration_date)) = (std::io::stdout().is_terminal(), expiration_date) {
             eprint!(
                 "{bl}expiring: {date}{br} ",
                 bl = color::frame.apply_to("["),

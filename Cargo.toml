@@ -17,7 +17,6 @@ doc = []
 
 [dependencies]
 anyhow = "1.0.75"
-atty = "0.2.14"
 base64 = "0.13.1"
 chrono = "0.4.31"
 clap = {version = "3.2.25", features = ["derive", "cargo"]}
