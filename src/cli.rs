@@ -286,8 +286,8 @@ pub mod color {
 
 #[allow(non_upper_case_globals)]
 pub mod text {
-    use std::io::IsTerminal;
     use std::collections::HashMap;
+    use std::io::IsTerminal;
 
     /// Return separator for columns in output tables.
     ///

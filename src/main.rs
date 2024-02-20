@@ -48,9 +48,7 @@ fn try_main() -> Result<()> {
         }
     };
 
-    SimpleLogger::new()
-        .with_level(level)
-        .init()?;
+    SimpleLogger::new().with_level(level).init()?;
 
     trace!("Opts: {:?}", opts);
 

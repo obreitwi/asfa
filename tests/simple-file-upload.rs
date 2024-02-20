@@ -14,7 +14,6 @@ fn simple_file_upload(host: &str) -> Result<()> {
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), file_size)?;
     let alias = fixture::random_filename(8, "txt");
 
-
     let hash = run_fun(format!("sha256sum {}", local.display()))?
         .split_whitespace()
         .next()
@@ -22,17 +21,15 @@ fn simple_file_upload(host: &str) -> Result<()> {
         .to_string();
 
     let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
-    cargo_run(host, &format!(
-        "push {} --alias {} --expire none",
-        local.display(),
-        alias
-    ))
+    cargo_run(
+        host,
+        &format!("push {} --alias {} --expire none", local.display(), alias),
+    )
     .with_context(|| "Could not push.")?;
-    cargo_run(host, &format!(
-        "push {} --alias {} --expire none",
-        local.display(),
-        alias
-    ))
+    cargo_run(
+        host,
+        &format!("push {} --alias {} --expire none", local.display(), alias),
+    )
     .with_context(|| "Second push of identical file failed.")?;
     cargo_run(host, "verify").with_context(|| "Could not verify.")?;
     cargo_run(host, &format!("check {}", local.display())).with_context(|| "Could not check.")?;
@@ -48,8 +45,11 @@ fn simple_file_upload(host: &str) -> Result<()> {
     run_cmd(format!("diff -q \"{}\" \"{}\"", local.display(), remote,))
         .with_context(|| "Files differ")?;
     cargo_run(host, "verify").with_context(|| "Could not verify.")?;
-    cargo_run(host, &format!("clean --file {} --no-confirm", local.display()))
-        .with_context(|| "Could not clean.")?;
+    cargo_run(
+        host,
+        &format!("clean --file {} --no-confirm", local.display()),
+    )
+    .with_context(|| "Could not clean.")?;
     if Path::new(&remote).exists() {
         bail!("Remote file not cleaned up!");
     }
@@ -100,8 +100,11 @@ fn upload_with_prefix_suffix(host: &str) -> Result<()> {
         .with_context(|| "Files differ")?;
     run_cmd(format!("cargo run -- --loglevel debug -H {} verify", host,))
         .with_context(|| "Could not verify.")?;
-    cargo_run(host, &format!("clean --file {} --no-confirm", local.display()))
-        .with_context(|| "Could not clean.")?;
+    cargo_run(
+        host,
+        &format!("clean --file {} --no-confirm", local.display()),
+    )
+    .with_context(|| "Could not clean.")?;
     if Path::new(&remote).exists() {
         bail!("Remote file not cleaned up!");
     }
@@ -173,7 +176,6 @@ fn simple_file_upload_speed_limited(
     arg_limit: &str,
     expected_min_duration: Duration,
 ) -> Result<()> {
-
     log::info!("Uploading to host: {}", host);
 
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), file_size)?;
@@ -187,12 +189,10 @@ fn simple_file_upload_speed_limited(
 
     let hash_b64 = base64::encode_config(hex::decode(hash)?, base64::URL_SAFE);
     let start = Instant::now();
-    cargo_run(host, &format!(
-        "push {} --alias {} {}",
-        local.display(),
-        alias,
-        arg_limit
-    ))
+    cargo_run(
+        host,
+        &format!("push {} --alias {} {}", local.display(), alias, arg_limit),
+    )
     .with_context(|| "Could not push.")?;
     let finish = Instant::now();
     if finish.duration_since(start) < expected_min_duration {
@@ -203,8 +203,7 @@ fn simple_file_upload_speed_limited(
         );
     }
 
-    cargo_run(host, "verify")
-        .with_context(|| "Could not verify.")?;
+    cargo_run(host, "verify").with_context(|| "Could not verify.")?;
     let remote = format!(
         "{}/{}/{}",
         std::env::var("ASFA_FOLDER_UPLOAD")?,

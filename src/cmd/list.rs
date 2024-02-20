@@ -1,7 +1,7 @@
 use anyhow::Result;
-use std::io::IsTerminal;
-use clap::{Parser,AppSettings};
+use clap::{AppSettings, Parser};
 use console::Style;
+use std::io::IsTerminal;
 
 use crate::cfg::Config;
 use crate::cli::color;
@@ -26,7 +26,7 @@ pub struct List {
     filter: Option<String>,
 
     /// Only list first `N` entries.
-    #[clap(short = 'N', long, conflicts_with="last")]
+    #[clap(short = 'N', long, conflicts_with = "last")]
     first: Option<usize>,
 
     /// Specify indices of files to list (if none given, list all).
@@ -34,7 +34,7 @@ pub struct List {
     indices: Vec<i64>,
 
     /// Only list last `n` entries.
-    #[clap(short = 'n', long, conflicts_with="first")]
+    #[clap(short = 'n', long, conflicts_with = "first")]
     last: Option<usize>,
 
     /// If `details` is set to true in config, --no-details can be specified to suppress output.
@@ -123,7 +123,11 @@ impl Command for List {
                 let content = if content.is_empty() {
                     vec![format!(
                         "{}(There are no remote files to show.)",
-                        if std::io::stdout().is_terminal() { " " } else { "" }
+                        if std::io::stdout().is_terminal() {
+                            " "
+                        } else {
+                            ""
+                        }
                     )]
                 } else {
                     content

@@ -1,7 +1,7 @@
-use anyhow::{Context, Result, bail};
-use std::io::IsTerminal;
+use anyhow::{bail, Context, Result};
 use clap::{AppSettings, Parser};
 use console::Style;
+use std::io::IsTerminal;
 use std::path::PathBuf;
 
 use crate::cfg::Config;

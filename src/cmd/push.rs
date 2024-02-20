@@ -1,7 +1,7 @@
 use anyhow::{bail, Context, Result};
-use std::io::IsTerminal;
 use clap::Parser;
 use log::debug;
+use std::io::IsTerminal;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::string::String;

@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use clap::{Parser,AppSettings};
+use clap::{AppSettings, Parser};
 use dialoguer::{theme::ColorfulTheme, Confirm};
 use log::debug;
 use std::path::Path;

@@ -13,8 +13,8 @@ mod verify;
 pub use check::Check;
 pub use clean::Clean;
 pub use list::List;
-pub use rename::Rename;
 pub use push::Push;
+pub use rename::Rename;
 pub use verify::Verify;
 
 pub trait Command {

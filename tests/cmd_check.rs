@@ -25,7 +25,7 @@ fn ensure_return_code_failed_check() -> Result<()> {
         .output()
         .context("Couldn't execute command")?;
 
-    if !matches!(output.status.code(), Some(1)){
+    if !matches!(output.status.code(), Some(1)) {
         bail!("Expected return 1, found {:?}", output.status.code());
     }
 
