@@ -1,5 +1,5 @@
 use anyhow::Result;
-use atty::Stream;
+use std::io::IsTerminal;
 use clap::{Parser,AppSettings};
 use console::Style;
 
@@ -123,7 +123,7 @@ impl Command for List {
                 let content = if content.is_empty() {
                     vec![format!(
                         "{}(There are no remote files to show.)",
-                        if atty::is(Stream::Stdout) { " " } else { "" }
+                        if std::io::stdout().is_terminal() { " " } else { "" }
                     )]
                 } else {
                     content
@@ -131,7 +131,7 @@ impl Command for List {
 
                 // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
                 // parseable format
-                if atty::is(Stream::Stdout) {
+                if std::io::stdout().is_terminal() {
                     draw_boxed(
                         format!(
                             "{listing} remote files:",
