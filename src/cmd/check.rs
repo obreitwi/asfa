@@ -1,7 +1,7 @@
 use anyhow::{bail, Result};
-use std::io::IsTerminal;
 use clap::Parser;
 use console::Style;
+use std::io::IsTerminal;
 use std::path::PathBuf;
 
 use crate::cfg::Config;
