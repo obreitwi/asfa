@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SpinnerSetting","UserCommand"],"fn":["draw_boxed","join_frames","spinner","style_progress_bar_count","style_progress_bar_transfer","style_spinner"],"mod":["color","text"],"struct":["Opts","WaitingSpinner"]};

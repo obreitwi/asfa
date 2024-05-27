@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"asfa":[["impl&lt;'a&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/1.77.2/core/iter/traits/iterator/trait.Iterator.html\" title=\"trait core::iter::traits::iterator::Iterator\">Iterator</a> for <a class=\"struct\" href=\"asfa/file_listing/struct.FileListingIter.html\" title=\"struct asfa::file_listing::FileListingIter\">FileListingIter</a>&lt;'a&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

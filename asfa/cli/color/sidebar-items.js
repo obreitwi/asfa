@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["dot","entry","expire","failure","filename","frame","success"]};

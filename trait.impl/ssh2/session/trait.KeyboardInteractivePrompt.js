@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"asfa":[["impl <a class=\"trait\" href=\"https://docs.rs/ssh2/ssh2/session/trait.KeyboardInteractivePrompt.html\" title=\"trait ssh2::session::KeyboardInteractivePrompt\">KeyboardInteractivePrompt</a> for <a class=\"struct\" href=\"asfa/ssh/struct.InteractivePrompt.html\" title=\"struct asfa::ssh::InteractivePrompt\">InteractivePrompt</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
