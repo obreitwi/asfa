@@ -155,6 +155,8 @@
         # Extra inputs can be added here; cargo and rustc are provided by default.
         packages = with pkgs; [
           bacon
+          cargo-edit
+          cargo-release
           findutils
           gawk
           gh
