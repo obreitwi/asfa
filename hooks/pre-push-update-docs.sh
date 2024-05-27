@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # NOTE: Currently disabled as we only generate/upload docs on release.
 #

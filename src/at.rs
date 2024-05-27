@@ -59,7 +59,7 @@ impl<'a> At<'a> {
         let tempfile = self.session.mktemp()?;
 
         let cmd_rm = format!(
-            "#!/bin/bash\nrm '{}' && rmdir '{}'",
+            "#!/usr/bin/env bash\nrm '{}' && rmdir '{}'",
             self.session.prepend_base_folder(path).display(),
             self.session
                 .prepend_base_folder(path.parent().with_context(|| format!(

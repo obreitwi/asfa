@@ -155,6 +155,11 @@
         # Extra inputs can be added here; cargo and rustc are provided by default.
         packages = with pkgs; [
           bacon
+          findutils
+          gawk
+          gh
+          ghp-import
+          help2man
           # pkgs.ripgrep
         ];
       };

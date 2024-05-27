@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Upate docs to latest released (i.e. tagged) version.
 
