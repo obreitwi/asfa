@@ -1,6 +1,6 @@
 [package]
 name = "asfa"
-version = "0.9.2-pre"
+version = "0.9.1"
 authors = ["Oliver Breitwieser <oliver@breitwieser.eu>"]
 edition = "2021"
 description = "Avoid sending file attachments by uploading via SSH to a remote site with non-guessable (hash-based) prefix and print URLs."
@@ -50,15 +50,15 @@ targets = ["x86_64-unknown-linux-gnu"]
 [package.metadata.release]
 sign-commit = true
 sign-tag = true
-dev-version-ext = "pre"
+# dev-version-ext = "pre"
 push-remote = "git@github.com:obreitwi/asfa.git"
 tag-message = "Release: v{{version}}"
 pre-release-commit-message = "Release: v{{version}}"
-post-release-commit-message = "Development iteration: v{{next_version}}"
+# post-release-commit-message = "Development iteration: v{{next_version}}"
 
 [[package.metadata.release.pre-release-replacements]]
 file="CHANGELOG.md"
-search="(?m)^## v[0-9]+\\.[0-9]+\\.[0-9]+-pre \\(under development\\)$"
+search="^## Unreleased changes$"
 replace="## v{{version}} ({{date}})"
 exactly = 1
 
@@ -66,10 +66,4 @@ exactly = 1
 file="README.md"
 search="https://img\\.shields\\.io/github/commits-since/obreitwi/asfa/v[0-9]+\\.[0-9]+\\.[0-9]+"
 replace="https://img.shields.io/github/commits-since/obreitwi/asfa/v{{version}}"
-exactly = 1
-
-[[package.metadata.release.post-release-replacements]]
-file = "CHANGELOG.md"
-search = "(?m)(?P<header>^# .*)$"
-replace = "$header\n\n## v{{next_version}} (under development)"
 exactly = 1

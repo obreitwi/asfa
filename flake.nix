@@ -161,6 +161,7 @@
           gawk
           gh
           ghp-import
+          gnused
           help2man
           # pkgs.ripgrep
         ];
