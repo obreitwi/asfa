@@ -1,7 +1,7 @@
 
 # Changelog for [`asfa`](https://github.com/obreitwi/asfa)
 
-## Unreleased changes
+## v0.10.0 (2024-05-27)
 
 * Disable unnecessary regex features to reduce binary size by ~20% (by @jirutka)
 * Cosmetic: Ensure verification separator is at least ellipsis ("...").
