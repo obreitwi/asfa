@@ -23,7 +23,7 @@ check_all_dependencies() {
 generate_docs()
 {
     cd "${toplevel}"
-    cargo +nightly doc --features=doc --no-deps
+    cargo doc --features=doc --no-deps
     # redirect from root folder to doc of asfa
     echo "<meta http-equiv=refresh content=0;url=asfa/index.html>" > "${toplevel}/target/doc/index.html"
 }
