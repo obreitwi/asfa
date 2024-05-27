@@ -32,7 +32,7 @@ upload_docs()
 {
     git push "${remote}" :gh-pages
     git fetch "${remote}"
-    git branch -D gh-pages
+    git branch -D gh-pages || true
     ghp-import --force                       \
                --push                        \
                --no-jekyll                   \
