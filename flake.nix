@@ -163,7 +163,7 @@
           ghp-import
           gnused
           help2man
-          # pkgs.ripgrep
+          libssh2
         ];
       };
     });
