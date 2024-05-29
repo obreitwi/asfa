@@ -53,6 +53,9 @@ mkdir -p "${folder_release}"
 mkdir -p "${folder_target}"
 mkdir -p "${folder_man}"
 
+# make sure binary works everywhere, not just in nix
+patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 "${path_bin}"
+
 install -Dm755 "${path_bin}" "${folder_release}"
 
 help2man -o "${folder_man}/asfa.1" "${path_bin}"
