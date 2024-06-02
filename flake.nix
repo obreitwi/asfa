@@ -46,6 +46,8 @@
         inherit src;
         strictDeps = true;
 
+        nativeBuildInputs = [ pkgs.pkg-config ];
+
         buildInputs =
           [
             # Add additional build inputs here
@@ -59,8 +61,6 @@
 
         # Additional environment variables can be set directly
         # MY_CUSTOM_VAR = "some value";
-        OPENSSL_DIR = lib.attrsets.getOutput "dev" pkgs.openssl;
-        OPENSSL_LIB_DIR = lib.attrsets.getOutput "lib" pkgs.openssl + "/lib";
       };
 
       craneLibLLvmTools =
@@ -163,7 +163,6 @@
           ghp-import
           gnused
           help2man
-          libssh2
         ];
       };
     });
