@@ -41,7 +41,7 @@ yaml-rust = "0.4.5"
 
 [dev-dependencies]
 cmd_lib_core = "0.4.0"
-rand = "0.8.5"
+rand = "0.9.3"
 
 [package.metadata.docs.rs]
 features = ["doc"]
