@@ -31,7 +31,7 @@ lazy_static = "1.4.0"
 log = "0.4.20"
 percent-encoding = "2.3.0"
 regex = { version = "1.10.2", default-features = false, features = ["std", "unicode-bool", "unicode-perl"] }
-rpassword = "7.3.1"
+rpassword = "7.5.0"
 sha2= "0.10.8"
 simple_logger = { version = "2.3.0", default-features = false, features = ["threads", "colors"]}
 ssh2 = "0.9.4"
