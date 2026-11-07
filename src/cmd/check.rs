@@ -60,7 +60,7 @@ impl Command for Check {
             }
         } else if !config.is_silent() {
             let content = found.format_files(
-                Some(&session.host),
+                Some(session.host),
                 self.filenames,
                 show_details || self.with_size,
                 show_details || self.with_time,

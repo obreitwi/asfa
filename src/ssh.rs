@@ -103,7 +103,7 @@ impl<'a> SshSession<'a> {
         if !self.raw.authenticated() && methods.contains("password") {
             if let Some(password) = self.host.password.as_ref() {
                 debug!("Authenticating with plaintext password.");
-                if let Err(e) = self.raw.userauth_password(&self.get_username(), &password) {
+                if let Err(e) = self.raw.userauth_password(&self.get_username(), password) {
                     log::debug!("Password authenication failed: {}", e);
                 }
             }
@@ -135,7 +135,7 @@ impl<'a> SshSession<'a> {
                 "No authentication method successful for host {}. Run in loglevel debug for clues.",
                 self.host.alias
             );
-            error!("{}", &msg);
+            error!("{}", msg);
             Err(anyhow::Error::new(IOError::new(
                 ErrorKind::InvalidInput,
                 msg,
@@ -168,7 +168,7 @@ impl<'a> SshSession<'a> {
             "Interactive authentication enabled for host {}",
             self.host.alias
         );
-        let password = prompt_password(&format!(
+        let password = prompt_password(format!(
             "Interactive authentication enabled. Enter password for {}:",
             self.host.alias
         ))?;
@@ -197,7 +197,7 @@ impl<'a> SshSession<'a> {
         );
         let password = match private_key_file_password {
             Some(pw) => Some(pw.to_owned()),
-            None if interactive => Some(prompt_password(&format!(
+            None if interactive => Some(prompt_password(format!(
                 "Interactive authentication enabled. Enter password for {}:",
                 private_key_file
             ))?),
@@ -311,8 +311,8 @@ impl<'a> SshSession<'a> {
     }
 
     /// Get listing of files
-    pub fn list_files(&self) -> Result<FileListing> {
-        FileListing::new(&self)
+    pub fn list_files(&self) -> Result<FileListing<'_>> {
+        FileListing::new(self)
     }
 
     /// Make folder on the remote site if it does not exist (relative to the current host's
@@ -340,7 +340,7 @@ impl<'a> SshSession<'a> {
     }
 
     /// Make remote file on remote side and return path to it.
-    pub fn mktemp(&self) -> Result<Tempfile> {
+    pub fn mktemp(&self) -> Result<Tempfile<'_>> {
         let tmp = self
             .exec_remote("mktemp")?
             .expect("Could not create temporary remote file.")?;
@@ -465,7 +465,7 @@ impl<'a> SshSession<'a> {
         let mut channel = self.raw.channel_session()?;
         let cmd = format!(
             "find '{}' -mindepth 2 -maxdepth 2 -type f -print0 | xargs -0 stat -c '%Y %s %n'",
-            &self.host.folder.display()
+            self.host.folder.display()
         );
         channel.exec(&cmd)?;
         let mut raw = String::new();
@@ -763,13 +763,8 @@ impl<'a> Tempfile<'a> {
     }
 }
 
+#[derive(Default)]
 struct InteractivePrompt {}
-
-impl Default for InteractivePrompt {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl KeyboardInteractivePrompt for InteractivePrompt {
     fn prompt<'a>(
@@ -794,7 +789,7 @@ impl KeyboardInteractivePrompt for InteractivePrompt {
             .map(|p| {
                 if p.echo {
                     dialoguer::Input::new()
-                        .with_prompt(&p.text.to_string())
+                        .with_prompt(p.text.to_string())
                         .allow_empty(true)
                         .interact_text()
                         .unwrap_or_default()

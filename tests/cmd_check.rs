@@ -12,7 +12,7 @@ fn ensure_return_code_failed_check() -> Result<()> {
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), 256)?;
 
     let output = Command::new("cargo")
-        .args(&[
+        .args([
             "run",
             "--",
             "--loglevel",

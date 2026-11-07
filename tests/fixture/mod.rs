@@ -36,7 +36,7 @@ pub fn ensure_env() -> Result<()> {
 /// Prepare asfa command execution
 pub fn prepare_cmd(host: &str) -> Command {
     let mut cmd = Command::new("cargo");
-    cmd.args(&["run", "--", "--loglevel", "debug", "-H", host]);
+    cmd.args(["run", "--", "--loglevel", "debug", "-H", host]);
     cmd
 }
 

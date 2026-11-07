@@ -77,7 +77,7 @@ impl Command for Verify {
 
         let spinner = {
             if !config.is_silent() {
-                Some(WaitingSpinner::new(format!("{} 0/{}", message, &num_files)))
+                Some(WaitingSpinner::new(format!("{} 0/{}", message, num_files)))
             } else {
                 // Do not print anything if asfa is set to very quiet)
                 None
@@ -101,7 +101,7 @@ impl Command for Verify {
             files[..].chunks(chunk_size).zip(hashes_actual).enumerate()
         {
             if let Some(spinner) = spinner.as_ref() {
-                spinner.set_message(format!("{} {}/{}", message, idx * chunk_size, &num_files))?;
+                spinner.set_message(format!("{} {}/{}", message, idx * chunk_size, num_files))?;
             }
             let hashes_actual = hashes_actual?;
             for (file, hash_actual) in files.iter().zip(hashes_actual) {

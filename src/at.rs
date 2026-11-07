@@ -85,7 +85,7 @@ impl<'a> At<'a> {
         tempfile.remove()?;
 
         let pattern = "No atd running?";
-        if submission.stderr().contains(&pattern) {
+        if submission.stderr().contains(pattern) {
             bail!(
                 "There was a problem setting the remote file to expire: \
                 atd does not appear to be running. Please investigate!\n\
@@ -93,7 +93,7 @@ impl<'a> At<'a> {
                 submission
                     .stderr()
                     .lines()
-                    .filter(|l| l.contains(&pattern))
+                    .filter(|l| l.contains(pattern))
                     .collect::<Vec<&str>>()
                     .join("\n")
             );

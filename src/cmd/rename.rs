@@ -37,7 +37,7 @@ enum IndexOrFile<'a> {
 }
 
 impl Rename {
-    fn parse_input(&self) -> IndexOrFile {
+    fn parse_input(&self) -> IndexOrFile<'_> {
         use IndexOrFile::*;
         match self.input.parse::<i64>() {
             Ok(idx) => Index(idx),
@@ -105,7 +105,7 @@ impl Command for Rename {
         };
         let path_new = {
             let mut path = host.folder.clone();
-            path.push(&hash);
+            path.push(hash);
             path.push(&self.filename);
             path
         };
@@ -116,12 +116,12 @@ impl Command for Rename {
             path_new.display().to_string().replace("'", "")
         ))?;
 
-        let url_new = host.get_url(&format!("{}/{}", hash.display(), &self.filename.display()))?;
+        let url_new = host.get_url(&format!("{}/{}", hash.display(), self.filename.display()))?;
         if !config.is_silent() {
             // Only print fancy boxes if we are attached to a TTY -> otherwise, just dump data in
             // parseable format
             if std::io::stdout().is_terminal() {
-                let content = vec![format!(
+                let content = [format!(
                     " {old} → {new} ",
                     old = Style::new().red().bright().apply_to(
                         old_path_relative
@@ -129,10 +129,10 @@ impl Command for Rename {
                             .map(|s| s.to_string_lossy())
                             .with_context(|| "Invalid remote file name")?
                     ),
-                    new = &url_new
+                    new = url_new
                 )];
                 draw_boxed(
-                    &Style::new()
+                    Style::new()
                         .bold()
                         .green()
                         .bright()
@@ -142,7 +142,7 @@ impl Command for Rename {
                     &color::frame,
                 )?;
             } else {
-                println!("{}", &url_new);
+                println!("{}", url_new);
             }
         }
         Ok(())

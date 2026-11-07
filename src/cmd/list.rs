@@ -114,7 +114,7 @@ impl Command for List {
                 println!();
             } else {
                 let content = to_list.format_files(
-                    Some(&session.host),
+                    Some(session.host),
                     self.filenames,
                     show_details || self.with_size,
                     show_details || self.with_time,

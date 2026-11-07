@@ -64,7 +64,7 @@ fn try_main() -> Result<()> {
     trace!("Config file: {:#?}", cfg);
     trace!("Host: {:?}", host);
 
-    let session = SshSession::connect(&host)?;
+    let session = SshSession::connect(host)?;
 
     use cli::UserCommand::*;
     match opts.cmd {

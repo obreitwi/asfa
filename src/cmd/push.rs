@@ -94,16 +94,12 @@ impl Push {
         let hash = get_hash(to_upload, prefix_length)
             .with_context(|| format!("Could not read {} to compute hash.", to_upload.display()))?;
 
-        let expirer = if let Some(delay) = self
-            .expire
-            .as_ref()
-            .or_else(|| session.host.expire.as_ref())
-        {
+        let expirer = if let Some(delay) = self.expire.as_ref().or(session.host.expire.as_ref()) {
             // Allow for explicit disabling term that overwrites a possibly set default
             if ["no", "none", "disabled", "false"].contains(&delay.as_str()) {
                 None
             } else {
-                Some(At::new(session, &delay)?)
+                Some(At::new(session, delay)?)
             }
         } else {
             None
@@ -117,7 +113,7 @@ impl Push {
 
         // TODO: Maybe check if file exists already.
         session.upload_file(
-            &to_upload,
+            to_upload,
             &target,
             self.limit_mbits
                 .map(|f| {
@@ -149,7 +145,7 @@ impl Push {
         }
 
         if let Some(group) = &session.host.group {
-            session.adjust_group(&folder, &group)?;
+            session.adjust_group(&folder, group)?;
         };
 
         let expiration_date = if let Some(expirer) = expirer {
@@ -169,9 +165,7 @@ impl Push {
         }
         println!(
             "{}",
-            session
-                .host
-                .get_url(&format!("{}/{}", &hash, &target_name))?,
+            session.host.get_url(&format!("{}/{}", hash, target_name))?,
         );
 
         Ok(())

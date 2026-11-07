@@ -112,7 +112,7 @@ impl Command for Clean {
 
         if do_delete {
             for (_, file, _) in files_to_delete.iter() {
-                remove_file(&file)?
+                remove_file(file)?
             }
         }
 
@@ -128,7 +128,7 @@ impl Clean {
         let formatted_files = files.format_files(None, with_stats, with_stats, with_stats)?;
 
         crate::cli::draw_boxed(
-            &format!(
+            format!(
                 "Will {delete} the following files:",
                 delete = console::Style::new()
                     .bold()

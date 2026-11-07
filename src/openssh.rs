@@ -45,7 +45,7 @@ impl OpenSshConfig {
         if !Self::check_prerequisites()? {
             return Err(OpenSshError::ExecutableNotFound);
         }
-        let output = String::from_utf8(Command::new("ssh").args(&["-G", host]).output()?.stdout)?;
+        let output = String::from_utf8(Command::new("ssh").args(["-G", host]).output()?.stdout)?;
 
         use OpenSshConfigEntry::*;
 

@@ -12,7 +12,7 @@ fn ensure_renaming() -> Result<()> {
     let local = fixture::make_random_file(fixture::random_filename(12, "txt"), 256)?;
 
     let upload = prepare_cmd(host)
-        .args(&["push", &local.to_string_lossy()])
+        .args(["push", &local.to_string_lossy()])
         .spawn()?
         .wait()?;
 
@@ -22,7 +22,7 @@ fn ensure_renaming() -> Result<()> {
 
     let rename_to = "foobar";
     let rename = prepare_cmd(host)
-        .args(&["rename", &local.to_string_lossy(), rename_to])
+        .args(["rename", &local.to_string_lossy(), rename_to])
         .spawn()?
         .wait()?;
     if !rename.success() {
@@ -39,7 +39,7 @@ fn ensure_renaming() -> Result<()> {
 
     let rename_to = "barfoo";
     let rename = prepare_cmd(host)
-        .args(&["mv", "-1", rename_to])
+        .args(["mv", "-1", rename_to])
         .spawn()?
         .wait()?;
     if !rename.success() {

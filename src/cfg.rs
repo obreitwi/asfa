@@ -221,7 +221,7 @@ impl Config {
                 };
 
                 let host_yaml = YamlLoader::load_from_str(&read_to_string(&possible_host)?)?;
-                let error = format!("Invalid host-file for host {}", &alias);
+                let error = format!("Invalid host-file for host {}", alias);
                 let host =
                     Host::from_yaml_with_config(alias, &host_yaml[0], &config).context(error)?;
 
@@ -257,7 +257,7 @@ impl Config {
         };
 
         config.auth = if let Some(Yaml::Hash(auth)) = config_yaml.get(&yaml_string("auth")) {
-            match Auth::from_yaml(&auth, None) {
+            match Auth::from_yaml(auth, None) {
                 Ok(auth) => auth,
                 Err(e) => {
                     bail!("Could not read global authentication settings: {}", e);
@@ -313,7 +313,7 @@ impl Config {
         match alias
             .as_ref()
             .map(|a| a.as_ref())
-            .or_else(|| self.default_host.as_deref())
+            .or(self.default_host.as_deref())
         {
             None => match self.hosts.len() {
                 0 => {
@@ -396,7 +396,7 @@ impl Host {
     pub fn get_url(&self, file: &str) -> Result<String> {
         Ok(format!(
             "{}/{}",
-            &self.url,
+            self.url,
             utf8_percent_encode(file, CONTROLS_ENHANCED)
         ))
     }

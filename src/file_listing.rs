@@ -48,7 +48,7 @@ impl<'a> FileListing<'a> {
                         .iter()
                         .map(|(idx, p)| (idx, p.as_path()))
                         .filter(|(_, path)| {
-                            re.is_match(&path.file_name().unwrap().to_string_lossy().to_string())
+                            re.is_match(path.file_name().unwrap().to_string_lossy().as_ref())
                         })
                         .map(|(idx, _)| *idx)
                         .collect();
@@ -175,7 +175,7 @@ impl<'a> FileListing<'a> {
                 let indices = self
                     .indices
                     .into_iter()
-                    .skip(if num_indices > n { num_indices - n } else { 0 })
+                    .skip(num_indices.saturating_sub(n))
                     .collect();
                 Self { indices, ..self }
             }
@@ -336,7 +336,7 @@ impl<'a> FileListing<'a> {
                 .map(|i| self.all_files.get(i).unwrap().as_path());
             let idx = self.indices.iter().copied();
             let raw_stats = self.ssh.stat(paths)?;
-            self.stats = Some(idx.zip(raw_stats.into_iter()).collect());
+            self.stats = Some(idx.zip(raw_stats).collect());
         }
         Ok(())
     }
@@ -435,9 +435,9 @@ impl<'a> Iterator for FileListingIter<'a> {
     type Item = (usize, &'a Path, Option<&'a FileStat>);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let (idx, file) = match self.iter_idx.next().cloned() {
-            Some(idx) => (idx, self.files.get(&idx).unwrap()),
-            None => return None,
+        let (idx, file) = {
+            let idx = self.iter_idx.next().cloned()?;
+            (idx, self.files.get(&idx).unwrap())
         };
         let stat = self.stats.map(|s| s.get(&idx).unwrap());
 

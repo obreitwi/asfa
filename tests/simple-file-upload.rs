@@ -259,7 +259,7 @@ fn run_simple_uploads() -> Result<()> {
     )?;
     simple_file_upload_speed_limited(
         "asfa-ci-key",
-        1 * 1024 * 1024 / 8, /* = 1 Mbit */
+        1024 * 1024 / 8, /* = 1 Mbit */
         "--limit-mbits 0.1",
         Duration::from_secs(9),
     )?;
